@@ -23,14 +23,21 @@ import { toast } from 'sonner';
 export const LoginScreen = () => {
   const { login } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
-  const [username, setUsername] = useState('');
+  const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!username || !password) {
-      toast.error('Please enter both username and password');
+    const idPattern = /^\d{4}[A-Z]$/;
+
+    if (!ID || !password) {
+      toast.error('Please enter both ID and password');
+      return;
+    }
+
+    if (!idPattern.test(ID)) {
+      toast.error('ID must be exactly four digits followed by one uppercase letter');
       return;
     }
 
@@ -42,16 +49,14 @@ export const LoginScreen = () => {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-medsuite-light to-white p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          {/* ✅ Logo Image */}
           <img
             src="/logo.png"
             alt="Sonatrach MedSuite Logo"
-            className="mx-auto mb-4 h-32 w-auto" // Increased from h-20 to h-32
+            className="mx-auto mb-4 h-32 w-auto"
           />
           <h4 className="text-3xl font-bold text-medsuite-dark mb-3">
             Sonatrach MedSuite
           </h4>
-          {/* <p className="text-medsuite-gray">Employee Healthcare Platform</p> */}
         </div>
 
         <Card className="border-medsuite-primary/20">
@@ -98,12 +103,12 @@ export const LoginScreen = () => {
             <form onSubmit={handleLogin}>
               <div className="grid gap-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="ID">ID</Label>
                   <Input
-                    id="username"
-                    placeholder="Enter your username"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    id="ID"
+                    placeholder="Enter your ID"
+                    value={ID}
+                    onChange={(e) => setID(e.target.value)}
                   />
                 </div>
 
@@ -135,13 +140,6 @@ export const LoginScreen = () => {
               </div>
             </form>
           </CardContent>
-
-          {/* Optional footer note */}
-          {/* <CardFooter>
-            <p className="text-xs text-center w-full text-muted-foreground">
-              This is a demo application. Any username and password will work.
-            </p>
-          </CardFooter> */}
         </Card>
       </div>
     </div>
