@@ -19,12 +19,25 @@ import {
 import { Briefcase, Stethoscope } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export const LoginScreen = () => {
   const { login } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
   const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const specialties = [
+    'Cardiology',
+    'Dermatology',
+    'Pediatrics',
+    'Neurology',
+    'Ophthalmology',
+    'Orthopedics',
+    'General Surgery',
+    'Internal Medicine',
+    'Other',
+  ];
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,13 +49,18 @@ export const LoginScreen = () => {
       return;
     }
 
+    if (selectedRole === 'doctor' && !specialty) {
+      toast.error('Please select your specialty');
+      return;
+    }
+
     if (!idPattern.test(ID)) {
       toast.error('ID must be exactly four digits followed by one uppercase letter');
       return;
     }
 
     login(selectedRole);
-    toast.success(`Logged in as ${selectedRole}`);
+    toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
   };
 
   return (
@@ -102,6 +120,23 @@ export const LoginScreen = () => {
 
             <form onSubmit={handleLogin}>
               <div className="grid gap-4">
+                {selectedRole === 'doctor' && (
+                  <div className="grid gap-2">
+                    <Label htmlFor="specialty">Specialty</Label>
+                    <Select value={specialty} onValueChange={setSpecialty}>
+                      <SelectTrigger id="specialty">
+                        <SelectValue placeholder="Select your specialty" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {specialties.map((spec) => (
+                          <SelectItem key={spec} value={spec}>
+                            {spec}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
                 <div className="grid gap-2">
                   <Label htmlFor="ID">ID</Label>
                   <Input
