@@ -9,6 +9,9 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import AppointmentsPage from "./pages/AppointmentsPage";
 import RecordsPage from "./pages/RecordsPage";
+import ConsultationsPage from "./pages/CONSULTATIONS";
+import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
+
 import PrescriptionsPage from "./pages/PrescriptionsPage";
 // import MessagesPage from "./pages/MessagesPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -39,6 +42,8 @@ const App = () => (
             <Route path="/doctors/add" element={<AddDoctorPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
+            <Route path="/consultations" element={<ConsultationsPage />} />
+            <Route path="/dossiers-medicaux" element={<DossiersMedicauxPage />} />
             <Route path="/departments/add" element={<AddDepartmentPage />} />
             <Route path="/stats" element={<StatsPage />} />
             <Route path="*" element={<NotFound />} />
