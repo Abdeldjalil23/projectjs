@@ -31,8 +31,8 @@ export const LoginScreen = () => {
     'MEDECINE',
     'DENTISTE',
     'INFERMIER',
-    'SOSIALE'
-    
+    'SOSIALE',
+
   ];
 
   const handleLogin = (e: React.FormEvent) => {
