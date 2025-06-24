@@ -31,6 +31,7 @@ export const LoginScreen = () => {
     'MEDECINE',
     'DENTISTE',
     'INFERMIER',
+    'SOSIALE'
     
   ];
 
