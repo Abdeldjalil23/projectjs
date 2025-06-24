@@ -113,40 +113,7 @@ export const DoctorDashboard = () => {
           </CardContent>
         </Card>
         
-        <Card className="col-span-1">
-          <CardHeader className="pb-3">
-            <CardTitle>Recent Patients</CardTitle>
-            <CardDescription>Patients you've recently treated</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[320px] pr-4">
-              <div className="space-y-4">
-                {recentPatients.map((patient) => (
-                  <div key={patient.id} className="flex items-start justify-between border-b pb-3">
-                    <div className="flex items-center space-x-3">
-                      <Avatar>
-                        <AvatarFallback className="bg-medsuite-secondary text-medsuite-dark">
-                          {patient.avatar}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="font-medium">{patient.name}</p>
-                        <p className="text-xs text-muted-foreground">{patient.lastVisit}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm">{patient.condition}</p>
-                      <Badge variant={patient.status === 'Review' ? 'secondary' : 'outline'} className="mt-1">
-                        {patient.status}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
-                <Button variant="outline" className="w-full mt-2">View Patient Records</Button>
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
+       
       </div>
     </div>
   );
