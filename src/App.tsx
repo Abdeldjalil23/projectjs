@@ -11,6 +11,8 @@ import AppointmentsPage from "./pages/AppointmentsPage";
 import RecordsPage from "./pages/RecordsPage";
 import ConsultationsPage from "./pages/CONSULTATIONS";
 import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
+import SyntheseActivitesPage from './pages/SyntheseActivitesPage';
+import VisitePeriodiquePage from './pages/VisitePeriodiquePage';
 
 import PrescriptionsPage from "./pages/PrescriptionsPage";
 // import MessagesPage from "./pages/MessagesPage";
@@ -47,6 +49,8 @@ const App = () => (
             <Route path="/departments/add" element={<AddDepartmentPage />} />
             <Route path="/stats" element={<StatsPage />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/synthese-activites" element={<SyntheseActivitesPage />} />
+            <Route path="/visite-periodique" element={<VisitePeriodiquePage />} />
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
