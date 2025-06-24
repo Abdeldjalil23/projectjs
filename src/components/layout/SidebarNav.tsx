@@ -31,6 +31,11 @@ export const SidebarNav = () => {
         { title: 'Appointments', icon: Calendar, url: '/appointments' },
         { title: 'Patient Records', icon: FileText, url: '/records' },
         { title: 'Prescriptions', icon: Pill, url: '/prescriptions' },
+        // New Pages
+        { title: 'Consultations', icon: FileText, url: '/consultations' },
+        { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
+        { title: 'Synthèse des Activités de Médecin', icon: FileText, url: '/synthese-activites' },
+        { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
       ]);
     } else if (userRole === 'admin') {
       setMenuItems([
