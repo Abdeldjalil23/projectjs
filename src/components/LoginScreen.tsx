@@ -28,15 +28,10 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [specialty, setSpecialty] = useState('');
   const specialties = [
-    'Cardiology',
-    'Dermatology',
-    'Pediatrics',
-    'Neurology',
-    'Ophthalmology',
-    'Orthopedics',
-    'General Surgery',
-    'Internal Medicine',
-    'Other',
+    'MEDECINE',
+    'DENTISTE',
+    'INFERMIER',
+    
   ];
 
   const handleLogin = (e: React.FormEvent) => {
