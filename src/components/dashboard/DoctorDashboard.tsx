@@ -8,7 +8,6 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 
 export const DoctorDashboard = () => {
   const upcomingAppointments = [
-    { id: 1, patient: 'Ahmed Ali', time: '09:30 AM', status: 'Confirmed', type: 'Check-up', avatar: 'AA' },
     { id: 2, patient: 'Sara Rahim', time: '10:15 AM', status: 'Waiting', type: 'Follow-up', avatar: 'SR' },
     { id: 3, patient: 'Mohammed Hassan', time: '11:00 AM', status: 'Confirmed', type: 'Consultation', avatar: 'MH' },
     { id: 4, patient: 'Fatima Zahra', time: '12:30 PM', status: 'Confirmed', type: 'Check-up', avatar: 'FZ' },
