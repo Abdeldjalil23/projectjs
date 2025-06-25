@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,9 +10,6 @@ import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
 import VisitePeriodiquePage from './pages/VisitePeriodiquePage';
 import DossierDetailsPage from './pages/DossierDetailsPage';
 import NouvelleConsultation from './pages/Nouvelleconsultation';
-import LetterOrientation from './pages/LetterOrientation';
-
-
 import PrescriptionsPage from "./pages/PrescriptionsPage";
 import SettingsPage from "./pages/SettingsPage";
 import DoctorsPage from "./pages/admin/DoctorsPage";
@@ -37,7 +33,6 @@ const App = () => (
             <Route path="/prescriptions" element={<PrescriptionsPage />} />
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/doctors" element={<DoctorsPage />} />
-            <Route path="/letterorientation" element={<LetterOrientation />} />
             <Route path="/doctors/add" element={<AddDoctorPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />

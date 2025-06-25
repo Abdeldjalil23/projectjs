@@ -13,6 +13,15 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogClose
+} from '@/components/ui/dialog';
 
 const types = [
   {
@@ -59,8 +68,40 @@ const types = [
   },
 ];
 
+const ordonnanceForm = (
+  <form className="space-y-4 print:bg-white">
+    <div>
+      <label className="block mb-1 font-medium">اسم المريض</label>
+      <input type="text" className="input input-bordered w-full" placeholder="اسم المريض" />
+    </div>
+    <div>
+      <label className="block mb-1 font-medium">اسم الطبيب</label>
+      <input type="text" className="input input-bordered w-full" placeholder="اسم الطبيب" />
+    </div>
+    <div>
+      <label className="block mb-1 font-medium">تاريخ الوصفة</label>
+      <input type="date" className="input input-bordered w-full" />
+    </div>
+    <div>
+      <label className="block mb-1 font-medium">الأدوية</label>
+      <textarea className="input input-bordered w-full min-h-[80px]" placeholder="اسم الدواء - الجرعة - المدة..." />
+    </div>
+    <div className="flex gap-2 justify-end">
+      <Button type="button" variant="outline" onClick={() => window.print()}>طباعة</Button>
+    </div>
+  </form>
+);
+
 const NouvelleConsultation = () => {
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [selectedType, setSelectedType] = useState(null);
+
+  const handleDemander = (type) => {
+    setSelectedType(type);
+    setOpen(true);
+  };
+
   return (
     <AppLayout title="Nouvelle Consultation">
       <div className="p-4 max-w-5xl mx-auto flex flex-col min-h-[80vh]">
@@ -71,7 +112,7 @@ const NouvelleConsultation = () => {
               {type.icon}
               <div className="font-bold text-lg mb-1">{type.title}</div>
               <div className="text-muted-foreground mb-4 text-sm">{type.desc}</div>
-              <Button variant="outline">{type.action}</Button>
+              <Button variant="outline" onClick={() => handleDemander(type)}>{type.action}</Button>
             </Card>
           ))}
         </div>
@@ -81,6 +122,34 @@ const NouvelleConsultation = () => {
             Retour
           </Button>
         </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>
+                {selectedType && selectedType.title === 'Ordonnance' ? 'وصفة طبية جديدة' : 'Demande de service'}
+              </DialogTitle>
+              <DialogDescription>
+                {selectedType ? (
+                  <div>
+                    <div className="flex flex-col items-center mb-4">
+                      {selectedType.icon}
+                      <div className="font-bold text-lg mt-2">{selectedType.title}</div>
+                    </div>
+                    <div className="text-center text-muted-foreground mb-2">{selectedType.desc}</div>
+                  </div>
+                ) : null}
+              </DialogDescription>
+            </DialogHeader>
+            {selectedType && selectedType.title === 'Ordonnance' ? (
+              <div className="mt-4">{ordonnanceForm}</div>
+            ) : null}
+            <div className="flex justify-end mt-4">
+              <DialogClose asChild>
+                <Button variant="outline">Fermer</Button>
+              </DialogClose>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AppLayout>
   );
