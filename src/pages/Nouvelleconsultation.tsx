@@ -23,6 +23,31 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 
+// كود CSS للطباعة فقط الوصفة
+const printStyles = `
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .printable-ordonnance, .printable-ordonnance * {
+    visibility: visible !important;
+  }
+  .printable-ordonnance {
+    position: absolute !important;
+    left: 0; top: 0;
+    width: 100vw !important;
+    background: white !important;
+    color: black !important;
+    box-shadow: none !important;
+    padding: 32px !important;
+    margin: 0 !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+}
+`;
+
 const types = [
   {
     icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />,
@@ -69,25 +94,29 @@ const types = [
 ];
 
 const ordonnanceForm = (
-  <form className="space-y-4 print:bg-white">
+  <form className="space-y-4 printable-ordonnance bg-white rounded shadow p-6">
+    <div className="text-center mb-6">
+      <h2 className="text-2xl font-bold mb-2">وصفة طبية</h2>
+      <p className="text-muted-foreground text-sm">Prescription médicale</p>
+    </div>
     <div>
       <label className="block mb-1 font-medium">اسم المريض</label>
-      <input type="text" className="input input-bordered w-full" placeholder="اسم المريض" />
+      <input type="text" className="input input-bordered w-full border p-2 rounded" placeholder="اسم المريض" />
     </div>
     <div>
       <label className="block mb-1 font-medium">اسم الطبيب</label>
-      <input type="text" className="input input-bordered w-full" placeholder="اسم الطبيب" />
+      <input type="text" className="input input-bordered w-full border p-2 rounded" placeholder="اسم الطبيب" />
     </div>
     <div>
       <label className="block mb-1 font-medium">تاريخ الوصفة</label>
-      <input type="date" className="input input-bordered w-full" />
+      <input type="date" className="input input-bordered w-full border p-2 rounded" />
     </div>
     <div>
       <label className="block mb-1 font-medium">الأدوية</label>
-      <textarea className="input input-bordered w-full min-h-[80px]" placeholder="اسم الدواء - الجرعة - المدة..." />
+      <textarea className="input input-bordered w-full min-h-[80px] border p-2 rounded" placeholder="اسم الدواء - الجرعة - المدة..." />
     </div>
-    <div className="flex gap-2 justify-end">
-      <Button type="button" variant="outline" onClick={() => window.print()}>طباعة</Button>
+    <div className="flex gap-2 justify-end mt-6">
+      <Button type="button" variant="outline" onClick={() => window.print()} className="ml-2">طباعة</Button>
     </div>
   </form>
 );
@@ -96,6 +125,16 @@ const NouvelleConsultation = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState(null);
+
+  // إضافة كود CSS للطباعة لمرة واحدة فقط
+  React.useEffect(() => {
+    const style = document.createElement('style');
+    style.innerHTML = printStyles;
+    document.head.appendChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   const handleDemander = (type) => {
     setSelectedType(type);
@@ -145,7 +184,7 @@ const NouvelleConsultation = () => {
             ) : null}
             <div className="flex justify-end mt-4">
               <DialogClose asChild>
-                <Button variant="outline">Fermer</Button>
+                <Button variant="outline" className="no-print">Fermer</Button>
               </DialogClose>
             </div>
           </DialogContent>
