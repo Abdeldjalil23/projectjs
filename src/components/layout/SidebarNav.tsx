@@ -28,8 +28,6 @@ export const SidebarNav = () => {
     if (userRole === 'doctor') {
       setMenuItems([
         { title: 'Dashboard', icon: Home, url: '/' },
-        { title: 'Appointments', icon: Calendar, url: '/appointments' },
-        { title: 'Patient Records', icon: FileText, url: '/records' },
         { title: 'Prescriptions', icon: Pill, url: '/prescriptions' },
         // New Pages
         { title: 'Consultations', icon: FileText, url: '/consultations' },

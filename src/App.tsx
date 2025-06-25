@@ -7,15 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
-import AppointmentsPage from "./pages/AppointmentsPage";
-import RecordsPage from "./pages/RecordsPage";
 import ConsultationsPage from "./pages/CONSULTATIONS";
 import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
 import SyntheseActivitesPage from './pages/SyntheseActivitesPage';
 import VisitePeriodiquePage from './pages/VisitePeriodiquePage';
 
 import PrescriptionsPage from "./pages/PrescriptionsPage";
-// import MessagesPage from "./pages/MessagesPage";
 import SettingsPage from "./pages/SettingsPage";
 import DoctorsPage from "./pages/admin/DoctorsPage";
 import AddDoctorPage from "./pages/admin/AddDoctorPage";
@@ -35,8 +32,6 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/appointments" element={<AppointmentsPage />} />
-            <Route path="/records" element={<RecordsPage />} />
             <Route path="/prescriptions" element={<PrescriptionsPage />} />
             {/* <Route path="/messages" element={<MessagesPage />} /> */}
             <Route path="/settings" element={<SettingsPage />} />
