@@ -30,9 +30,7 @@ export const SidebarNav = () => {
         { title: 'Dashboard', icon: Home, url: '/' },
         { title: 'Prescriptions', icon: Pill, url: '/prescriptions' },
         // New Pages
-        { title: 'Consultations', icon: FileText, url: '/consultations' },
         { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
-        { title: 'Synthèse des Activités de Médecin', icon: FileText, url: '/synthese-activites' },
         { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
       ]);
     } else if (userRole === 'admin') {
