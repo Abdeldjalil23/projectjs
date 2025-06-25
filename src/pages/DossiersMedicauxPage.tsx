@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ClipboardList } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 const DossiersMedicauxPage = () => {
   const { userRole } = useAuth();
+  const navigate = useNavigate();
 
   const records = [
     {
@@ -85,7 +87,12 @@ const DossiersMedicauxPage = () => {
                           <TableCell>{record.structure}</TableCell>
                           <TableCell>{record.email}</TableCell>
                           <TableCell>
-                            <Button variant="secondary" size="sm" className="flex items-center">
+                            <Button
+                              variant="secondary"
+                              size="sm"
+                              className="flex items-center"
+                              onClick={() => navigate(`/dossier/${record.id}`)}
+                            >
                               <ClipboardList className="w-4 h-4 mr-1" />
                               Voir
                             </Button>

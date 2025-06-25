@@ -9,6 +9,9 @@ import NotFound from "./pages/NotFound";
 import { AuthProvider } from "./context/AuthContext";
 import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
 import VisitePeriodiquePage from './pages/VisitePeriodiquePage';
+import DossierDetailsPage from './pages/DossierDetailsPage';
+import NouvelleConsultation from './pages/Nouvelleconsultation';
+
 
 import PrescriptionsPage from "./pages/PrescriptionsPage";
 import SettingsPage from "./pages/SettingsPage";
@@ -40,7 +43,9 @@ const App = () => (
             <Route path="/dossiers-medicaux" element={<DossiersMedicauxPage />} />
             <Route path="/departments/add" element={<AddDepartmentPage />} />
             <Route path="/stats" element={<StatsPage />} />
+            <Route path="/dossier/:id/nouvelle-consultation" element={<NouvelleConsultation />} />
             <Route path="*" element={<NotFound />} />
+            <Route path="/dossier/:id" element={<DossierDetailsPage />} />
             <Route path="/visite-periodique" element={<VisitePeriodiquePage />} />
           </Routes>
         </BrowserRouter>
