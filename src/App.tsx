@@ -11,6 +11,7 @@ import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
 import VisitePeriodiquePage from './pages/VisitePeriodiquePage';
 import DossierDetailsPage from './pages/DossierDetailsPage';
 import NouvelleConsultation from './pages/Nouvelleconsultation';
+import LetterOrientation from './pages/LetterOrientation';
 
 
 import PrescriptionsPage from "./pages/PrescriptionsPage";
@@ -34,9 +35,9 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/prescriptions" element={<PrescriptionsPage />} />
-            {/* <Route path="/messages" element={<MessagesPage />} /> */}
             <Route path="/settings" element={<SettingsPage />} />
             <Route path="/doctors" element={<DoctorsPage />} />
+            <Route path="/letterorientation" element={<LetterOrientation />} />
             <Route path="/doctors/add" element={<AddDoctorPage />} />
             <Route path="/reports" element={<ReportsPage />} />
             <Route path="/departments" element={<DepartmentsPage />} />
