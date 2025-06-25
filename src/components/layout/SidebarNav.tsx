@@ -9,8 +9,8 @@ import {
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { 
-  Home, Calendar, FileText, User, Users, BarChart3, Settings, 
-  LogOut, Bell, MessageSquare, Pill, HeartPulse
+  Home, FileText, User, Users, BarChart3, Settings, 
+  LogOut, Bell, Pill, HeartPulse
 } from 'lucide-react';
 
 type MenuItem = {
@@ -112,14 +112,15 @@ export const SidebarNav = () => {
       </SidebarContent>
       <SidebarFooter>
         <Button 
-          variant="outline" 
-          className="w-full justify-start" 
+          variant="outline"
+          className="w-full justify-start border-orange-500 text-orange-500"
           onClick={logout}
         >
           <LogOut className="mr-2 h-4 w-4" />
           Sign Out
         </Button>
       </SidebarFooter>
+
     </Sidebar>
   );
 };

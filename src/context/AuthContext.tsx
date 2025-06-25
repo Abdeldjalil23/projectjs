@@ -1,7 +1,8 @@
-
+// src/context/AuthContext.tsx
 import { createContext, useContext, useState, ReactNode } from 'react';
+import { NavigateFunction } from 'react-router-dom';
 
-export type UserRole = 'doctor' | 'admin' | 'patient' | null;
+export type UserRole = 'admin' | 'doctor' | 'patient' | null;
 
 interface AuthContextType {
   userRole: UserRole;
@@ -21,7 +22,7 @@ const AuthContext = createContext<AuthContextType>({
 
 export const useAuth = () => useContext(AuthContext);
 
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+export const AuthProvider = ({ children, navigate }: { children: ReactNode; navigate: NavigateFunction }) => {
   const [userRole, setUserRole] = useState<UserRole>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
@@ -33,6 +34,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUserRole(null);
     setIsLoggedIn(false);
+    navigate('/login');
   };
 
   return (

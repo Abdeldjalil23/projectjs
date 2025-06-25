@@ -1,39 +1,34 @@
+// src/pages/LoginPage.tsx
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; // ✅ التوجيه
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
+  Card, CardContent, CardDescription, CardFooter,
+  CardHeader, CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
+  Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
 import { Briefcase, Stethoscope } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import {
+  Select, SelectContent, SelectItem,
+  SelectTrigger, SelectValue
+} from '@/components/ui/select';
 
 export const LoginScreen = () => {
   const { login } = useAuth();
+  const navigate = useNavigate(); // ✅
+
   const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
   const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
   const [specialty, setSpecialty] = useState('');
-  const specialties = [
-    'MEDECINE',
-    'DENTISTE',
-    'INFERMIER',
-    'SOSIALE',
 
-  ];
+  const specialties = ['MEDECINE', 'DENTISTE', 'INFERMIER', 'SOSIALE'];
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,20 +52,21 @@ export const LoginScreen = () => {
 
     login(selectedRole);
     toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
+
+    // ✅ توجيه المستخدم بعد تسجيل الدخول
+    if (selectedRole === 'admin') {
+      navigate('/admin');
+    } else if (selectedRole === 'doctor') {
+      navigate('/'); // الصفحة الرئيسية للطبيب
+    }
   };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-medsuite-light to-white p-4">
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
-          <img
-            src="/logo.png"
-            alt="Sonatrach MedSuite Logo"
-            className="mx-auto mb-4 h-32 w-auto"
-          />
-          <h4 className="text-3xl font-bold text-medsuite-dark mb-3">
-            Sonatrach MedSuite
-          </h4>
+          <img src="/logo.png" alt="Sonatrach MedSuite Logo" className="mx-auto mb-4 h-32 w-auto" />
+          <h4 className="text-3xl font-bold text-medsuite-dark mb-3">Sonatrach MedSuite</h4>
         </div>
 
         <Card className="border-medsuite-primary/20">
@@ -86,17 +82,11 @@ export const LoginScreen = () => {
               onValueChange={(value) => setSelectedRole(value as UserRole)}
             >
               <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger
-                  value="doctor"
-                  className="flex items-center gap-1"
-                >
+                <TabsTrigger value="doctor" className="flex items-center gap-1">
                   <Stethoscope className="h-4 w-4" />
                   <span className="hidden sm:inline">Doctor</span>
                 </TabsTrigger>
-                <TabsTrigger
-                  value="admin"
-                  className="flex items-center gap-1"
-                >
+                <TabsTrigger value="admin" className="flex items-center gap-1">
                   <Briefcase className="h-4 w-4" />
                   <span className="hidden sm:inline">Admin</span>
                 </TabsTrigger>
@@ -133,6 +123,7 @@ export const LoginScreen = () => {
                     </Select>
                   </div>
                 )}
+
                 <div className="grid gap-2">
                   <Label htmlFor="ID">ID</Label>
                   <Input
@@ -146,10 +137,7 @@ export const LoginScreen = () => {
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <a
-                      href="#"
-                      className="text-sm text-medsuite-primary hover:underline"
-                    >
+                    <a href="#" className="text-sm text-medsuite-primary hover:underline">
                       Forgot password?
                     </a>
                   </div>
@@ -162,10 +150,7 @@ export const LoginScreen = () => {
                   />
                 </div>
 
-                <Button
-                  type="submit"
-                  className="bg-medsuite-primary hover:bg-medsuite-accent"
-                >
+                <Button type="submit" className="bg-medsuite-primary hover:bg-medsuite-accent">
                   Sign In
                 </Button>
               </div>
