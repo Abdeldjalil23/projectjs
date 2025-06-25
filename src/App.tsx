@@ -1,7 +1,4 @@
-<<<<<<< HEAD
-=======
 // src/App.tsx
->>>>>>> e3aa0ec28930fc55ba526366997a87a33c203eae
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -10,20 +7,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-<<<<<<< HEAD
-import { AuthProvider } from "./context/AuthContext";
-import DossiersMedicauxPage from './pages/DossiersMedicauxPage';
-import VisitePeriodiquePage from './pages/VisitePeriodiquePage';
-import DossierDetailsPage from './pages/DossierDetailsPage';
-import NouvelleConsultation from './pages/Nouvelleconsultation';
-=======
 import DossiersMedicauxPage from "./pages/DossiersMedicauxPage";
 import VisitePeriodiquePage from "./pages/VisitePeriodiquePage";
 import DossierDetailsPage from "./pages/DossierDetailsPage";
 import NouvelleConsultation from "./pages/Nouvelleconsultation";
-// import LetterOrientation from "./pages/LetterOrientation";
-
->>>>>>> e3aa0ec28930fc55ba526366997a87a33c203eae
 import PrescriptionsPage from "./pages/PrescriptionsPage";
 import SettingsPage from "./pages/SettingsPage";
 import DoctorsPage from "./pages/admin/DoctorsPage";
@@ -46,23 +33,10 @@ const App = () => (
       <BrowserRouter>
         <AuthProviderWithNavigate>
           <Routes>
-<<<<<<< HEAD
-            <Route path="/" element={<Index />} />
-            <Route path="/prescriptions" element={<PrescriptionsPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-            <Route path="/doctors" element={<DoctorsPage />} />
-            <Route path="/doctors/add" element={<AddDoctorPage />} />
-            <Route path="/reports" element={<ReportsPage />} />
-            <Route path="/departments" element={<DepartmentsPage />} />
-            <Route path="/dossiers-medicaux" element={<DossiersMedicauxPage />} />
-            <Route path="/departments/add" element={<AddDepartmentPage />} />
-            <Route path="/stats" element={<StatsPage />} />
-            <Route path="/dossier/:id/nouvelle-consultation" element={<NouvelleConsultation />} />
-=======
-            {/* ✅ صفحة تسجيل الدخول بدون حماية */}
+            {/* صفحة تسجيل الدخول بدون حماية */}
             <Route path="/login" element={<LoginPage />} />
 
-            {/* ✅ صفحات محمية باستخدام PrivateRoute */}
+            {/* صفحات محمية باستخدام PrivateRoute */}
             <Route
               path="/"
               element={
@@ -167,9 +141,7 @@ const App = () => (
                 </PrivateRoute>
               }
             />
-
             {/* صفحة 404 */}
->>>>>>> e3aa0ec28930fc55ba526366997a87a33c203eae
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProviderWithNavigate>
