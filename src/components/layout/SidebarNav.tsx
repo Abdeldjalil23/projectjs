@@ -31,7 +31,6 @@ export const SidebarNav = () => {
         { title: 'Prescriptions', icon: Pill, url: '/prescriptions' },
         // New Pages
         { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
-        { title: 'Lettre de Orientation', icon: FileText, url: '/letterorientation' },
         { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
       ]);
     } else if (userRole === 'admin') {
