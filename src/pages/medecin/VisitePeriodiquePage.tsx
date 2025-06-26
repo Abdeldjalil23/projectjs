@@ -1,39 +1,79 @@
-import { useAuth } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext'; // Keep if used for filtering data upstream
 import AppLayout from '@/components/layout/AppLayout';
 import {
   Card, CardHeader, CardTitle, CardDescription, CardContent,
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Clock, MapPin, User } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const VisitePeriodiquePage = () => {
-  const { userRole } = useAuth();
+  // const { userRole } = useAuth(); // You might use this to fetch/filter data
 
+  // Sample data adjusted for the new columns
+  // You'll need to fetch or structure your actual data similarly
   const visites = [
     {
-      id: 1,
-      date: new Date(),
-      time: '09:00',
-      patient: 'Noureddine Touati',
-      doctor: 'Dr. Amel Kherbache',
-      location: 'Centre Médical Bloc A',
+      numeroVisite: 'VP2024-001',
       type: 'Visite annuelle',
-      status: 'Terminée',
+      date: new Date('2024-07-15'),
+      agent: {
+        matricule: 'M10234',
+        nom: 'Touati',
+        prenom: 'Noureddine',
+        structure: 'Département IT',
+      },
+      medecin: 'Dr. Amel Kherbache',
+      infirmier: 'Inf. Samira Lido',
     },
     {
-      id: 2,
-      date: new Date(Date.now() + 86400000),
-      time: '11:00',
-      patient: 'Imane Gaci',
-      doctor: 'Dr. Amel Kherbache',
-      location: 'Centre Médical Bloc B',
-      type: 'Suivi post-visite',
-      status: 'Planifiée',
+      numeroVisite: 'VP2024-002',
+      type: 'Suivi post-opératoire',
+      date: new Date('2024-07-22'),
+      agent: {
+        matricule: 'M10235',
+        nom: 'Gaci',
+        prenom: 'Imane',
+        structure: 'Service Commercial',
+      },
+      medecin: 'Dr. Amel Kherbache',
+      infirmier: 'Inf. Karim Belkacem',
+    },
+    {
+      numeroVisite: 'VP2024-003',
+      type: 'Visite d\'embauche',
+      date: new Date('2024-06-10'),
+      agent: {
+        matricule: 'M10236',
+        nom: 'Benmohamed',
+        prenom: 'Ali',
+        structure: 'Direction Générale',
+      },
+      medecin: 'Dr. Farid Lounis',
+      infirmier: 'Inf. Samira Lido',
+    },
+    {
+      numeroVisite: 'VP2024-004',
+      type: 'Contrôle Périodique',
+      date: new Date('2024-08-01'),
+      agent: {
+        matricule: 'M10237',
+        nom: 'Salah',
+        prenom: 'Fatima',
+        structure: 'Ressources Humaines',
+      },
+      medecin: 'Dr. Sonia Cherif',
+      infirmier: 'Inf. Karim Belkacem',
     },
   ];
 
-  const isPatient = userRole === 'patient';
-  const pageTitle = 'Visites Périodiques';
+  const pageTitle = 'Suivi des Visites Médicales'; // Updated title for a more general/admin view
 
   return (
     <AppLayout title={pageTitle}>
@@ -42,44 +82,49 @@ const VisitePeriodiquePage = () => {
           <CardHeader>
             <CardTitle>{pageTitle}</CardTitle>
             <CardDescription>
-              {isPatient
-                ? 'Consultez vos visites médicales programmées et passées.'
-                : 'Liste des visites périodiques des agents.'}
+              Liste des visites médicales enregistrées pour les agents.
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            {visites.map(visit => (
-              <div
-                key={visit.id}
-                className="border rounded-lg p-4 flex flex-col md:flex-row justify-between"
-              >
-                <div className="space-y-1">
-                  <p className="font-semibold">
-                    {isPatient ? visit.doctor : visit.patient}
-                  </p>
-                  <div className="text-sm text-muted-foreground flex flex-wrap gap-2">
-                    <span className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {visit.date.toLocaleDateString()}
-                    </span>
-                    <span className="flex items-center">
-                      <Clock className="h-4 w-4 mr-1" />
-                      {visit.time}
-                    </span>
-                    <span className="flex items-center">
-                      <MapPin className="h-4 w-4 mr-1" />
-                      {visit.location}
-                    </span>
-                  </div>
-                  <Badge variant="outline">{visit.type}</Badge>
-                </div>
-
-                <div className="mt-3 md:mt-0 flex items-center gap-2">
-                  <Badge variant="outline">{visit.status}</Badge>
-                </div>
-              </div>
-            ))}
+          <CardContent>
+            {visites.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>N° Visite</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Matricule</TableHead>
+                    <TableHead>Nom</TableHead>
+                    <TableHead>Prénom</TableHead>
+                    <TableHead>Structure</TableHead>
+                    <TableHead>Médecin</TableHead>
+                    <TableHead>Infirmier(ère)</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {visites.map((visit, index) => ( // Added index as fallback key if numeroVisite isn't unique enough for some reason
+                    <TableRow key={visit.numeroVisite || index}>
+                      <TableCell className="font-medium">{visit.numeroVisite}</TableCell>
+                      <TableCell>
+                        <Badge variant="outline">{visit.type}</Badge>
+                      </TableCell>
+                      <TableCell>{visit.date.toLocaleDateString()}</TableCell>
+                      <TableCell>{visit.agent.matricule}</TableCell>
+                      <TableCell>{visit.agent.nom}</TableCell>
+                      <TableCell>{visit.agent.prenom}</TableCell>
+                      <TableCell>{visit.agent.structure}</TableCell>
+                      <TableCell>{visit.medecin}</TableCell>
+                      <TableCell>{visit.infirmier}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-center text-muted-foreground py-4">
+                Aucune visite à afficher.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
