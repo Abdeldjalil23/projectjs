@@ -12,9 +12,9 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Tabs, TabsList, TabsTrigger, TabsContent,
 } from '@/components/ui/tabs';
-import PostesOccupeesPage   from '@/pages/contentDoss/PostesOccupesTab';
-import AntecedentsP from '@/pages/contentDoss/AntecedentsP';
-import AntecedentsF from '@/pages/contentDoss/AntecedentsF';
+import PostesOccupeesPage   from '@/pages/medecin/contentDoss/PostesOccupesTab';
+import AntecedentsP from '@/pages/medecin/contentDoss/AntecedentsP';
+import AntecedentsF from '@/pages/medecin/contentDoss/AntecedentsF';
 
 
 // ========== Reusable Fields ==========
