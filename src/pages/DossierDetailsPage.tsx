@@ -147,16 +147,16 @@ const DossierDetailsPage = () => {
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
               {/* Basic Info */}
-              <InfoField label="Prénom" value={patientData.prenom} placeholder={undefined} />
-              <InfoField label="Nom" value={patientData.nom} placeholder={undefined} />
-              <InfoField label="Sexe" value={patientData.sexe} placeholder={undefined} />
-              <InfoField label="Nombre d'enfants" value={patientData.nbreEnf} type="number" placeholder={undefined} />
-              <InfoField label="Date de Naissance" value={patientData.dnaiss} type="date" placeholder={undefined} />
-              <InfoField label="Groupe Sanguin" value={patientData.gsang} placeholder={undefined} />
-              <InfoField label="N° Sécurité Sociale (NSS)" value={patientData.nss} placeholder={undefined} />
-              <InfoField label="Service National" value={patientData.serviceNational} placeholder={undefined} />
+              <InfoField label="Prénom" value={patientData.prenom} />
+              <InfoField label="Nom" value={patientData.nom} />
+              <InfoField label="Sexe" value={patientData.sexe} />
+              <InfoField label="Nombre d'enfants" value={patientData.nbreEnf} type="number" />
+              <InfoField label="Date de Naissance" value={patientData.dnaiss} type="date" />
+              <InfoField label="Groupe Sanguin" value={patientData.gsang} />
+              <InfoField label="N° Sécurité Sociale (NSS)" value={patientData.nss} />
+              <InfoField label="Service National" value={patientData.serviceNational} />
               
-              <InfoTextareaField label="Adresse" value={patientData.adresse} placeholder={undefined} />
+              <InfoTextareaField label="Adresse" value={patientData.adresse} />
 
               {/* Formation */}
               <div className="md:col-span-1 lg:col-span-1 space-y-2"> {/* Group checkboxes */}
@@ -170,8 +170,8 @@ const DossierDetailsPage = () => {
                 />
               </div>
 
-              <InfoTextareaField label="Qualification Personnelle" value={patientData.qualificationPersonnelle} placeholder={undefined} />
-              <InfoTextareaField label="Activités Professionnelles Antérieures" value={patientData.activitesProfessionnellesAnterieures} placeholder={undefined} />
+              <InfoTextareaField label="Qualification Personnelle" value={patientData.qualificationPersonnelle} />
+              <InfoTextareaField label="Activités Professionnelles Antérieures" value={patientData.activitesProfessionnellesAnterieures} />
 
               {/* Handicap */}
               <div className="md:col-span-1 lg:col-span-1 space-y-2"> {/* Group checkboxes */}
@@ -193,15 +193,15 @@ const DossierDetailsPage = () => {
 
               {/* Contact Section Title (Optional) */}
               <h3 className="text-lg font-semibold md:col-span-2 lg:col-span-3 mt-4 mb-2 border-b pb-1">Contact</h3>
-              <InfoField label="GSM" value={patientData.contactGsm} type="tel" placeholder={undefined} />
-              <InfoField label="Poste (Tél. interne)" value={patientData.contactPoste} placeholder={undefined} />
-              <InfoField label="Email" value={patientData.contactEmail} type="email" placeholder={undefined} />
+              <InfoField label="GSM" value={patientData.contactGsm} type="tel" />
+              <InfoField label="Poste (Tél. interne)" value={patientData.contactPoste} />
+              <InfoField label="Email" value={patientData.contactEmail} type="email" />
 
               {/* Affectation Section Title (Optional) */}
               <h3 className="text-lg font-semibold md:col-span-2 lg:col-span-3 mt-4 mb-2 border-b pb-1">Affectation</h3>
-              <InfoField label="Structure d'affectation" value={patientData.affectationStructure} placeholder={undefined} />
-              <InfoField label="Date de départ à la retraite (prévue)" value={patientData.affectationDepartRetraite} type="date" placeholder={undefined} />
-              <InfoField label="Date de recrutement" value={patientData.affectationDateRecrutement} type="date" placeholder={undefined} />
+              <InfoField label="Structure d'affectation" value={patientData.affectationStructure} />
+              <InfoField label="Date de départ à la retraite (prévue)" value={patientData.affectationDepartRetraite} type="date" />
+              <InfoField label="Date de recrutement" value={patientData.affectationDateRecrutement} type="date" />
             </div>
           </CardContent>
         </Card>

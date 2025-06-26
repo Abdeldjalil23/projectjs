@@ -14,13 +14,6 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 
 const initialPatientData = {
@@ -28,7 +21,7 @@ const initialPatientData = {
   prenom: '',
   nom: '',
   sexe: '',
-  nbreEnf: 0,
+  nbreEnf: '',
   dnaiss: '',
   gsang: '',
   nss: '',
@@ -58,14 +51,7 @@ const NouveauPatientPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
-    const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'number' ? (value === '' ? '' : parseInt(value, 10)) : value,
-    }));
-  };
-
-  const handleSelectChange = (name, value) => {
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
       [name]: value,
@@ -116,6 +102,17 @@ const NouveauPatientPage = () => {
       return;
     }
 
+    const id = Date.now();
+    const profileImageUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${formData.prenom}${formData.nom}&radius=50&backgroundColor=00897b,039be5,3949ab,e53935,fb8c00&backgroundType=gradientLinear&fontSize=40`;
+
+    const patientData = {
+      id,
+      ...formData,
+      profileImageUrl,
+    };
+
+    console.log('✅ Données patient à enregistrer :', patientData);
+
     toast({
       title: 'Soumission (Simulation)',
       description: 'Données du patient prêtes à être envoyées.',
@@ -123,7 +120,7 @@ const NouveauPatientPage = () => {
 
     setTimeout(() => {
       setIsSubmitting(false);
-      navigate('/dossiers-medicaux');
+      navigate(`/dossier/${id}`);
     }, 1000);
   };
 
@@ -178,6 +175,72 @@ const NouveauPatientPage = () => {
                   />
                 </div>
               </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {Object.keys(initialPatientData).map((key) => {
+                  if (typeof formData[key] === 'boolean' || key === 'profileImageUrl') return null;
+                  return (
+                    <div key={key}>
+                      <Label htmlFor={key}>{key}</Label>
+                      <Input
+                        id={key}
+                        name={key}
+                        value={formData[key]}
+                        onChange={handleChange}
+                      />
+                    </div>
+                  );
+                })}
+                <div>
+                  <Label>Formation</Label>
+                  <div className="space-y-1">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.formationScolaire}
+                        onChange={(e) => handleCheckboxChange('formationScolaire', e.target.checked)}
+                      />
+                      <span>Scolaire</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.formationProfessionnelle}
+                        onChange={(e) => handleCheckboxChange('formationProfessionnelle', e.target.checked)}
+                      />
+                      <span>Professionnelle</span>
+                    </label>
+                  </div>
+                </div>
+                <div>
+                  <Label>Handicap</Label>
+                  <div className="space-y-1">
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.handicapMoteur}
+                        onChange={(e) => handleCheckboxChange('handicapMoteur', e.target.checked)}
+                      />
+                      <span>Moteur</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.handicapAuditif}
+                        onChange={(e) => handleCheckboxChange('handicapAuditif', e.target.checked)}
+                      />
+                      <span>Auditif</span>
+                    </label>
+                    <label className="flex items-center space-x-2">
+                      <input
+                        type="checkbox"
+                        checked={formData.handicapVisuel}
+                        onChange={(e) => handleCheckboxChange('handicapVisuel', e.target.checked)}
+                      />
+                      <span>Visuel</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
             </CardContent>
             <CardFooter className="flex justify-end gap-2">
               <Button
@@ -198,59 +261,5 @@ const NouveauPatientPage = () => {
     </AppLayout>
   );
 };
-
-// Composant champ texte générique
-const InfoField = ({ label, name, value, onChange, type = 'text', required, placeholder, children }) => (
-  <div className="flex flex-col space-y-1">
-    <Label htmlFor={name}>{label}{required && <span className="text-red-500">*</span>}</Label>
-    {children ? children : (
-      <Input
-        id={name}
-        name={name}
-        value={value}
-        onChange={onChange}
-        type={type}
-        placeholder={placeholder}
-        required={required}
-      />
-    )}
-  </div>
-);
-
-// Champ texte long (textarea)
-const InfoTextareaField = ({ label, name, value, onChange, placeholder, className = '' }) => (
-  <div className={`flex flex-col space-y-1 ${className}`}>
-    <Label htmlFor={name}>{label}</Label>
-    <textarea
-      id={name}
-      name={name}
-      value={value}
-      onChange={onChange}
-      placeholder={placeholder}
-      className="border rounded px-3 py-2 text-sm"
-      rows={3}
-    />
-  </div>
-);
-
-// Groupe de cases à cocher
-const CheckboxGroup = ({ groupLabel, options, formData, onCheckboxChange }) => (
-  <div>
-    <p className="font-medium">{groupLabel}</p>
-    <div className="space-y-1 mt-1">
-      {options.map(({ id, label }) => (
-        <label key={id} className="flex items-center space-x-2">
-          <input
-            type="checkbox"
-            checked={!!formData[id]}
-            onChange={(e) => onCheckboxChange(id, e.target.checked)}
-            className="accent-primary"
-          />
-          <span>{label}</span>
-        </label>
-      ))}
-    </div>
-  </div>
-);
 
 export default NouveauPatientPage;
