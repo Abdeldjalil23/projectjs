@@ -1,265 +1,245 @@
-// src/pages/NouveauPatientPage.jsx
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import {
-  Card,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardContent,
-  CardFooter,
+  Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter,
 } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/components/ui/use-toast';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Textarea } from '@/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"; // Make sure you have this component
 
-const initialPatientData = {
-  profileImageUrl: '',
-  prenom: '',
-  nom: '',
-  sexe: '',
-  nbreEnf: '',
-  dnaiss: '',
-  gsang: '',
-  nss: '',
-  serviceNational: '',
-  adresse: '',
-  formationScolaire: false,
-  formationProfessionnelle: false,
-  qualificationPersonnelle: '',
-  activitesProfessionnellesAnterieures: '',
-  handicapMoteur: false,
-  handicapAuditif: false,
-  handicapVisuel: false,
-  contactGsm: '',
-  contactPoste: '',
-  contactEmail: '',
-  affectationStructure: '',
-  affectationDepartRetraite: '',
-  affectationDateRecrutement: '',
-};
+// Helper component for editable input fields
+const EditableField = ({ label, name, value, onChange, type = "text", placeholder, required = false, className = "" }) => (
+  <div className={`space-y-1 ${className}`}>
+    <Label htmlFor={name}>
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </Label>
+    <Input
+      id={name}
+      name={name}
+      type={type}
+      value={value || ''}
+      onChange={onChange}
+      placeholder={placeholder || `Entrez ${label.toLowerCase()}`}
+      className="w-full"
+      required={required}
+    />
+  </div>
+);
 
-const NouveauPatientPage = () => {
+// Helper component for editable textarea fields
+const EditableTextareaField = ({ label, name, value, onChange, placeholder, required = false, rows = 3, className = "md:col-span-2 lg:col-span-3" }) => (
+  <div className={`space-y-1 ${className}`}>
+    <Label htmlFor={name}>
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </Label>
+    <Textarea
+      id={name}
+      name={name}
+      value={value || ''}
+      onChange={onChange}
+      placeholder={placeholder || `Décrivez ${label.toLowerCase()}`}
+      className="w-full min-h-[80px]"
+      rows={rows}
+      required={required}
+    />
+  </div>
+);
+
+// Helper component for editable checkbox fields
+const EditableCheckboxField = ({ label, name, checked, onChange, className = "" }) => (
+  <div className={`flex items-center space-x-2 ${className}`}>
+    <Checkbox
+      id={name}
+      name={name}
+      checked={checked}
+      onCheckedChange={(isChecked) => onChange({ target: { name, value: isChecked, type: 'checkbox' } })}
+    />
+    <Label htmlFor={name} className="font-normal">
+      {label}
+    </Label>
+  </div>
+);
+
+// Helper component for editable select fields
+const EditableSelectField = ({ label, name, value, onChange, options, placeholder, required = false, className = "" }) => (
+  <div className={`space-y-1 ${className}`}>
+    <Label htmlFor={name}>
+      {label}
+      {required && <span className="text-red-500 ml-1">*</span>}
+    </Label>
+    <Select
+      name={name}
+      value={value}
+      onValueChange={(selectedValue) => onChange({ target: { name, value: selectedValue } })} // Simulate event structure
+      required={required}
+    >
+      <SelectTrigger className="w-full" id={name}>
+        <SelectValue placeholder={placeholder || `Sélectionnez ${label.toLowerCase()}`} />
+      </SelectTrigger>
+      <SelectContent>
+        {options.map(option => (
+          <SelectItem key={option.value} value={option.value}>
+            {option.label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
+  </div>
+);
+
+const AddPatientPage = () => {
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [formData, setFormData] = useState(initialPatientData);
-  const [profileImageFile, setProfileImageFile] = useState(null);
-  const [profileImagePreview, setProfileImagePreview] = useState(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [patientData, setPatientData] = useState({
+    prenom: '',
+    nom: '',
+    chronique: false,
+    sexe: '',
+    nbreEnf: 0,
+    dnaiss: '',
+    gsang: '',
+    nss: '',
+    serviceNational: '',
+    adresse: '',
+    formationScolaire: false,
+    formationProfessionnelle: false,
+    qualificationPersonnelle: '',
+    activitesProfessionnellesAnterieures: '',
+    handicapMoteur: false,
+    handicapAuditif: false,
+    handicapVisuel: false,
+    contactGsm: '',
+    contactPoste: '',
+    contactEmail: '',
+    affectationStructure: '',
+    affectationDepartRetraite: '',
+    affectationDateRecrutement: '',
+  });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
+    const { name, value, type, checked } = e.target;
+    setPatientData(prevData => ({
+      ...prevData,
+      [name]: type === 'checkbox' ? checked : (type === 'number' ? (value === '' ? '' : Number(value)) : value),
     }));
   };
 
-  const handleCheckboxChange = (name, checked) => {
-    setFormData((prev) => ({
-      ...prev,
-      [name]: checked,
-    }));
-  };
-
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast({
-          title: 'Image trop grande',
-          description: "La taille de l'image ne doit pas dépasser 2MB.",
-          variant: 'destructive',
-        });
-        return;
-      }
-      setProfileImageFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImagePreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    } else {
-      setProfileImageFile(null);
-      setProfileImagePreview(null);
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setIsSubmitting(true);
-
-    if (!formData.nom || !formData.prenom || !formData.dnaiss || !formData.sexe) {
-      toast({
-        title: 'Champs requis manquants',
-        description: 'Veuillez remplir Prénom, Nom, Date de Naissance et Sexe.',
-        variant: 'destructive',
-      });
-      setIsSubmitting(false);
-      return;
-    }
-
-    const id = Date.now();
-    const profileImageUrl = `https://api.dicebear.com/7.x/initials/svg?seed=${formData.prenom}${formData.nom}&radius=50&backgroundColor=00897b,039be5,3949ab,e53935,fb8c00&backgroundType=gradientLinear&fontSize=40`;
-
-    const patientData = {
-      id,
-      ...formData,
-      profileImageUrl,
-    };
-
-    console.log('✅ Données patient à enregistrer :', patientData);
-
-    toast({
-      title: 'Soumission (Simulation)',
-      description: 'Données du patient prêtes à être envoyées.',
-    });
-
-    setTimeout(() => {
-      setIsSubmitting(false);
-      navigate(`/dossier/${id}`);
-    }, 1000);
+    // TODO: API call to save patient data
+    console.log('Patient data to save:', patientData);
+    // For demonstration, navigate to a success page or back
+    // In a real app, you'd likely navigate to the new patient's detail page or a list
+    alert('Patient ajouté avec succès (simulation) !');
+    navigate(-1); // Go back to the previous page
   };
+
+  const sexeOptions = [
+    { value: 'Masculin', label: 'Masculin' },
+    { value: 'Féminin', label: 'Féminin' },
+    { value: 'Autre', label: 'Autre' },
+  ];
+
+  const serviceNationalOptions = [
+    { value: 'Accompli', label: 'Accompli' },
+    { value: 'Non Accompli', label: 'Non Accompli' },
+    { value: 'Sursis', label: 'Sursis' },
+    { value: 'Exempté', label: 'Exempté' },
+  ];
 
   return (
     <AppLayout title="Ajouter un Nouveau Patient">
-      <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Nouveau Dossier Patient</h1>
-          <Button variant="outline" onClick={() => navigate(-1)} disabled={isSubmitting}>
-            Annuler
-          </Button>
-        </div>
-
-        <form onSubmit={handleSubmit}>
-          <Card className="w-full">
+      <div className="p-4 md:p-6 space-y-6">
+        <Card className="w-full">
+          <form onSubmit={handleSubmit}>
             <CardHeader>
-              <CardTitle className="text-xl">Informations du Patient</CardTitle>
-              <CardDescription>
-                Remplissez les détails ci-dessous pour créer un nouveau dossier patient.
-              </CardDescription>
+              <CardTitle className="text-xl">Nouveau Dossier Patient</CardTitle>
+              <CardDescription>Remplissez les informations ci-dessous pour créer un nouveau dossier patient.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-start">
-                <div className="flex flex-col items-center space-y-2">
-                  <Avatar className="h-32 w-32 border text-4xl">
-                    <AvatarImage
-                      src={
-                        profileImagePreview ||
-                        `https://api.dicebear.com/7.x/initials/svg?seed=${formData.prenom || 'P'}${formData.nom || 'N'}&radius=50`
-                      }
-                      alt="Aperçu profil"
-                    />
-                    <AvatarFallback>
-                      {(formData.prenom?.[0] || 'P').toUpperCase()}
-                      {(formData.nom?.[0] || 'N').toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
-                  <Label
-                    htmlFor="profile-image-upload"
-                    className="text-sm text-blue-600 hover:underline cursor-pointer"
-                  >
-                    {profileImagePreview
-                      ? "Changer l'image (max 2MB)"
-                      : "Télécharger une image (max 2MB)"}
-                  </Label>
-                  <Input
-                    id="profile-image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
+              {/* Section Informations Générales */}
+              <div className="space-y-2 border-b pb-4">
+                <h3 className="text-lg font-semibold">Informations Générales et Personnelles</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                  <EditableField label="Prénom" name="prenom" value={patientData.prenom} onChange={handleChange} required placeholder={undefined} />
+                  <EditableField label="Nom" name="nom" value={patientData.nom} onChange={handleChange} required placeholder={undefined} />
+                  <EditableSelectField label="Sexe" name="sexe" value={patientData.sexe} onChange={handleChange} options={sexeOptions} required placeholder={undefined} />
+                  <EditableField label="Nombre d'enfants" name="nbreEnf" value={patientData.nbreEnf} onChange={handleChange} type="number" placeholder={undefined} />
+                  <EditableField label="Date de Naissance" name="dnaiss" value={patientData.dnaiss} onChange={handleChange} type="date" required placeholder={undefined} />
+                  <EditableField label="Groupe Sanguin" name="gsang" value={patientData.gsang} onChange={handleChange} placeholder={undefined} />
+                  <EditableField label="N° Sécurité Sociale (NSS)" name="nss" value={patientData.nss} onChange={handleChange} placeholder={undefined} />
+                  <EditableSelectField label="Service National" name="serviceNational" value={patientData.serviceNational} onChange={handleChange} options={serviceNationalOptions} placeholder={undefined} />
+                  <EditableCheckboxField label="Patient Chronique" name="chronique" checked={patientData.chronique} onChange={handleChange} className="mt-6" />
+                  <EditableTextareaField label="Adresse" name="adresse" value={patientData.adresse} onChange={handleChange} className="md:col-span-2 lg:col-span-3" placeholder={undefined} />
                 </div>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {Object.keys(initialPatientData).map((key) => {
-                  if (typeof formData[key] === 'boolean' || key === 'profileImageUrl') return null;
-                  return (
-                    <div key={key}>
-                      <Label htmlFor={key}>{key}</Label>
-                      <Input
-                        id={key}
-                        name={key}
-                        value={formData[key]}
-                        onChange={handleChange}
-                      />
-                    </div>
-                  );
-                })}
-                <div>
-                  <Label>Formation</Label>
-                  <div className="space-y-1">
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.formationScolaire}
-                        onChange={(e) => handleCheckboxChange('formationScolaire', e.target.checked)}
-                      />
-                      <span>Scolaire</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.formationProfessionnelle}
-                        onChange={(e) => handleCheckboxChange('formationProfessionnelle', e.target.checked)}
-                      />
-                      <span>Professionnelle</span>
-                    </label>
+
+              {/* Section Formation et Handicap */}
+              <div className="space-y-2 border-b pb-4">
+                <h3 className="text-lg font-semibold">Formation, Qualification et Handicap</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Formation</Label>
+                    <EditableCheckboxField label="Scolaire" name="formationScolaire" checked={patientData.formationScolaire} onChange={handleChange} />
+                    <EditableCheckboxField label="Professionnelle" name="formationProfessionnelle" checked={patientData.formationProfessionnelle} onChange={handleChange} />
                   </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-medium">Handicap</Label>
+                    <EditableCheckboxField label="Moteur" name="handicapMoteur" checked={patientData.handicapMoteur} onChange={handleChange} />
+                    <EditableCheckboxField label="Auditif" name="handicapAuditif" checked={patientData.handicapAuditif} onChange={handleChange} />
+                    <EditableCheckboxField label="Visuel" name="handicapVisuel" checked={patientData.handicapVisuel} onChange={handleChange} />
+                  </div>
+                  <div className="hidden lg:block"></div> {/* Spacer */}
+
+                  <EditableTextareaField label="Qualification Personnelle" name="qualificationPersonnelle" value={patientData.qualificationPersonnelle} onChange={handleChange} className="md:col-span-2 lg:col-span-3" placeholder={undefined} />
+                  <EditableTextareaField label="Activités Professionnelles Antérieures" name="activitesProfessionnellesAnterieures" value={patientData.activitesProfessionnellesAnterieures} onChange={handleChange} className="md:col-span-2 lg:col-span-3" placeholder={undefined} />
                 </div>
-                <div>
-                  <Label>Handicap</Label>
-                  <div className="space-y-1">
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.handicapMoteur}
-                        onChange={(e) => handleCheckboxChange('handicapMoteur', e.target.checked)}
-                      />
-                      <span>Moteur</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.handicapAuditif}
-                        onChange={(e) => handleCheckboxChange('handicapAuditif', e.target.checked)}
-                      />
-                      <span>Auditif</span>
-                    </label>
-                    <label className="flex items-center space-x-2">
-                      <input
-                        type="checkbox"
-                        checked={formData.handicapVisuel}
-                        onChange={(e) => handleCheckboxChange('handicapVisuel', e.target.checked)}
-                      />
-                      <span>Visuel</span>
-                    </label>
-                  </div>
+              </div>
+
+              {/* Section Contact */}
+              <div className="space-y-2 border-b pb-4">
+                <h3 className="text-lg font-semibold">Contact</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                  <EditableField label="GSM" name="contactGsm" value={patientData.contactGsm} onChange={handleChange} type="tel" placeholder={undefined} />
+                  <EditableField label="Poste (Tél. interne)" name="contactPoste" value={patientData.contactPoste} onChange={handleChange} placeholder={undefined} />
+                  <EditableField label="Email" name="contactEmail" value={patientData.contactEmail} onChange={handleChange} type="email" placeholder={undefined} />
+                </div>
+              </div>
+
+              {/* Section Affectation */}
+              <div className="space-y-2">
+                <h3 className="text-lg font-semibold">Affectation</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-4">
+                  <EditableField label="Structure d'affectation" name="affectationStructure" value={patientData.affectationStructure} onChange={handleChange} placeholder={undefined} />
+                  <EditableField label="Date de recrutement" name="affectationDateRecrutement" value={patientData.affectationDateRecrutement} onChange={handleChange} type="date" placeholder={undefined} />
+                  <EditableField label="Date de départ à la retraite (prévue)" name="affectationDepartRetraite" value={patientData.affectationDepartRetraite} onChange={handleChange} type="date" placeholder={undefined} />
                 </div>
               </div>
             </CardContent>
-            <CardFooter className="flex justify-end gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => navigate(-1)}
-                disabled={isSubmitting}
-              >
+            <CardFooter className="flex justify-end space-x-2 pt-6">
+              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
                 Annuler
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? 'Enregistrement...' : 'Enregistrer Patient'}
+              <Button type="submit">
+                Enregistrer le Patient
               </Button>
             </CardFooter>
-          </Card>
-        </form>
+          </form>
+        </Card>
       </div>
     </AppLayout>
   );
 };
 
-export default NouveauPatientPage;
+export default AddPatientPage;
