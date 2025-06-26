@@ -12,6 +12,7 @@ import VisitePeriodiquePage from "./pages/VisitePeriodiquePage";
 import DossierDetailsPage from "./pages/DossierDetailsPage";
 import NouvelleConsultation from "./pages/Nouvelleconsultation";
 import PrescriptionsPage from "./pages/PrescriptionsPage";
+import NouveauPatientPage from "./pages/NouveauPatientPage";
 import SettingsPage from "./pages/SettingsPage";
 import DoctorsPage from "./pages/admin/DoctorsPage";
 import AddDoctorPage from "./pages/admin/AddDoctorPage";
@@ -33,10 +34,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProviderWithNavigate>
           <Routes>
-            {/* صفحة تسجيل الدخول بدون حماية */}
             <Route path="/login" element={<LoginPage />} />
 
-            {/* صفحات محمية باستخدام PrivateRoute */}
             <Route
               path="/"
               element={
@@ -50,6 +49,14 @@ const App = () => (
               element={
                 <PrivateRoute>
                   <PrescriptionsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/nouveau-patient"
+              element={
+                <PrivateRoute>
+                  <NouveauPatientPage />
                 </PrivateRoute>
               }
             />
