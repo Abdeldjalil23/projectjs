@@ -39,6 +39,7 @@ export const SidebarNav = () => {
         { title: 'Doctors', icon: User, url: '/doctors' },
         { title: 'Departments', icon: Users, url: '/departments' },
         { title: 'Reports', icon: FileText, url: '/reports' },
+        { title: 'Visite Périodique', icon: FileText, url: '/visite-perdue' },
       ]);
     }
   }, [userRole]);
