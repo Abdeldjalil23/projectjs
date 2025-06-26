@@ -2,19 +2,22 @@
 import { useAuth } from '@/context/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import {
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
+  Card, CardHeader, CardContent,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { ClipboardList, PlusCircle } from 'lucide-react'; // Import PlusCircle
+import { ClipboardList, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 
 const DossiersMedicauxPage = () => {
   const { userRole } = useAuth();
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const records = [ // This should ideally be fetched from an API
+  const isPatient = userRole === 'patient';
+
+  const records = [
     {
       id: 1,
       prenom: 'Ali',
@@ -35,22 +38,29 @@ const DossiersMedicauxPage = () => {
     },
   ];
 
-  const isPatient = userRole === 'patient';
-
-  const handleAddNewPatient = () => {
-    navigate('/nouveau-patient');
-  };
+  const filteredRecords = records.filter(record =>
+    record.prenom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    record.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    record.nomJeuneFille.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    record.fonction.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    record.structure.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    record.email.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <AppLayout title="Dossiers Médicaux">
-      <div className="p-4 md:p-6 space-y-6"> {/* Consistent padding */}
+      <div className="p-4 md:p-6 space-y-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold tracking-tight"> {/* Use h1 for main page title */}
+          <h1 className="text-2xl font-bold tracking-tight">
             {isPatient ? 'Mon Dossier Médical' : 'Dossiers Médicaux des Patients'}
           </h1>
+
           {!isPatient && (
-            <Button onClick={handleAddNewPatient}>
-              <PlusCircle className="w-4 h-4 mr-2" />
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => navigate('/nouveau-patient')}
+            >
               Nouveau Patient
             </Button>
           )}
@@ -58,75 +68,54 @@ const DossiersMedicauxPage = () => {
 
         <Card>
           <CardHeader>
-            {/* CardTitle can be removed if main title is outside, or kept for context within card */}
-            {/* <CardTitle>Optional: Liste des Dossiers</CardTitle> */}
-            <CardDescription>
-              {isPatient
-                ? 'Consultez les informations de votre dossier médical.'
-                : 'Liste de tous les dossiers médicaux enregistrés. Cliquez sur "Voir" pour consulter ou ajoutez un nouveau patient.'}
-            </CardDescription>
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline">Filtrer</Button>
+              <Button variant="outline">Trier</Button>
+            </div>
           </CardHeader>
           <CardContent>
-            {isPatient ? (
-              <div className="space-y-4 mt-4">
-                <p className="text-sm text-muted-foreground">
-                  Aucun dossier médical récent disponible pour vous.
-                  {/* Consider fetching and displaying the patient's own record if available */}
-                </p>
-              </div>
-            ) : (
-              <Tabs defaultValue="all">
-                <TabsList>
-                  <TabsTrigger value="all">Tous les dossiers</TabsTrigger>
-                </TabsList>
-                <TabsContent value="all" className="mt-4 overflow-x-auto">
-                  {records.length > 0 ? (
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Prénom</TableHead>
-                          <TableHead>Nom</TableHead>
-                          <TableHead>Nom de jeune fille</TableHead>
-                          <TableHead>Fonction</TableHead>
-                          <TableHead>Structure</TableHead>
-                          <TableHead>Email</TableHead>
-                          <TableHead>Action</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {records.map(record => (
-                          <TableRow key={record.id}>
-                            <TableCell>{record.id}</TableCell>
-                            <TableCell>{record.prenom}</TableCell>
-                            <TableCell>{record.nom}</TableCell>
-                            <TableCell>{record.nomJeuneFille || '-'}</TableCell>
-                            <TableCell>{record.fonction}</TableCell>
-                            <TableCell>{record.structure}</TableCell>
-                            <TableCell>{record.email}</TableCell>
-                            <TableCell>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                className="flex items-center"
-                                onClick={() => navigate(`/dossier/${record.id}`)}
-                              >
-                                <ClipboardList className="w-4 h-4 mr-1" />
-                                Voir
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  ) : (
-                     <p className="text-center text-muted-foreground py-4">
-                        Aucun dossier patient trouvé. Cliquez sur "Nouveau Patient" pour en ajouter un.
-                     </p>
-                  )}
-                </TabsContent>
-              </Tabs>
-            )}
+            <div className="space-y-5">
+              {filteredRecords.length > 0 ? (
+                filteredRecords.map((record) => (
+                  <Card key={record.id} className="bg-card overflow-hidden">
+                    <div className="h-1 w-full bg-medsuite-primary" />
+                    <CardContent className="p-4 mt-2">
+                      <div className="flex flex-col md:flex-row justify-between">
+                        <div className="space-y-2">
+                          <h3 className="font-medium text-lg text-medsuite-primary">
+                            {record.prenom} {record.nom}
+                          </h3>
+                          <div className="text-sm text-muted-foreground space-y-1">
+                            <p><strong>Nom de jeune fille:</strong> {record.nomJeuneFille || '-'}</p>
+                            <p><strong>Fonction:</strong> {record.fonction}</p>
+                            <p><strong>Structure:</strong> {record.structure}</p>
+                            <p><strong>Email:</strong> {record.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex gap-2 mt-3 md:mt-0 self-start">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/dossier/${record.id}`)}
+                          >
+                            <ClipboardList className="mr-2 h-4 w-4" />
+                            Voir
+                          </Button>
+                          <Button variant="outline" size="sm">
+                            <Download className="mr-2 h-4 w-4" />
+                            Exporter
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <div className="text-center p-8 text-muted-foreground">
+                  Aucun dossier patient trouvé correspondant à vos critères.
+                </div>
+              )}
+            </div>
           </CardContent>
         </Card>
       </div>

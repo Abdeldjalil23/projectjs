@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input'; // For file input
 import { Label } from '@/components/ui/label'; // For file input label
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"; // For Sexe
 // Make sure this path is correct for your project structure:
-import { InfoField, InfoTextareaField, CheckboxGroup } from '@/components/form/FormFields';
+import { InfoField, InfoTextareaField, CheckboxGroup } from './components/ui/FormFields';
 import { useToast } from "@/components/ui/use-toast"; // For notifications
 
 const initialPatientData = {
