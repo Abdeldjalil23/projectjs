@@ -1,3 +1,6 @@
+// src/pages/medecin/PostesOccupeesPage.tsx
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
+import InfoTextareaField from '@/components/InfoTextareaField';
 // PostesOccupesTab.jsx (in the same folder as DossierDetailsPage.jsx)
 import {
   Table,
@@ -7,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 const mockPostesOccupesData = [
@@ -55,7 +57,7 @@ const formatDate = (dateString) => {
   });
 };
 
-const PostesOccupesTab = ({ patientId }) => {
+const PostesOccupeesPage = ({ patientId }) => {
   // TODO: Fetch data based on patientId in a real app
   const postesData = mockPostesOccupesData; 
 
@@ -130,4 +132,4 @@ const PostesOccupesTab = ({ patientId }) => {
   );
 };
 
-export default PostesOccupesTab;
+export default PostesOccupeesPage;

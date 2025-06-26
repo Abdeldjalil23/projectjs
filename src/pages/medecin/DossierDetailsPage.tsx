@@ -1,35 +1,25 @@
+// src/pages/medecin/DossierDetailsPage.tsx
+
 import { useParams, useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
-import {
-  Card, CardHeader, CardTitle, CardDescription, CardContent,
-} from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
-  Tabs, TabsList, TabsTrigger, TabsContent
+  Tabs, TabsList, TabsTrigger, TabsContent,
 } from '@/components/ui/tabs';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import PostesOccupeesPage   from '@/pages/contentDoss/PostesOccupesTab';
+import AntecedentsP from '@/pages/contentDoss/AntecedentsP';
+import AntecedentsF from '@/pages/contentDoss/AntecedentsF';
 
-// ✅ InfoField component
-const InfoField = ({
-  label = '',
-  value = '',
-  type = 'text',
-  readOnly = true,
-  placeholder = ''
-}) => (
+
+// ========== Reusable Fields ==========
+
+const InfoField = ({ label = '', value = '', type = 'text', readOnly = true, placeholder = '' }) => (
   <div className="space-y-1">
     <Label htmlFor={label.toLowerCase().replace(/\s/g, '-')}>{label}</Label>
     <Input
@@ -43,13 +33,7 @@ const InfoField = ({
   </div>
 );
 
-// ✅ InfoTextareaField component
-const InfoTextareaField = ({
-  label = '',
-  value = '',
-  readOnly = true,
-  placeholder = ''
-}) => (
+const InfoTextareaField = ({ label = '', value = '', readOnly = true, placeholder = '' }) => (
   <div className="space-y-1 md:col-span-2 lg:col-span-3">
     <Label htmlFor={label.toLowerCase().replace(/\s/g, '-')}>{label}</Label>
     <Textarea
@@ -62,7 +46,6 @@ const InfoTextareaField = ({
   </div>
 );
 
-// ✅ CheckboxGroup component
 const CheckboxGroup = ({ groupLabel, options, patientData }) => (
   <div className="space-y-2">
     <Label className="text-sm font-medium">{groupLabel}</Label>
@@ -70,28 +53,19 @@ const CheckboxGroup = ({ groupLabel, options, patientData }) => (
       {options.map(option => (
         <div key={option.id} className="flex items-center space-x-2">
           <Checkbox id={option.id} checked={!!patientData[option.id]} disabled />
-          <Label htmlFor={option.id} className="font-normal">
-            {option.label}
-          </Label>
+          <Label htmlFor={option.id} className="font-normal">{option.label}</Label>
         </div>
       ))}
     </div>
   </div>
 );
 
-// Function to format tab titles nicely
-const formatTabTitle = (str) => {
-  if (!str) return '';
-  const withSpaces = str.replace(/([A-Z])/g, ' $1');
-  return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
-};
+// ========== Main Page Component ==========
 
-// ✅ Main Page Component
 const DossierDetailsPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // MOCK DATA
   const patientData = {
     id,
     profileImageUrl: `https://api.dicebear.com/7.x/initials/svg?seed=Patient${id}&radius=50&backgroundColor=00897b,039be5,3949ab,e53935,fb8c00&backgroundType=gradientLinear&fontSize=40`,
@@ -120,160 +94,43 @@ const DossierDetailsPage = () => {
     chronique: true,
   };
 
-  const handleNewConsultation = () => {
-    navigate(`/dossier/${id}/nouvelle-consultation`);
-  };
-  const mockPostesOccupesData = [
-  {
-    id: 'po1',
-    intituleFonction: 'Développeur Web Junior',
-    du: '2015-09-01',
-    au: '2017-08-31',
-    risquesProfessionnels: ['Travail sur écran', 'Stress'],
-    nuisances: ['Bruit de bureau'],
-    typeChangement: 'Promotion interne',
-    motif: 'Évolution de carrière',
-    motifsChangementPoste: 'Opportunité pour un poste de Développeur Confirmé.',
-  },
-  {
-    id: 'po2',
-    intituleFonction: 'Développeur Web Confirmé',
-    du: '2017-09-01',
-    au: '2020-01-15',
-    risquesProfessionnels: ['Travail sur écran prolongé', 'Sédentarité'],
-    nuisances: ['Climatisation variable'],
-    typeChangement: 'Démission',
-    motif: 'Nouvelle opportunité externe',
-    motifsChangementPoste: 'Recherche de nouveaux défis techniques.',
-  },
-  {
-    id: 'po3',
-    intituleFonction: 'Chef de Projet Technique',
-    du: '2020-02-01',
-    au: null, 
-    risquesProfessionnels: ['Gestion du stress', 'Charge mentale'],
-    nuisances: ['Réunions fréquentes'],
-    typeChangement: 'En cours',
-    motif: '-',
-    motifsChangementPoste: '-',
-  },
-];
-
-const formatDate = (dateString) => {
-  if (!dateString) return 'En cours';
-  return new Date(dateString).toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'short', // Using short month for brevity
-    day: 'numeric',
-  });
-};
-
-const PostesOccupesTab = ({ patientId=id }) => {
-  // TODO: Fetch data based on patientId in a real app
-  const postesData = mockPostesOccupesData; 
-
-  if (!postesData || postesData.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Postes Occupés</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Aucun poste occupé n'a été enregistré pour ce patient.</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Historique des Postes Occupés</CardTitle>
-        <CardDescription>Liste des fonctions exercées par le patient.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[180px]">Intitulé Fonction</TableHead>
-                <TableHead className="min-w-[100px]">Du</TableHead>
-                <TableHead className="min-w-[100px]">Au</TableHead>
-                <TableHead className="min-w-[200px]">Risques Professionnels</TableHead>
-                <TableHead className="min-w-[180px]">Nuisances</TableHead>
-                <TableHead className="min-w-[150px]">Type Changement</TableHead>
-                <TableHead className="min-w-[180px]">Motif</TableHead>
-                <TableHead className="min-w-[250px]">Détails Changement</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {postesData.map((poste) => (
-                <TableRow key={poste.id}>
-                  <TableCell className="font-medium">{poste.intituleFonction}</TableCell>
-                  <TableCell>{formatDate(poste.du)}</TableCell>
-                  <TableCell>{poste.au ? formatDate(poste.au) : <Badge variant="outline">En cours</Badge>}</TableCell>
-                  <TableCell>
-                    {Array.isArray(poste.risquesProfessionnels) && poste.risquesProfessionnels.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {poste.risquesProfessionnels.map((risque, index) => (
-                          <Badge key={index} variant="destructive" className="text-xs font-normal">{risque}</Badge>
-                        ))}
-                      </div>
-                    ) : '-'}
-                  </TableCell>
-                  <TableCell>
-                    {Array.isArray(poste.nuisances) && poste.nuisances.length > 0 ? (
-                       <div className="flex flex-wrap gap-1">
-                        {poste.nuisances.map((nuisance, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs font-normal">{nuisance}</Badge>
-                        ))}
-                      </div>
-                    ) : '-'}
-                  </TableCell>
-                  <TableCell>{poste.typeChangement || '-'}</TableCell>
-                  <TableCell>{poste.motif || '-'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{poste.motifsChangementPoste || '-'}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
-  );
-};
-  const tabsConfig = [
-    { value: "info", label: "Infos Générales", component: null }, // Content for "info" is directly below
-    { value: "postes", label: "Postes Occupés", component: PostesOccupesTab },
-    { value: "antecedentsP", label: "Antécédents P.", component: null /* Placeholder */ },
-    { value: "antecedentsF", label: "Antécédents F.", component: null /* Placeholder */ },
-    { value: "accidents", label: "Accidents", component: null /* Placeholder */ },
-    { value: "vaccins", label: "Vaccins", component: null /* Placeholder */ },
-    { value: "intoxications", label: "Intoxications", component: null /* Placeholder */ },
-    { value: "visite1", label: "Visite 1", component: null /* Placeholder */ },
-    { value: "visite2", label: "Visite 2", component: null /* Placeholder */ },
-  ];
-
-  const getAge = (birthDateString) => { // Removed TypeScript type annotation
-    if (!birthDateString) return '';
+  const getAge = (birthDateString: string) => {
     const today = new Date();
     const birthDate = new Date(birthDateString);
     let age = today.getFullYear() - birthDate.getFullYear();
     const m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
-      age--;
-    }
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
     return age;
   };
 
-  return (
-    <AppLayout title={`Dossier Médical: ${patientData.prenom} ${patientData.nom}`}>
-      <div className="p-4 md:p-6 space-y-6">
+  const handleNewConsultation = () => {
+    navigate(`/dossier/${id}/nouvelle-consultation`);
+  };
 
+  const tabsConfig = [
+    { value: 'info', label: 'Infos Générales' },
+    { value: 'postes', label: 'Postes Occupés' },
+    { value: 'antecedentsP', label: 'Antécédents P.' },
+    { value: 'antecedentsF', label: 'Antécédents F.' },
+    { value: 'accidents', label: 'Accidents' },
+    { value: 'vaccins', label: 'Vaccins' },
+    { value: 'intoxications', label: 'Intoxications' },
+    { value: 'visite1', label: 'Visite 1' },
+    { value: 'visite2', label: 'Visite 2' },
+  ];
+
+  const formatTabTitle = (str: string) => {
+    const withSpaces = str.replace(/([A-Z])/g, ' $1');
+    return withSpaces.charAt(0).toUpperCase() + withSpaces.slice(1);
+  };
+
+  return (
+    <AppLayout title="Dossier Médical">
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Title + Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <h1 className="text-2xl font-bold tracking-tight">
-            {patientData.prenom} {patientData.nom} - {getAge(patientData.dnaiss)} ans
-            {patientData.chronique && <span className="text-red-600 font-semibold ml-2">(Chronique)</span>}
+            {patientData.prenom} {patientData.nom} — âge {getAge(patientData.dnaiss)} {patientData.chronique ? '(Chronique)' : ''}
           </h1>
           <Button onClick={handleNewConsultation}>Nouvelle Consultation</Button>
         </div>
@@ -285,7 +142,7 @@ const PostesOccupesTab = ({ patientId=id }) => {
                 <TabsTrigger
                   key={tab.value}
                   value={tab.value}
-                  className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-sm font-medium rounded-none border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none focus-visible:ring-offset-0"
+                  className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary"
                 >
                   {tab.label}
                 </TabsTrigger>
@@ -293,15 +150,14 @@ const PostesOccupesTab = ({ patientId=id }) => {
             </TabsList>
           </div>
 
-          {/* Tab: Infos Générales */}
+          {/* Tabs Content */}
+
           <TabsContent value="info" className="mt-4">
             <Card>
               <CardHeader className="flex flex-col sm:flex-row items-start gap-4">
                 <Avatar className="h-24 w-24 border flex-shrink-0">
-                  <AvatarImage src={patientData.profileImageUrl} alt={`Avatar de ${patientData.prenom}`} />
-                  <AvatarFallback>
-                    {(patientData.prenom?.[0] || '') + (patientData.nom?.[0] || '')}
-                  </AvatarFallback>
+                  <AvatarImage src={patientData.profileImageUrl} alt="Avatar" />
+                  <AvatarFallback>{(patientData.prenom?.[0] || '') + (patientData.nom?.[0] || '')}</AvatarFallback>
                 </Avatar>
                 <div className="flex-grow">
                   <CardTitle className="text-xl">Informations Générales et Personnelles</CardTitle>
@@ -318,7 +174,6 @@ const PostesOccupesTab = ({ patientId=id }) => {
                   <InfoField label="Groupe Sanguin" value={patientData.gsang} />
                   <InfoField label="N° Sécurité Sociale (NSS)" value={patientData.nss} />
                   <InfoField label="Service National" value={patientData.serviceNational} />
-                  
                   <InfoTextareaField label="Adresse" value={patientData.adresse} />
 
                   <CheckboxGroup
@@ -329,7 +184,7 @@ const PostesOccupesTab = ({ patientId=id }) => {
                     ]}
                     patientData={patientData}
                   />
-                   <CheckboxGroup
+                  <CheckboxGroup
                     groupLabel="Handicap"
                     options={[
                       { id: 'handicapMoteur', label: 'Moteur' },
@@ -338,11 +193,10 @@ const PostesOccupesTab = ({ patientId=id }) => {
                     ]}
                     patientData={patientData}
                   />
-                  <div className="hidden lg:block"></div>
 
                   <InfoTextareaField label="Qualification Personnelle" value={patientData.qualificationPersonnelle} />
                   <InfoTextareaField label="Activités Professionnelles Antérieures" value={patientData.activitesProfessionnellesAnterieures} />
-                  
+
                   <h3 className="text-lg font-semibold col-span-full mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">Contact</h3>
                   <InfoField label="GSM" value={patientData.contactGsm} type="tel" />
                   <InfoField label="Poste (interne)" value={patientData.contactPoste} />
@@ -357,26 +211,33 @@ const PostesOccupesTab = ({ patientId=id }) => {
             </Card>
           </TabsContent>
 
-          {/* Render other tabs using tabsConfig */}
-          {tabsConfig.filter(tab => tab.value !== "info").map(tab => {
-            const TabComponent = tab.component;
-            return (
-              <TabsContent value={tab.value} key={tab.value} className="mt-4">
-                {TabComponent ? (
-                  <TabComponent patientId={id} /> 
-                ) : (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>{formatTabTitle(tab.label.endsWith('.') ? tab.value : tab.label)}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-muted-foreground">Contenu pour "{formatTabTitle(tab.label.endsWith('.') ? tab.value : tab.label)}" à venir...</p>
-                    </CardContent>
-                  </Card>
-                )}
+          <TabsContent value="postes" className="mt-4">
+            <PostesOccupeesPage patientId={patientData} />
+          </TabsContent>
+
+          <TabsContent value="antecedentsP" className="mt-4">
+            <AntecedentsP patientId={patientData} />
+          </TabsContent>
+
+          <TabsContent value="antecedentsF" className="mt-4">
+            <AntecedentsF patientId={patientData} />
+          </TabsContent>
+
+          {/* You can replace with real content later */}
+          {tabsConfig
+            .filter(tab => !['info', 'postes', 'antecedentsP'].includes(tab.value))
+            .map(tab => (
+              <TabsContent key={tab.value} value={tab.value} className="mt-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>{formatTabTitle(tab.value)}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">Contenu pour "{formatTabTitle(tab.value)}" à venir...</p>
+                  </CardContent>
+                </Card>
               </TabsContent>
-            );
-          })}
+            ))}
         </Tabs>
       </div>
     </AppLayout>
