@@ -53,11 +53,10 @@ export const LoginScreen = () => {
     login(selectedRole);
     toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
 
-    // ✅ توجيه المستخدم بعد تسجيل الدخول
     if (selectedRole === 'admin') {
-      navigate('/admin');
+      navigate('/');
     } else if (selectedRole === 'doctor') {
-      navigate('/'); // الصفحة الرئيسية للطبيب
+      navigate('/'); 
     }
   };
 
