@@ -7,11 +7,12 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
-import DossiersMedicauxPage from "./pages/DossiersMedicauxPage";
-import VisitePeriodiquePage from "./pages/VisitePeriodiquePage";
-import DossierDetailsPage from "./pages/DossierDetailsPage";
-import NouvelleConsultation from "./pages/Nouvelleconsultation";
-import PrescriptionsPage from "./pages/PrescriptionsPage";
+import DossiersMedicauxPage from "./pages/medecin/DossiersMedicauxPage";
+import VisitePeriodiquePage from "./pages/medecin/VisitePeriodiquePage";
+import DossierDetailsPage from "./pages/medecin/DossierDetailsPage";
+import NouvelleConsultation from "./pages/medecin/Nouvelleconsultation";
+import PrescriptionsPage from "./pages/medecin/PrescriptionsPage";
+import NouveauPatientPage from "./pages/medecin/NouveauPatientPage";
 import SettingsPage from "./pages/SettingsPage";
 import DoctorsPage from "./pages/admin/DoctorsPage";
 import AddDoctorPage from "./pages/admin/AddDoctorPage";
@@ -33,10 +34,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProviderWithNavigate>
           <Routes>
-            {/* صفحة تسجيل الدخول بدون حماية */}
             <Route path="/login" element={<LoginPage />} />
 
-            {/* صفحات محمية باستخدام PrivateRoute */}
             <Route
               path="/"
               element={
@@ -50,6 +49,14 @@ const App = () => (
               element={
                 <PrivateRoute>
                   <PrescriptionsPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/nouveau-patient"
+              element={
+                <PrivateRoute>
+                  <NouveauPatientPage />
                 </PrivateRoute>
               }
             />
