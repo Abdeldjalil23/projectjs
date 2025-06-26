@@ -23,27 +23,45 @@ import {
   DialogClose
 } from '@/components/ui/dialog';
 
-// كود CSS للطباعة فقط الوصفة
+// كود CSS للطباعة مضبوط بدقة على حجم A5، مع إزالة الهوامش والحشو الزائد وتوسيط النموذج
 const printStyles = `
 @media print {
-  body * {
-    visibility: hidden !important;
-  }
-  .printable-ordonnance, .printable-ordonnance * {
-    visibility: visible !important;
+  html, body {
+    width: 148mm !important;
+    height: 210mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+    box-sizing: border-box !important;
   }
   .printable-ordonnance {
-    position: absolute !important;
-    left: 0; top: 0;
-    width: 100vw !important;
-    background: white !important;
-    color: black !important;
+    width: 148mm !important;
+    height: 210mm !important;
+    min-width: 148mm !important;
+    min-height: 210mm !important;
+    max-width: 148mm !important;
+    max-height: 210mm !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
     box-shadow: none !important;
-    padding: 32px !important;
-    margin: 0 !important;
+    border: none !important;
+    border-radius: 0 !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    position: static !important;
+    direction: ltr !important;
+    text-align: left !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
   }
   .no-print {
     display: none !important;
+  }
+  @page {
+    size: A5 portrait;
+    margin: 0;
   }
 }
 `;
@@ -94,29 +112,50 @@ const types = [
 ];
 
 const ordonnanceForm = (
-  <form className="space-y-4 printable-ordonnance bg-white rounded shadow p-6">
-    <div className="text-center mb-6">
-      <h2 className="text-2xl font-bold mb-2">وصفة طبية</h2>
-      <p className="text-muted-foreground text-sm">Prescription médicale</p>
+  <form dir="ltr" className="printable-ordonnance bg-white rounded shadow p-2 max-w-none mx-auto border border-gray-300 font-sans text-left">
+    {/* Header */}
+    <div className="flex justify-between items-start mb-6 w-full">
+      {/* Left: Logo & Center Info */}
+      <div className="flex flex-col items-start gap-1">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="bg-black text-white font-bold text-xs px-2 py-1 rounded">S</div>
+          <span className="font-bold text-xs tracking-tight">sonatrach</span>
+        </div>
+        <div className="text-xs font-semibold">Direction Régionale Haoud Berkaoui</div>
+        <div className="text-xs">Centre de Médecine de Travail</div>
+        <div className="text-xs mt-2">Nom du Médecin</div>
+        <div className="text-xs text-muted-foreground">(Cachet)</div>
+      </div>
+      {/* Right: Feuille de Maladie & Patient Info */}
+      <div className="flex flex-col items-end gap-1 w-1/2">
+        <div className="font-bold text-sm underline mb-2">FEUILLE DE MALADIE</div>
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 w-full text-xs">
+          <div className="font-semibold">Nom :</div>
+          <input type="text" className="border-b border-gray-400 focus:outline-none px-1 bg-transparent" />
+          <div className="font-semibold">Prénoms :</div>
+          <input type="text" className="border-b border-gray-400 focus:outline-none px-1 bg-transparent" />
+          <div className="font-semibold line-through">Malade (AEC) :</div>
+          <div></div>
+          <div className="font-semibold">Âge :</div>
+          <input type="text" className="border-b border-gray-400 focus:outline-none px-1 bg-transparent" />
+          <div className="font-semibold">Date :</div>
+          <input type="date" className="border-b border-gray-400 focus:outline-none px-1 bg-transparent" />
+        </div>
+      </div>
     </div>
-    <div>
-      <label className="block mb-1 font-medium">اسم المريض</label>
-      <input type="text" className="input input-bordered w-full border p-2 rounded" placeholder="اسم المريض" />
+    {/* ORDONNANCE Title */}
+    <div className="flex flex-col items-center my-10 w-full">
+      <div className="tracking-widest font-bold text-lg mb-1">ORDONNANCE</div>
+      <div className="w-32 border-b-2 border-black mb-2"></div>
     </div>
-    <div>
-      <label className="block mb-1 font-medium">اسم الطبيب</label>
-      <input type="text" className="input input-bordered w-full border p-2 rounded" placeholder="اسم الطبيب" />
+    {/* Prescription Content Area */}
+    <div className="min-h-[120px] mb-10 w-full">
+      <textarea className="w-full h-32 bg-transparent border-none focus:outline-none resize-none text-base" placeholder="Ecrire l'ordonnance ici..."></textarea>
     </div>
-    <div>
-      <label className="block mb-1 font-medium">تاريخ الوصفة</label>
-      <input type="date" className="input input-bordered w-full border p-2 rounded" />
-    </div>
-    <div>
-      <label className="block mb-1 font-medium">الأدوية</label>
-      <textarea className="input input-bordered w-full min-h-[80px] border p-2 rounded" placeholder="اسم الدواء - الجرعة - المدة..." />
-    </div>
-    <div className="flex gap-2 justify-end mt-6">
-      <Button type="button" variant="outline" onClick={() => window.print()} className="ml-2">طباعة</Button>
+    {/* Footer: empty for signature/stamp */}
+    <div className="flex justify-between items-end mt-8 w-full">
+      <div className="text-xs text-muted-foreground">&nbsp;</div>
+      <Button type="button" variant="outline" onClick={() => window.print()} className="no-print">Imprimer</Button>
     </div>
   </form>
 );
@@ -182,11 +221,6 @@ const NouvelleConsultation = () => {
             {selectedType && selectedType.title === 'Ordonnance' ? (
               <div className="mt-4">{ordonnanceForm}</div>
             ) : null}
-            <div className="flex justify-end mt-4">
-              <DialogClose asChild>
-                <Button variant="outline" className="no-print">Fermer</Button>
-              </DialogClose>
-            </div>
           </DialogContent>
         </Dialog>
       </div>
