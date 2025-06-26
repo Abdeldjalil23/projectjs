@@ -101,10 +101,6 @@ const DossiersMedicauxPage = () => {
                             <ClipboardList className="mr-2 h-4 w-4" />
                             Voir
                           </Button>
-                          <Button variant="outline" size="sm">
-                            <Download className="mr-2 h-4 w-4" />
-                            Exporter
-                          </Button>
                         </div>
                       </div>
                     </CardContent>
