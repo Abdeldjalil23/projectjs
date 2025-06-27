@@ -1,134 +1,209 @@
-// src/pages/medecin/AntecedentsP.tsx
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import InfoTextareaField from '@/components/InfoTextareaField';
-// PostesOccupesTab.jsx (in the same folder as DossierDetailsPage.jsx)
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+// You can place this file in a relevant folder, e.g., src/pages/dossiers/AntecedentsF.tsx
 
-const mockPostesOccupesData = [
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import {
+  Card, CardContent, CardHeader, CardTitle,
+} from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import {
+  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
+} from '@/components/ui/table';
+import { PlusCircle, Save, Trash2, XCircle } from 'lucide-react';
+import { toast } from 'sonner';
+
+// Define a type for a single antecedent record for better TypeScript support
+type Antecedent = {
+  id: number;
+  date: string;
+  type: string;
+  malade: string;
+  descriptionMaladie: string;
+  interventionsChirurgicale: string;
+  descriptionIntervention: string;
+  accidents: string;
+};
+
+// Initial mock data to show how the table works
+const initialData: Antecedent[] = [
   {
-    id: 'po1',
-    intituleFonction: 'Développeur Web Junior',
-    du: '2015-09-01',
-    au: '2017-08-31',
-    risquesProfessionnels: ['Travail sur écran', 'Stress'],
-    nuisances: ['Bruit de bureau'],
-    typeChangement: 'Promotion interne',
-    motif: 'Évolution de carrière',
-    motifsChangementPoste: 'Opportunité pour un poste de Développeur Confirmé.',
+    id: 1,
+    date: '2015-06-20',
+    type: 'Chirurgical',
+    malade: 'Non',
+    descriptionMaladie: '-',
+    interventionsChirurgicale: 'Appendicectomie',
+    descriptionIntervention: 'Ablation de l\'appendice suite à une inflammation aiguë.',
+    accidents: '-',
   },
   {
-    id: 'po2',
-    intituleFonction: 'Développeur Web Confirmé',
-    du: '2017-09-01',
-    au: '2020-01-15',
-    risquesProfessionnels: ['Travail sur écran prolongé', 'Sédentarité'],
-    nuisances: ['Climatisation variable'],
-    typeChangement: 'Démission',
-    motif: 'Nouvelle opportunité externe',
-    motifsChangementPoste: 'Recherche de nouveaux défis techniques.',
-  },
-  {
-    id: 'po3',
-    intituleFonction: 'Chef de Projet Technique',
-    du: '2020-02-01',
-    au: null, 
-    risquesProfessionnels: ['Gestion du stress', 'Charge mentale'],
-    nuisances: ['Réunions fréquentes'],
-    typeChangement: 'En cours',
-    motif: '-',
-    motifsChangementPoste: '-',
+    id: 2,
+    date: '2021-01-10',
+    type: 'Médical',
+    malade: 'Oui',
+    descriptionMaladie: 'Hypertension artérielle',
+    descriptionIntervention: '-',
+    interventionsChirurgicale: '-',
+    accidents: 'Aucun',
   },
 ];
 
-const formatDate = (dateString) => {
-  if (!dateString) return 'En cours';
-  return new Date(dateString).toLocaleDateString('fr-FR', {
-    year: 'numeric',
-    month: 'short', // Using short month for brevity
-    day: 'numeric',
-  });
-};
+const AntecedentsP = () => {
+  const [antecedents, setAntecedents] = useState<Antecedent[]>(initialData);
 
-const AntecedentsP = ({ patientId }) => {
-  // TODO: Fetch data based on patientId in a real app
-  const postesData = mockPostesOccupesData; 
-
-  if (!postesData || postesData.length === 0) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Postes Occupés</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Aucun poste occupé n'a été enregistré pour ce patient.</p>
-        </CardContent>
-      </Card>
+  // Handles changes in any input field within the table
+  const handleInputChange = (id: number, field: keyof Antecedent, value: string) => {
+    setAntecedents((prev) =>
+      prev.map((row) => (row.id === id ? { ...row, [field]: value } : row))
     );
-  }
+  };
+
+  // Adds a new, empty row to the table
+  const handleAddRow = () => {
+    const newRow: Antecedent = {
+      id: Date.now(), // Use a timestamp for a unique temporary ID
+      date: '',
+      type: '',
+      malade: '',
+      descriptionMaladie: '',
+      interventionsChirurgicale: '',
+      descriptionIntervention: '',
+      accidents: '',
+    };
+    setAntecedents((prev) => [...prev, newRow]);
+    toast.info('Nouvelle ligne ajoutée. Veuillez la remplir.');
+  };
+
+  // Removes a row from the table by its ID
+  const handleDeleteRow = (id: number) => {
+    setAntecedents((prev) => prev.filter((row) => row.id !== id));
+    toast.success('Ligne supprimée avec succès.');
+  };
+
+  // Simulates saving the data
+  const handleSave = () => {
+    // In a real application, you would send this data to your backend API
+    console.log('Données à enregistrer:', antecedents);
+    toast.success('Les antécédents ont été enregistrés !');
+    // Optionally, you could navigate away after saving
+    // navigate('/dossiers');
+  };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Historique des Postes Occupés</CardTitle>
-        <CardDescription>Liste des fonctions exercées par le patient.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[180px]">Intitulé Fonction</TableHead>
-                <TableHead className="min-w-[100px]">Du</TableHead>
-                <TableHead className="min-w-[100px]">Au</TableHead>
-                <TableHead className="min-w-[200px]">Risques Professionnels</TableHead>
-                <TableHead className="min-w-[180px]">Nuisances</TableHead>
-                <TableHead className="min-w-[150px]">Type Changement</TableHead>
-                <TableHead className="min-w-[180px]">Motif</TableHead>
-                <TableHead className="min-w-[250px]">Détails Changement</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {postesData.map((poste) => (
-                <TableRow key={poste.id}>
-                  <TableCell className="font-medium">{poste.intituleFonction}</TableCell>
-                  <TableCell>{formatDate(poste.du)}</TableCell>
-                  <TableCell>{poste.au ? formatDate(poste.au) : <Badge variant="outline">En cours</Badge>}</TableCell>
-                  <TableCell>
-                    {Array.isArray(poste.risquesProfessionnels) && poste.risquesProfessionnels.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {poste.risquesProfessionnels.map((risque, index) => (
-                          <Badge key={index} variant="destructive" className="text-xs font-normal">{risque}</Badge>
-                        ))}
-                      </div>
-                    ) : '-'}
-                  </TableCell>
-                  <TableCell>
-                    {Array.isArray(poste.nuisances) && poste.nuisances.length > 0 ? (
-                       <div className="flex flex-wrap gap-1">
-                        {poste.nuisances.map((nuisance, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs font-normal">{nuisance}</Badge>
-                        ))}
-                      </div>
-                    ) : '-'}
-                  </TableCell>
-                  <TableCell>{poste.typeChangement || '-'}</TableCell>
-                  <TableCell>{poste.motif || '-'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{poste.motifsChangementPoste || '-'}</TableCell>
+    <div className="p-4 md:p-6 space-y-6">
+      <h1 className="text-2xl font-bold tracking-tight">
+        Saisir les antécédents personnels de l'agent
+      </h1>
+
+      <Card>
+        <CardHeader className="flex flex-row items-center justify-between">
+          <CardTitle>Liste des Antécédents</CardTitle>
+          <Button onClick={handleAddRow} size="sm" className="flex items-center gap-2">
+            <PlusCircle className="h-4 w-4" />
+            Ajouter un antécédent
+          </Button>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="min-w-[150px]">Date</TableHead>
+                  <TableHead className="min-w-[150px]">Type d'antécédents</TableHead>
+                  <TableHead className="min-w-[100px]">Malade</TableHead>
+                  <TableHead className="min-w-[250px]">Description Maladie</TableHead>
+                  <TableHead className="min-w-[250px]">Interventions Chirurgicales</TableHead>
+                  <TableHead className="min-w-[250px]">Description de l'intervention</TableHead>
+                  <TableHead className="min-w-[200px]">Accidents</TableHead>
+                  <TableHead>Actions</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-      </CardContent>
-    </Card>
+              </TableHeader>
+              <TableBody>
+                {antecedents.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell>
+                      <Input
+                        type="date"
+                        value={row.date}
+                        onChange={(e) => handleInputChange(row.id, 'date', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        placeholder="Médical, Chirurgical..."
+                        value={row.type}
+                        onChange={(e) => handleInputChange(row.id, 'type', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        placeholder="Oui/Non"
+                        value={row.malade}
+                        onChange={(e) => handleInputChange(row.id, 'malade', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        placeholder="Description de la maladie..."
+                        value={row.descriptionMaladie}
+                        onChange={(e) => handleInputChange(row.id, 'descriptionMaladie', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        placeholder="Nom de l'intervention..."
+                        value={row.interventionsChirurgicale}
+                        onChange={(e) => handleInputChange(row.id, 'interventionsChirurgicale', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        placeholder="Détails de l'intervention..."
+                        value={row.descriptionIntervention}
+                        onChange={(e) => handleInputChange(row.id, 'descriptionIntervention', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Input
+                        placeholder="Type d'accident..."
+                        value={row.accidents}
+                        onChange={(e) => handleInputChange(row.id, 'accidents', e.target.value)}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleDeleteRow(row.id)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                        <span className="sr-only">Supprimer</span>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </div>
+          {antecedents.length === 0 && (
+            <div className="text-center p-8 text-muted-foreground">
+              Aucun antécédent saisi. Cliquez sur "Ajouter" pour commencer.
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end gap-2">
+        <Button variant="outline" className="flex items-center gap-2">
+          <XCircle className="h-4 w-4" />
+          Annuler
+        </Button>
+        <Button onClick={handleSave} className="flex items-center gap-2">
+          <Save className="h-4 w-4" />
+          Enregistrer les modifications
+        </Button>
+      </div>
+    </div>
   );
 };
 
