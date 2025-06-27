@@ -11,6 +11,84 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose
 } from '@/components/ui/dialog';
 
+// TypeScript interfaces for state
+interface FormData {
+  nom: string;
+  prenoms: string;
+  age: string;
+  date: string;
+  medicaments: string;
+}
+
+interface OrientationData {
+  nom: string;
+  prenom: string;
+  age: string;
+  nature: string[];
+  avis: string;
+  destinataire: string;
+  date: string;
+}
+
+interface SoinsData {
+  emisLe: string;
+  docteur: string;
+  nom: string;
+  dateAccident: string;
+  service: string;
+  compagnie: string;
+  choix: string;
+  arretJours: string;
+  arretDu: string;
+  arretAu: string;
+  prolongationJours: string;
+  prolongationDu: string;
+  prolongationAu: string;
+  repriseDate: string;
+  admissionLieu: string;
+  exemplaires: string;
+  signature: string;
+}
+
+interface EvacData {
+  date: string;
+  nom: string;
+  prenom: string;
+  fonction: string;
+  structure: string;
+  domicile: string;
+  hopital: string;
+  specialiste: string;
+  delai: string;
+  maladie: boolean;
+  accident: boolean;
+  autres: string;
+  transport: {
+    avion: boolean;
+    ambulance: boolean;
+    sh: boolean;
+    propres: boolean;
+  };
+  inf: string;
+  assistant: string;
+}
+
+interface ExplorationData {
+  nom: string;
+  prenom: string;
+  age: string;
+  date: string;
+  tests: string[];
+  commentaires: string;
+}
+
+interface ServiceType {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  action: string;
+}
+
 const printStyles = `
 @media print {
   @page {
@@ -52,7 +130,7 @@ const printStyles = `
 }
 `;
 
-const types = [
+const types: ServiceType[] = [
   { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Consultation générale', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
   { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'طلب أو تجديد وصفة طبية', action: 'Demander' },
   { icon: <Navigation className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Orientation', desc: 'إحالة أو توجيه لطبيب مختص', action: 'Demander' },
@@ -62,22 +140,41 @@ const types = [
   { icon: <HeartPulse className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Soins', desc: 'رعاية تمريضية أو متابعة', action: 'Demander' }
 ];
 
-const NouvelleConsultation = () => {
+const testOptions: string[] = [
+  "Hémogramme complet", "Glycémie à jeun", "Cholestérol total", "HDL Cholestérol", "LDL Cholestérol", "Triglycérides",
+  "Créatinine", "Urée", "Acide urique", "Bilan hépatique (ASAT, ALAT)", "Gamma GT", "Phosphatases alcalines",
+  "Ionogramme sanguin", "Calcium total", "Phosphore", "Ferritine", "VS (Vitesse de sédimentation)", "CRP (Protéine C réactive)",
+  "TP, TCA (Bilan de coagulation)", "Groupage sanguin", "Sérologie VIH", "Sérologie Hépatite B", "Sérologie Hépatite C",
+  "Bilan lipidique complet", "TSH (Thyroïde)", "FT3 - FT4", "ECBU (Examen d'urines)", "Coproculture", "Bilan inflammatoire",
+  "Test de grossesse (Beta HCG)", "Test rapide Covid-19", "Sérologie Covid-19", "Hémoculture", "Glycémie postprandiale",
+  "Microalbuminurie", "Protéinurie"
+];
+
+
+const natureOptions: string[] = [
+  'Visite périodique',
+  'Urgence médicochirurgicale',
+  'Visite spécifique',
+  'Visite d\'embauche',
+  'Visite de soins'
+];
+
+const NouvelleConsultation: React.FC = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [selectedType, setSelectedType] = useState(null);
-  const [formData, setFormData] = useState({ nom: '', prenoms: '', age: '', date: '', medicaments: '' });
+  const [selectedType, setSelectedType] = useState<ServiceType | null>(null);
+  const [formData, setFormData] = useState<FormData>({ nom: '', prenoms: '', age: '', date: '', medicaments: '' });
   const today = new Date().toISOString().slice(0, 10);
-  const [orientationData, setOrientationData] = useState({ nom: '', prenom: '', age: '', nature: [], avis: '', destinataire: '', date: today });
+  const [orientationData, setOrientationData] = useState<OrientationData>({ nom: '', prenom: '', age: '', nature: [], avis: '', destinataire: '', date: today });
   const [orientationOpen, setOrientationOpen] = useState(false);
-  const [soinsData, setSoinsData] = useState({
-    emisLe: new Date().toISOString().slice(0, 10),
+  const [soinsData, setSoinsData] = useState<SoinsData>({
+    emisLe: today,
     docteur: '',
     nom: '',
     dateAccident: '',
     service: '',
     compagnie: '',
-    choix: '1', // 1: Arret, 2: Prolongation, 3: Reprise, 4: Admission
+    choix: '1',
     arretJours: '',
     arretDu: '',
     arretAu: '',
@@ -90,8 +187,8 @@ const NouvelleConsultation = () => {
     signature: ''
   });
   const [soinsOpen, setSoinsOpen] = useState(false);
-  const [evacData, setEvacData] = useState({
-    date: new Date().toISOString().slice(0, 10),
+  const [evacData, setEvacData] = useState<EvacData>({
+    date: today,
     nom: '',
     prenom: '',
     fonction: '',
@@ -104,27 +201,30 @@ const NouvelleConsultation = () => {
     accident: false,
     autres: '',
     transport: { avion: false, ambulance: false, sh: false, propres: false },
-    inf: '', // 'oui' | 'non'
-    assistant: '', // 'oui' | 'non'
+    inf: '',
+    assistant: ''
   });
   const [evacOpen, setEvacOpen] = useState(false);
-
-  const natureOptions = [
-    'Visite périodique',
-    'Urgence médicochirurgicale',
-    'Visite spécifique',
-    'Visite d\'embauche',
-    'Visite de soins'
-  ];
+  const [explorationData, setExplorationData] = useState<ExplorationData>({
+    nom: '',
+    prenom: '',
+    age: '',
+    date: today,
+    tests: [],
+    commentaires: ''
+  });
+  const [explorationOpen, setExplorationOpen] = useState(false);
 
   useEffect(() => {
     const style = document.createElement('style');
     style.innerHTML = printStyles;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => {
+      document.head.removeChild(style);
+    };
   }, []);
 
-  const handleDemander = (type) => {
+  const handleDemander = (type: ServiceType) => {
     if (type.title === 'Orientation') {
       setOrientationOpen(true);
       setSelectedType(type);
@@ -140,16 +240,21 @@ const NouvelleConsultation = () => {
       setSelectedType(type);
       return;
     }
+    if (type.title === 'Exploration') {
+      setExplorationOpen(true);
+      setSelectedType(type);
+      return;
+    }
     setSelectedType(type);
     setOpen(true);
   };
 
-  const handleInputChange = (e) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOrientationInput = (e) => {
+  const handleOrientationInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     if (type === 'checkbox') {
       setOrientationData((prev) => {
@@ -163,20 +268,35 @@ const NouvelleConsultation = () => {
     }
   };
 
-  const handleSoinsInput = (e) => {
-    const { name, value, type } = e.target;
+  const handleSoinsInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
     setSoinsData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleEvacInput = (e) => {
+  const handleEvacInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     if (name.startsWith('transport.')) {
-      const key = name.split('.')[1];
+      const key = name.split('.')[1] as keyof EvacData['transport'];
       setEvacData((prev) => ({ ...prev, transport: { ...prev.transport, [key]: checked } }));
     } else if (type === 'checkbox') {
       setEvacData((prev) => ({ ...prev, [name]: checked }));
     } else {
       setEvacData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleExplorationInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
+      const checked = e.target.checked;
+      setExplorationData((prev) => {
+        const newTests = checked
+          ? [...prev.tests, value]
+          : prev.tests.filter((t) => t !== value);
+        return { ...prev, tests: newTests };
+      });
+    } else {
+      setExplorationData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -221,12 +341,12 @@ const NouvelleConsultation = () => {
             {selectedType?.title === 'Ordonnance' && (
               <div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input className="border p-2" name="nom" placeholder="اسم المريض" onChange={handleInputChange} />
-                  <input className="border p-2" name="prenoms" placeholder="اللقب" onChange={handleInputChange} />
-                  <input className="border p-2" name="age" placeholder="العمر" onChange={handleInputChange} />
-                  <input className="border p-2" name="date" type="date" onChange={handleInputChange} />
+                  <input className="border p-2" name="nom" placeholder="اسم المريض" value={formData.nom} onChange={handleInputChange} />
+                  <input className="border p-2" name="prenoms" placeholder="اللقب" value={formData.prenoms} onChange={handleInputChange} />
+                  <input className="border p-2" name="age" placeholder="العمر" value={formData.age} onChange={handleInputChange} />
+                  <input className="border p-2" name="date" type="date" value={formData.date} onChange={handleInputChange} />
                 </div>
-                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="دواء - كمية - مدة..." onChange={handleInputChange} />
+                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="دواء - كمية - مدة..." value={formData.medicaments} onChange={handleInputChange} />
                 <div className="mt-4 text-end">
                   <Button onClick={handlePrint}>طباعة</Button>
                 </div>
@@ -241,10 +361,8 @@ const NouvelleConsultation = () => {
         </Dialog>
 
         <div className="print-area hidden">
-          <div className="font-sans text-black bg-white mx-auto p-8" style={{width: '14.8cm', height: '21cm'}}>
-            {/* Header */}
+          <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
             <div className="flex flex-row justify-between items-start mb-8 w-full">
-              {/* Left: شعار ومعلومات */}
               <div className="flex flex-col items-start gap-1 text-xs min-w-[200px]">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="bg-black text-white font-bold text-xs px-2 py-1 rounded">S</span>
@@ -255,17 +373,16 @@ const NouvelleConsultation = () => {
                 <div className="mt-2">Nom du Médecin</div>
                 <div className="text-muted-foreground">(Cachet)</div>
               </div>
-              {/* Right: FEUILLE DE MALADIE والحقول */}
               <div className="flex flex-col items-end gap-1 w-[340px]">
                 <div className="font-bold text-base mb-2 underline underline-offset-2">FEUILLE DE MALADIE</div>
                 <div className="flex flex-col gap-2 w-full text-xs">
                   <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px]">Nom :</div>
-                    <div className="w-full text-base font-normal px-1" style={{borderBottom: '2px solid #000', minHeight: '2em'}}>{formData.nom}</div>
+                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.nom}</div>
                   </div>
                   <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px]">Prénoms :</div>
-                    <div className="w-full text-base font-normal px-1" style={{borderBottom: '2px solid #000', minHeight: '2em'}}>{formData.prenoms}</div>
+                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.prenoms}</div>
                   </div>
                   <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px] line-through">Malade (AEC) :</div>
@@ -273,21 +390,19 @@ const NouvelleConsultation = () => {
                   </div>
                   <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px]">Age :</div>
-                    <div className="w-full text-base font-normal px-1" style={{borderBottom: '2px solid #000', minHeight: '2em'}}>{formData.age}</div>
+                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.age}</div>
                   </div>
                   <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px]">Date :</div>
-                    <div className="w-full text-base font-normal px-1" style={{borderBottom: '2px solid #000', minHeight: '2em'}}>{formData.date}</div>
+                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.date}</div>
                   </div>
                 </div>
               </div>
             </div>
-            {/* العنوان ORDONNANCE */}
             <div className="flex flex-col items-center my-12 w-full">
               <div className="tracking-[0.4em] font-bold text-lg mb-1">ORDONNANCE</div>
               <div className="w-40 border-b-2 border-black mb-2"></div>
             </div>
-            {/* جدول الأدوية */}
             <div className="w-full mt-8">
               <table className="w-full border text-sm">
                 <thead>
@@ -362,7 +477,7 @@ const NouvelleConsultation = () => {
               </div>
               <div className="flex justify-between mt-4">
                 <span className="font-bold">LE MEDECIN</span>
-                <Button onClick={() => window.print()}>طباعة</Button>
+                <Button onClick={handlePrint}>طباعة</Button>
               </div>
               <div className="flex justify-end mt-2">
                 <DialogClose asChild>
@@ -372,10 +487,9 @@ const NouvelleConsultation = () => {
             </div>
           </DialogContent>
         </Dialog>
-        {/* منطقة الطباعة لنموذج Orientation */}
         {orientationOpen && (
           <div className="print-area hidden">
-            <div className="font-sans text-black bg-white mx-auto p-8" style={{width: '14.8cm', height: '21cm'}}>
+            <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
               <div className="flex flex-row justify-between items-center mb-2">
                 <div>
                   <div className="font-bold text-xs">ENTREPRISE NATIONALE SONATRACH</div>
@@ -428,10 +542,10 @@ const NouvelleConsultation = () => {
               <div className="flex flex-row justify-between items-center mb-2">
                 <div className="font-bold text-lg">CERTIFICAT MEDICAL DE</div>
                 <div className="flex flex-col text-xs border border-black p-2">
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="1" checked={soinsData.choix==='1'} onChange={handleSoinsInput}/> 1 Arrêt de travail</label>
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="2" checked={soinsData.choix==='2'} onChange={handleSoinsInput}/> 2 Prolongation</label>
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="3" checked={soinsData.choix==='3'} onChange={handleSoinsInput}/> 3 Reprise de travail</label>
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="4" checked={soinsData.choix==='4'} onChange={handleSoinsInput}/> 4 Hospitalisation</label>
+                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="1" checked={soinsData.choix === '1'} onChange={handleSoinsInput} /> 1 Arrêt de travail</label>
+                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="2" checked={soinsData.choix === '2'} onChange={handleSoinsInput} /> 2 Prolongation</label>
+                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="3" checked={soinsData.choix === '3'} onChange={handleSoinsInput} /> 3 Reprise de travail</label>
+                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="4" checked={soinsData.choix === '4'} onChange={handleSoinsInput} /> 4 Hospitalisation</label>
                 </div>
                 <div className="text-red-600 font-bold text-lg ml-4">N° <input className="border-b border-black w-20" name="signature" value={soinsData.signature} onChange={handleSoinsInput} placeholder="Numéro" /></div>
               </div>
@@ -451,16 +565,16 @@ const NouvelleConsultation = () => {
               </div>
               <div className="font-bold my-2">Je soussigné, Docteur en Médecine, Certifie que l'état de santé du susnommé justifie :</div>
               <div className="border border-black p-4 mb-2 flex flex-col gap-3">
-                {soinsData.choix==='1' && (
+                {soinsData.choix === '1' && (
                   <div className="flex flex-wrap items-center gap-2"><span className="font-bold">1</span> Traitement avec arrêt de travail de <input className="border-b border-black w-12" name="arretJours" value={soinsData.arretJours} onChange={handleSoinsInput} /> jours, sauf complications, du <input className="border-b border-black w-24" name="arretDu" value={soinsData.arretDu} onChange={handleSoinsInput} /> au <input className="border-b border-black w-24" name="arretAu" value={soinsData.arretAu} onChange={handleSoinsInput} /></div>
                 )}
-                {soinsData.choix==='2' && (
+                {soinsData.choix === '2' && (
                   <div className="flex flex-wrap items-center gap-2"><span className="font-bold">2</span> Prolongation d'arrêt de travail de <input className="border-b border-black w-12" name="prolongationJours" value={soinsData.prolongationJours} onChange={handleSoinsInput} /> jours, sauf complications, du <input className="border-b border-black w-24" name="prolongationDu" value={soinsData.prolongationDu} onChange={handleSoinsInput} /> au <input className="border-b border-black w-24" name="prolongationAu" value={soinsData.prolongationAu} onChange={handleSoinsInput} /></div>
                 )}
-                {soinsData.choix==='3' && (
+                {soinsData.choix === '3' && (
                   <div className="flex flex-wrap items-center gap-2"><span className="font-bold">3</span> Reprise de travail à dater du <input className="border-b border-black w-24" name="repriseDate" value={soinsData.repriseDate} onChange={handleSoinsInput} /></div>
                 )}
-                {soinsData.choix==='4' && (
+                {soinsData.choix === '4' && (
                   <div className="flex flex-wrap items-center gap-2"><span className="font-bold">4</span> Admission ou transport d'urgence à l'hôpital ou à la clinique de <input className="border-b border-black w-40" name="admissionLieu" value={soinsData.admissionLieu} onChange={handleSoinsInput} /></div>
                 )}
               </div>
@@ -470,7 +584,7 @@ const NouvelleConsultation = () => {
                 <div>Signature du Médecin</div>
               </div>
               <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={() => window.print()}>طباعة</Button>
+                <Button onClick={handlePrint}>طباعة</Button>
                 <DialogClose asChild>
                   <Button variant="outline">Fermer</Button>
                 </DialogClose>
@@ -478,10 +592,9 @@ const NouvelleConsultation = () => {
             </div>
           </DialogContent>
         </Dialog>
-        {/* منطقة الطباعة لنموذج Soins */}
         {soinsOpen && (
           <div className="print-area hidden">
-            <div className="font-sans text-black bg-white mx-auto p-8" style={{width: '18cm', height: '21cm'}}>
+            <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
               <div className="flex flex-row justify-between items-center mb-2">
                 <div className="font-bold text-lg">CERTIFICAT MEDICAL DE</div>
                 <div className="flex flex-col text-xs border border-black p-2">
@@ -502,17 +615,25 @@ const NouvelleConsultation = () => {
               </div>
               <div className="font-bold my-2">Je soussigné, Docteur en Médecine, Certifie que l'état de santé du susnommé justifie :</div>
               <div className="border border-black p-4 mb-2 flex flex-col gap-3">
-                {soinsData.choix==='1' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">1</span> Traitement avec arrêt de travail de <span className="border-b border-black px-1 min-w-[40px] inline-block">{soinsData.arretJours}</span> jours, sauf complications, du <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.arretDu}</span> au <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.arretAu}</span></div>
+                {soinsData.choix === '1' && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold">1</span> Traitement avec arrêt de travail de <span className="border-b border-black px-1 min-w-[40px] inline-block">{soinsData.arretJours}</span> jours, sauf complications, du <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.arretDu}</span> au <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.arretAu}</span>
+                  </div>
                 )}
-                {soinsData.choix==='2' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">2</span> Prolongation d'arrêt de travail de <span className="border-b border-black px-1 min-w-[40px] inline-block">{soinsData.prolongationJours}</span> jours, sauf complications, du <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.prolongationDu}</span> au <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.prolongationAu}</span></div>
+                {soinsData.choix === '2' && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold">2</span> Prolongation d'arrêt de travail de <span className="border-b border-black px-1 min-w-[40px] inline-block">{soinsData.prolongationJours}</span> jours, sauf complications, du <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.prolongationDu}</span> au <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.prolongationAu}</span>
+                  </div>
                 )}
-                {soinsData.choix==='3' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">3</span> Reprise de travail à dater du <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.repriseDate}</span></div>
+                {soinsData.choix === '3' && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold">3</span> Reprise de travail à dater du <span className="border-b border-black px-1 min-w-[60px] inline-block">{soinsData.repriseDate}</span>
+                  </div>
                 )}
-                {soinsData.choix==='4' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">4</span> Admission ou transport d'urgence à l'hôpital ou à la clinique de <span className="border-b border-black px-1 min-w-[120px] inline-block">{soinsData.admissionLieu}</span></div>
+                {soinsData.choix === '4' && (
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-bold">4</span> Admission ou transport d'urgence à l'hôpital ou à la clinique de <span className="border-b border-black px-1 min-w-[120px] inline-block">{soinsData.admissionLieu}</span>
+                  </div>
                 )}
               </div>
               <div className="flex flex-row justify-between mt-4 text-xs">
@@ -570,16 +691,16 @@ const NouvelleConsultation = () => {
               <div className="font-bold">Accompagné par :</div>
               <div className="flex gap-8 items-center mb-2">
                 <div>L'infirmier :
-                  <label className="ml-2"><input type="radio" name="inf" value="oui" checked={evacData.inf==='oui'} onChange={handleEvacInput} /> Oui</label>
-                  <label className="ml-2"><input type="radio" name="inf" value="non" checked={evacData.inf==='non'} onChange={handleEvacInput} /> Non</label>
+                  <label className="ml-2"><input type="radio" name="inf" value="oui" checked={evacData.inf === 'oui'} onChange={handleEvacInput} /> Oui</label>
+                  <label className="ml-2"><input type="radio" name="inf" value="non" checked={evacData.inf === 'non'} onChange={handleEvacInput} /> Non</label>
                 </div>
                 <div>L'assistant(e) :
-                  <label className="ml-2"><input type="radio" name="assistant" value="oui" checked={evacData.assistant==='oui'} onChange={handleEvacInput} /> Oui</label>
-                  <label className="ml-2"><input type="radio" name="assistant" value="non" checked={evacData.assistant==='non'} onChange={handleEvacInput} /> Non</label>
+                  <label className="ml-2"><input type="radio" name="assistant" value="oui" checked={evacData.assistant === 'oui'} onChange={handleEvacInput} /> Oui</label>
+                  <label className="ml-2"><input type="radio" name="assistant" value="non" checked={evacData.assistant === 'non'} onChange={handleEvacInput} /> Non</label>
                 </div>
               </div>
               <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={() => window.print()}>طباعة</Button>
+                <Button onClick={handlePrint}>طباعة</Button>
                 <DialogClose asChild>
                   <Button variant="outline">Fermer</Button>
                 </DialogClose>
@@ -588,10 +709,9 @@ const NouvelleConsultation = () => {
             </div>
           </DialogContent>
         </Dialog>
-        {/* منطقة الطباعة لنموذج Evacuation */}
         {evacOpen && (
           <div className="print-area hidden">
-            <div className="font-sans text-black bg-white mx-auto p-8" style={{width: '18cm', height: '21cm'}}>
+            <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
               <div className="flex flex-row justify-between items-center mb-2">
                 <div>
                   <div className="font-bold text-xs">sonatrach</div>
@@ -631,10 +751,135 @@ const NouvelleConsultation = () => {
               </div>
               <div className="font-bold">Accompagné par :</div>
               <div className="flex gap-8 items-center mb-2">
-                <span>L'infirmier : Oui <span className="border border-black w-4 h-4 inline-block text-center">{evacData.inf==='oui' ? '✔' : ''}</span> Non <span className="border border-black w-4 h-4 inline-block text-center">{evacData.inf==='non' ? '✔' : ''}</span></span>
-                <span>L'assistant(e) : Oui <span className="border border-black w-4 h-4 inline-block text-center">{evacData.assistant==='oui' ? '✔' : ''}</span> Non <span className="border border-black w-4 h-4 inline-block text-center">{evacData.assistant==='non' ? '✔' : ''}</span></span>
+                <span>L'infirmier : Oui <span className="border border-black w-4 h-4 inline-block text-center">{evacData.inf === 'oui' ? '✔' : ''}</span> Non <span className="border border-black w-4 h-4 inline-block text-center">{evacData.inf === 'non' ? '✔' : ''}</span></span>
+                <span>L'assistant(e) : Oui <span className="border border-black w-4 h-4 inline-block text-center">{evacData.assistant === 'oui' ? '✔' : ''}</span> Non <span className="border border-black w-4 h-4 inline-block text-center">{evacData.assistant === 'non' ? '✔' : ''}</span></span>
               </div>
               <div className="text-end font-bold mt-4">Le Médecin</div>
+            </div>
+          </div>
+        )}
+
+        <Dialog open={explorationOpen} onOpenChange={setExplorationOpen}>
+          <DialogContent className="dialog-print-hide max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>DEMANDE D'ANALYSE MÉDICALE</DialogTitle>
+              <DialogDescription>طلب تحاليل أو فحوصات مخبرية</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {["nom", "prenom", "age"].map((field) => (
+                  <input
+                    key={field}
+                    name={field}
+                    className="border-b border-black px-2 py-1 text-sm"
+                    placeholder={`${field.charAt(0).toUpperCase() + field.slice(1)} / ${field === "nom" ? "الاسم" : field === "prenom" ? "اللقب" : "العمر"}`}
+                    value={explorationData[field]}
+                    onChange={handleExplorationInput}
+                  />
+                ))}
+                <input
+                  type="date"
+                  className="border-b border-black px-2 py-1 text-sm"
+                  name="date"
+                  value={explorationData.date}
+                  onChange={handleExplorationInput}
+                />
+              </div>
+
+              <div>
+                <div className="font-semibold mb-2">Type d'analyse / نوع التحليل :</div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto pr-2">
+                  {testOptions.map((opt) => (
+                    <label key={opt} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="checkbox"
+                        name="tests"
+                        value={opt}
+                        checked={explorationData.tests.includes(opt)}
+                        onChange={handleExplorationInput}
+                      />
+                      {opt}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <textarea
+                name="commentaires"
+                className="border w-full p-2 text-sm"
+                rows={4}
+                placeholder="Commentaires supplémentaires / تعليقات إضافية"
+                value={explorationData.commentaires}
+                onChange={handleExplorationInput}
+              />
+
+              <div className="flex justify-between mt-4">
+                <span className="font-bold">LE MÉDECIN / الطبيب</span>
+                <Button onClick={handlePrint}>طباعة</Button>
+              </div>
+
+              <div className="flex justify-end">
+                <DialogClose asChild>
+                  <Button variant="outline">Fermer</Button>
+                </DialogClose>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {explorationOpen && (
+          <div className="print-area hidden">
+            <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
+              <div className="flex justify-between items-start mb-8">
+                <div className="text-xs min-w-[200px] space-y-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-black text-white font-bold text-xs px-2 py-1 rounded">S</span>
+                    <span className="font-bold tracking-tight">sonatrach</span>
+                  </div>
+                  <div className="font-semibold">Direction Régionale Haoud Berkaoui</div>
+                  <div>Centre de Médecine de Travail</div>
+                  <div className="mt-2">Nom du Médecin</div>
+                  <div className="text-muted-foreground">(Cachet)</div>
+                </div>
+
+                <div className="text-xs w-[340px] space-y-2">
+                  <div className="font-bold text-base underline">DEMANDE D'ANALYSE MÉDICALE</div>
+                  {["Nom", "Prénoms", "Age", "Date"].map((label) => (
+                    <div key={label} className="flex items-center">
+                      <div className="font-semibold min-w-[70px]">{label} :</div>
+                      <div className="w-full text-base font-normal px-1 border-b-2 border-black min-h-[2em]">
+                        {explorationData[label.toLowerCase()]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="text-center my-12">
+                <div className="tracking-[0.4em] font-bold text-lg mb-1">DEMANDE D'ANALYSE</div>
+                <div className="w-40 border-b-2 border-black mx-auto mb-2"></div>
+              </div>
+
+              <div className="text-sm">
+                <div className="font-semibold mb-2">Analyses demandées :</div>
+                <ul className="list-disc pl-5">
+                  {explorationData.tests.map((test, i) => (
+                    <li key={i}>{test}</li>
+                  ))}
+                </ul>
+
+                {explorationData.commentaires && (
+                  <div className="mt-4">
+                    <div className="font-semibold">Commentaires :</div>
+                    <div>{explorationData.commentaires}</div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end mt-12">
+                <span className="font-bold">LE MÉDECIN</span>
+              </div>
             </div>
           </div>
         )}
