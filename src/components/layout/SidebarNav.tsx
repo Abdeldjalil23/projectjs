@@ -27,7 +27,6 @@ export const SidebarNav = () => {
     if (userRole === 'doctor') {
       setMenuItems([
         { title: 'Dashboard', icon: Home, url: '/' },
-        { title: 'Prescriptions', icon: Pill, url: '/prescriptions' },
         // New Pages
         { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
         { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },

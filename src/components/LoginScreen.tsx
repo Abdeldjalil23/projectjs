@@ -56,7 +56,7 @@ export const LoginScreen = () => {
     if (selectedRole === 'admin') {
       navigate('/');
     } else if (selectedRole === 'doctor') {
-      navigate('/'); 
+      navigate('/');
     }
   };
 

@@ -8,7 +8,9 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Mail, Phone } from 'lucide-react';
 import {
   Tabs,
   TabsContent,
@@ -59,12 +61,11 @@ export const AdminDashboard = () => {
     { month: "Jun", Respiratory: 14, Cardiovascular: 20, Orthopedic: 17, Other: 13 },
   ];
 
-  const employeeMetrics = [
-    { name: "Production", total: 1520, appointments: 350, leaves: 42 },
-    { name: "Engineering", total: 985, appointments: 210, leaves: 28 },
-    { name: "Administration", total: 680, appointments: 180, leaves: 22 },
-    { name: "Research", total: 420, appointments: 120, leaves: 15 },
-    { name: "Logistics", total: 325, appointments: 95, leaves: 18 },
+  const doctorsData = [
+    { id: 1, name: 'Dr. Mohammed Ali', specialty: 'General Medicine', avatar: 'MA', email: 'mohammed.ali@sonatrach.dz', phone: '+213 123 456 789' },
+    { id: 2, name: 'Dr. Fatima Zahra', specialty: 'Dentist', avatar: 'FZ', email: 'fatima.zahra@sonatrach.dz', phone: '+213 876 543 210' },
+    { id: 3, name: 'Dr. Karim Benzema', specialty: 'Psychologist', avatar: 'KB', email: 'karim.benzema@sonatrach.dz', phone: '+213 567 812 345' },
+    { id: 4, name: 'Dr. Nadia Saoudi', specialty: 'General Medicine', avatar: 'NS', email: 'nadia.saoudi@sonatrach.dz', phone: '+213 432 187 654' },
   ];
 
   return (
@@ -245,47 +246,39 @@ export const AdminDashboard = () => {
         </Card>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Employee Health Metrics</CardTitle>
-            <CardDescription>Medical usage by business unit</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px] pr-4">
-              <div className="space-y-6">
-                {employeeMetrics.map((unit) => {
-                  const percent = Math.round((unit.appointments / unit.total) * 100);
-                  return (
-                    <div key={unit.name} className="space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                          <p className="text-sm font-medium leading-none">{unit.name}</p>
-                          <p className="text-sm text-muted-foreground">{unit.total} employees</p>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">{unit.appointments} appointments</Badge>
-                          <Badge variant="outline" className="bg-red-50 text-red-500">
-                            {unit.leaves} on leave
-                          </Badge>
-                        </div>
-                      </div>
-                      <div className="mt-2">
-                        <div className="flex items-center justify-between text-xs mb-1">
-                          <span>Appointment ratio</span>
-                          <span className="text-medsuite-primary">{percent}%</span>
-                        </div>
-                        <div className="h-2 bg-medsuite-secondary rounded-full overflow-hidden">
-                          <div
-                            className="bg-medsuite-primary h-full rounded-full"
-                            style={{ width: `${percent}%` }}
-                          />
-                        </div>
-                      </div>
+        <CardHeader>
+        <CardTitle>Annuaire des Médecins</CardTitle>
+        <CardDescription>Coordonnées du personnel médical.</CardDescription>
+        </CardHeader>
+        <CardContent>
+        <ScrollArea className="h-[300px]">
+          <div className="space-y-6 pr-4">
+            {doctorsData.map((doctor) => (
+              <div key={doctor.id} className="flex items-start space-x-4">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback className="bg-primary text-primary-foreground">
+                    {doctor.avatar}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold leading-none">{doctor.name}</p>
+                  <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
+                  <div className="mt-2 space-y-1">
+                    <div className="flex items-center">
+                      <Mail className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">{doctor.email}</span>
                     </div>
-                  );
-                })}
+                    <div className="flex items-center">
+                      <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground">{doctor.phone}</span>
+                    </div>
+                  </div>
+                </div>
               </div>
-            </ScrollArea>
-          </CardContent>
+            ))}
+          </div>
+        </ScrollArea>
+        </CardContent>
         </Card>
       </div>
 
