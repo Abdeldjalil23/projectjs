@@ -60,7 +60,7 @@ const protectedRoutes = [
   { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation /> },
   { path: "/admin/visite-perdue", element: <AdminViPerdPage /> },
   { path: "/admin/users", element: <UsersPage /> },
-  { path: "/admin/users", element: <MedViPerPage /> },
+  { path: "/visite-periodique", element: <MedViPerPage /> },
 ];
 
 const App = () => (
