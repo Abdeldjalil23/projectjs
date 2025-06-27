@@ -1,67 +1,99 @@
-
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AreaChart, BarChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Bar } from 'recharts';
-import { Users, User, Building2, AlertTriangle, TrendingUp, FileBarChart } from 'lucide-react';
+import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import { ArrowUpCircle, ArrowDownCircle, MinusCircle } from 'lucide-react';
+import {
+  Users,
+  User,
+  Building2,
+  AlertTriangle,
+  TrendingUp,
+  FileBarChart,
+  UserCog,
+  Plus,
+} from "lucide-react";
+import {
+  AreaChart,
+  BarChart,
+  Area,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
 
 export const AdminDashboard = () => {
-  const departmentStats = [
-    { name: 'Cardiology', employees: 245, appointments: 120, cases: 85 },
-    { name: 'Neurology', employees: 185, appointments: 95, cases: 62 },
-    { name: 'Orthopedics', employees: 210, appointments: 105, cases: 70 },
-    { name: 'Ophthalmology', employees: 160, appointments: 85, cases: 45 },
-    { name: 'General Medicine', employees: 320, appointments: 150, cases: 110 },
+  const navigate = useNavigate();
+
+  const chronicIllnessData = [
+    { name: 'Diabète', count: 124 },
+    { name: 'Hypertension Artérielle', count: 210 },
+    { name: 'Asthme', count: 78 },
+    { name: 'Maladies Cardiaques', count: 56 },
+    { name: 'Arthrite', count: 95 },
+    { name: 'Maladie Rénale', count: 42 },
   ];
 
   const healthTrends = [
-    { month: 'Jan', 'Respiratory': 20, 'Cardiovascular': 24, 'Orthopedic': 15, 'Other': 12 },
-    { month: 'Feb', 'Respiratory': 15, 'Cardiovascular': 28, 'Orthopedic': 18, 'Other': 11 },
-    { month: 'Mar', 'Respiratory': 25, 'Cardiovascular': 26, 'Orthopedic': 16, 'Other': 14 },
-    { month: 'Apr', 'Respiratory': 30, 'Cardiovascular': 24, 'Orthopedic': 20, 'Other': 16 },
-    { month: 'May', 'Respiratory': 18, 'Cardiovascular': 22, 'Orthopedic': 22, 'Other': 15 },
-    { month: 'Jun', 'Respiratory': 14, 'Cardiovascular': 20, 'Orthopedic': 17, 'Other': 13 },
+    { month: "Jan", Respiratory: 20, Cardiovascular: 24, Orthopedic: 15, Other: 12 },
+    { month: "Feb", Respiratory: 15, Cardiovascular: 28, Orthopedic: 18, Other: 11 },
+    { month: "Mar", Respiratory: 25, Cardiovascular: 26, Orthopedic: 16, Other: 14 },
+    { month: "Apr", Respiratory: 30, Cardiovascular: 24, Orthopedic: 20, Other: 16 },
+    { month: "May", Respiratory: 18, Cardiovascular: 22, Orthopedic: 22, Other: 15 },
+    { month: "Jun", Respiratory: 14, Cardiovascular: 20, Orthopedic: 17, Other: 13 },
   ];
-  
+
   const employeeMetrics = [
-    { name: 'Production', total: 1520, appointments: 350, leaves: 42 },
-    { name: 'Engineering', total: 985, appointments: 210, leaves: 28 },
-    { name: 'Administration', total: 680, appointments: 180, leaves: 22 },
-    { name: 'Research', total: 420, appointments: 120, leaves: 15 },
-    { name: 'Logistics', total: 325, appointments: 95, leaves: 18 },
+    { name: "Production", total: 1520, appointments: 350, leaves: 42 },
+    { name: "Engineering", total: 985, appointments: 210, leaves: 28 },
+    { name: "Administration", total: 680, appointments: 180, leaves: 22 },
+    { name: "Research", total: 420, appointments: 120, leaves: 15 },
+    { name: "Logistics", total: 325, appointments: 95, leaves: 18 },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
         <Card className="stats-card">
           <div className="flex justify-between items-start">
             <div>
               <p className="text-sm font-medium text-muted-foreground">Total Employees</p>
-              <h3 className="text-2xl font-bold">3,845</h3>
+              <h3 className="text-2xl font-bold">845</h3>
             </div>
             <div className="p-2 bg-medsuite-secondary rounded-full">
               <Users className="h-5 w-5 text-medsuite-primary" />
             </div>
           </div>
-          <p className="text-xs text-medsuite-primary">+12 new this month</p>
         </Card>
-        
+
         <Card className="stats-card">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Active Medical Cases</p>
-              <h3 className="text-2xl font-bold">257</h3>
+              <p className="text-sm font-medium text-muted-foreground">Number Of Doctors</p>
+              <h3 className="text-2xl font-bold">4</h3>
             </div>
             <div className="p-2 bg-medsuite-secondary rounded-full">
               <User className="h-5 w-5 text-medsuite-primary" />
             </div>
           </div>
-          <p className="text-xs text-medsuite-primary">18 require attention</p>
         </Card>
-        
+
         <Card className="stats-card">
           <div className="flex justify-between items-start">
             <div>
@@ -72,13 +104,12 @@ export const AdminDashboard = () => {
               <Building2 className="h-5 w-5 text-medsuite-primary" />
             </div>
           </div>
-          <p className="text-xs text-medsuite-primary">2 new centers planned</p>
         </Card>
-        
+
         <Card className="stats-card">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-sm font-medium text-muted-foreground">Critical Alerts</p>
+              <p className="text-sm font-medium text-muted-foreground">Chronique</p>
               <h3 className="text-2xl font-bold">5</h3>
             </div>
             <div className="p-2 bg-red-100 rounded-full">
@@ -87,8 +118,24 @@ export const AdminDashboard = () => {
           </div>
           <p className="text-xs text-red-500">Requires immediate action</p>
         </Card>
+
+        <Card
+          className="stats-card cursor-pointer hover:bg-muted/50 transition"
+          onClick={() => navigate("/admin/users")}
+        >
+          <div className="flex justify-between items-start">
+            <div>
+              <p className="text-sm font-medium text-muted-foreground">System Users</p>
+              <h3 className="text-2xl font-bold">21</h3>
+            </div>
+            <div className="p-2 bg-medsuite-secondary rounded-full">
+              <UserCog className="h-5 w-5 text-medsuite-primary" />
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground">Manage Users</p>
+        </Card>
       </div>
-      
+
       <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
@@ -96,7 +143,9 @@ export const AdminDashboard = () => {
               <CardTitle className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" /> Health Trends
               </CardTitle>
-              <CardDescription>Monthly breakdown of medical cases by category</CardDescription>
+              <CardDescription>
+                Monthly breakdown of medical cases by category
+              </CardDescription>
             </div>
             <Button variant="outline" size="sm" className="gap-1">
               <FileBarChart className="h-4 w-4" /> Export Report
@@ -120,10 +169,34 @@ export const AdminDashboard = () => {
                     <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Area type="monotone" dataKey="Respiratory" stackId="1" stroke="#3EAAB8" fill="#E6F7F9" />
-                    <Area type="monotone" dataKey="Cardiovascular" stackId="1" stroke="#2A7B85" fill="#B3E1E9" />
-                    <Area type="monotone" dataKey="Orthopedic" stackId="1" stroke="#1D4E54" fill="#D3EDF1" />
-                    <Area type="monotone" dataKey="Other" stackId="1" stroke="#718096" fill="#EDF2F7" />
+                    <Area
+                      type="monotone"
+                      dataKey="Respiratory"
+                      stackId="1"
+                      stroke="#3EAAB8"
+                      fill="#E6F7F9"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Cardiovascular"
+                      stackId="1"
+                      stroke="#2A7B85"
+                      fill="#B3E1E9"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Orthopedic"
+                      stackId="1"
+                      stroke="#1D4E54"
+                      fill="#D3EDF1"
+                    />
+                    <Area
+                      type="monotone"
+                      dataKey="Other"
+                      stackId="1"
+                      stroke="#718096"
+                      fill="#EDF2F7"
+                    />
                   </AreaChart>
                 </ResponsiveContainer>
               </div>
@@ -150,39 +223,27 @@ export const AdminDashboard = () => {
           </Tabs>
         </CardContent>
       </Card>
-      
+
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardHeader>
-            <CardTitle>Department Stats</CardTitle>
-            <CardDescription>Medical metrics by department</CardDescription>
+            <CardTitle>Liste des Maladies Chroniques</CardTitle>
+            <CardDescription>Nombre total de cas pour chaque condition.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ScrollArea className="h-[300px] pr-4">
-              <table className="w-full">
-                <thead>
-                  <tr>
-                    <th className="text-left font-medium text-muted-foreground pb-3">Department</th>
-                    <th className="text-center font-medium text-muted-foreground pb-3">Employees</th>
-                    <th className="text-center font-medium text-muted-foreground pb-3">Appointments</th>
-                    <th className="text-center font-medium text-muted-foreground pb-3">Active Cases</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {departmentStats.map((dept) => (
-                    <tr key={dept.name} className="border-b">
-                      <td className="py-3">{dept.name}</td>
-                      <td className="py-3 text-center">{dept.employees}</td>
-                      <td className="py-3 text-center">{dept.appointments}</td>
-                      <td className="py-3 text-center">{dept.cases}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <ScrollArea className="h-[300px]">
+              <div className="space-y-4 pr-4">
+                {chronicIllnessData.map((illness) => (
+                  <div key={illness.name} className="flex items-center justify-between">
+                    <p className="text-sm font-medium">{illness.name}</p>
+                    <Badge variant="secondary">{illness.count}</Badge>
+                  </div>
+                ))}
+              </div>
             </ScrollArea>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader>
             <CardTitle>Employee Health Metrics</CardTitle>
@@ -191,42 +252,47 @@ export const AdminDashboard = () => {
           <CardContent>
             <ScrollArea className="h-[300px] pr-4">
               <div className="space-y-6">
-                {employeeMetrics.map((unit) => (
-                  <div key={unit.name} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <div className="space-y-1">
-                        <p className="text-sm font-medium leading-none">{unit.name}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {unit.total} employees
-                        </p>
+                {employeeMetrics.map((unit) => {
+                  const percent = Math.round((unit.appointments / unit.total) * 100);
+                  return (
+                    <div key={unit.name} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                          <p className="text-sm font-medium leading-none">{unit.name}</p>
+                          <p className="text-sm text-muted-foreground">{unit.total} employees</p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <Badge variant="outline">{unit.appointments} appointments</Badge>
+                          <Badge variant="outline" className="bg-red-50 text-red-500">
+                            {unit.leaves} on leave
+                          </Badge>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline">{unit.appointments} appointments</Badge>
-                        <Badge variant="outline" className="bg-red-50 text-red-500">
-                          {unit.leaves} on leave
-                        </Badge>
+                      <div className="mt-2">
+                        <div className="flex items-center justify-between text-xs mb-1">
+                          <span>Appointment ratio</span>
+                          <span className="text-medsuite-primary">{percent}%</span>
+                        </div>
+                        <div className="h-2 bg-medsuite-secondary rounded-full overflow-hidden">
+                          <div
+                            className="bg-medsuite-primary h-full rounded-full"
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                    <div className="mt-2">
-                      <div className="flex items-center justify-between text-xs mb-1">
-                        <span>Appointment ratio</span>
-                        <span className="text-medsuite-primary">
-                          {Math.round((unit.appointments / unit.total) * 100)}%
-                        </span>
-                      </div>
-                      <div className="h-2 bg-medsuite-secondary rounded-full overflow-hidden">
-                        <div 
-                          className="bg-medsuite-primary h-full rounded-full" 
-                          style={{ width: `${Math.round((unit.appointments / unit.total) * 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </ScrollArea>
           </CardContent>
         </Card>
+      </div>
+
+      <div className="flex justify-end">
+        <Button variant="outline" onClick={() => navigate("/admin/users")} className="flex items-center gap-1">
+          <Plus className="h-4 w-4" /> Add New User
+        </Button>
       </div>
     </div>
   );

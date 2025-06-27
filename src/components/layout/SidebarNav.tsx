@@ -31,16 +31,19 @@ export const SidebarNav = () => {
         // New Pages
         { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
         { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
+        { title: 'Reports', icon: FileText, url: '/medecin/reports' }
       ]);
     } else if (userRole === 'admin') {
-      setMenuItems([
-        { title: 'Dashboard', icon: Home, url: '/' },
-        { title: 'Employee Stats', icon: BarChart3, url: '/stats' },
-        { title: 'Doctors', icon: User, url: '/doctors' },
-        { title: 'Departments', icon: Users, url: '/departments' },
-        { title: 'Reports', icon: FileText, url: '/reports' },
-      ]);
-    }
+        setMenuItems([
+          { title: 'Dashboard', icon: Home, url: '/' },
+          { title: 'Employee Stats', icon: BarChart3, url: '/admin/stats' },
+          { title: 'Doctors', icon: User, url: '/admin/doctors' },
+          { title: 'Departments', icon: Users, url: '/admin/departments' },
+          { title: 'Reports', icon: FileText, url: '/admin/reports' },
+          { title: 'Visite Périodique', icon: FileText, url: '/admin/visite-perdue' },
+          { title: 'Manage Users', icon: User, url: '/admin/users' },
+       ]);
+      }
   }, [userRole]);
 
   const userRoleLabel = () => {
