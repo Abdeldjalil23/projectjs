@@ -136,8 +136,8 @@ export const AdminDashboard = () => {
           <p className="text-xs text-muted-foreground">Manage Users</p>
         </Card>
       </div>
-
-      <Card>
+{/* // the charts */}
+      {/* <Card>
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <div>
@@ -223,65 +223,9 @@ export const AdminDashboard = () => {
             </TabsContent>
           </Tabs>
         </CardContent>
-      </Card>
+      </Card> */}
 
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>Liste des Maladies Chroniques</CardTitle>
-            <CardDescription>Nombre total de cas pour chaque condition.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ScrollArea className="h-[300px]">
-              <div className="space-y-4 pr-4">
-                {chronicIllnessData.map((illness) => (
-                  <div key={illness.name} className="flex items-center justify-between">
-                    <p className="text-sm font-medium">{illness.name}</p>
-                    <Badge variant="secondary">{illness.count}</Badge>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </CardContent>
-        </Card>
-
-        <Card>
-        <CardHeader>
-        <CardTitle>Annuaire des Médecins</CardTitle>
-        <CardDescription>Coordonnées du personnel médical.</CardDescription>
-        </CardHeader>
-        <CardContent>
-        <ScrollArea className="h-[300px]">
-          <div className="space-y-6 pr-4">
-            {doctorsData.map((doctor) => (
-              <div key={doctor.id} className="flex items-start space-x-4">
-                <Avatar className="h-10 w-10">
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {doctor.avatar}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold leading-none">{doctor.name}</p>
-                  <p className="text-sm text-muted-foreground">{doctor.specialty}</p>
-                  <div className="mt-2 space-y-1">
-                    <div className="flex items-center">
-                      <Mail className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{doctor.email}</span>
-                    </div>
-                    <div className="flex items-center">
-                      <Phone className="mr-2 h-4 w-4 text-muted-foreground" />
-                      <span className="text-xs text-muted-foreground">{doctor.phone}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-        </CardContent>
-        </Card>
-      </div>
-
+the add 
       <div className="flex justify-end">
         <Button variant="outline" onClick={() => navigate("/admin/users")} className="flex items-center gap-1">
           <Plus className="h-4 w-4" /> Add New User

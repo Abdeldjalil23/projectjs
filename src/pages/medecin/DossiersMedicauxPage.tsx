@@ -63,15 +63,7 @@ const DossiersMedicauxPage = () => {
           <h1 className="text-2xl font-bold tracking-tight">
             {isPatient ? 'Mon Dossier Médical' : 'Dossiers Médicaux des Patients'}
           </h1>
-          {!isPatient && (
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => navigate('/nouveau-patient')}
-            >
-              Nouveau Patient
-            </Button>
-          )}
+          
         </div>
 
         <Card>

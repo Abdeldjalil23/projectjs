@@ -1,74 +1,89 @@
-// src/pages/medecin/AntecedentsF.tsx
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import InfoTextareaField from '@/components/InfoTextareaField';
-// PostesOccupesTab.jsx (in the same folder as DossierDetailsPage.jsx)
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-const mockPostesOccupesData = [
+// Mock data representing a person's medical history.
+// In a real app, this would be fetched from an API.
+const mockAntecedentsData = [
   {
-    id: 'po1',
-    intituleFonction: 'Développeur Web Junior',
-    du: '2015-09-01',
-    au: '2017-08-31',
-    risquesProfessionnels: ['Travail sur écran', 'Stress'],
-    nuisances: ['Bruit de bureau'],
-    typeChangement: 'Promotion interne',
-    motif: 'Évolution de carrière',
-    motifsChangementPoste: 'Opportunité pour un poste de Développeur Confirmé.',
+    id: 'ant1',
+    date: '2018-05-20',
+    type: 'Médical',
+    maladie: 'Asthme allergique',
+    descriptionMaladie: 'Crises déclenchées par le pollen au printemps. Traité avec Ventoline.',
+    interventionChirurgicale: null,
+    descriptionIntervention: null,
+    accidents: null,
   },
   {
-    id: 'po2',
-    intituleFonction: 'Développeur Web Confirmé',
-    du: '2017-09-01',
-    au: '2020-01-15',
-    risquesProfessionnels: ['Travail sur écran prolongé', 'Sédentarité'],
-    nuisances: ['Climatisation variable'],
-    typeChangement: 'Démission',
-    motif: 'Nouvelle opportunité externe',
-    motifsChangementPoste: 'Recherche de nouveaux défis techniques.',
+    id: 'ant2',
+    date: '2021-11-10',
+    type: 'Chirurgical',
+    maladie: null,
+    descriptionMaladie: null,
+    interventionChirurgicale: 'Appendicectomie',
+    descriptionIntervention: 'Ablation de l\'appendice suite à une crise aiguë. Cicatrice discrète.',
+    accidents: null,
   },
   {
-    id: 'po3',
-    intituleFonction: 'Chef de Projet Technique',
-    du: '2020-02-01',
-    au: null, 
-    risquesProfessionnels: ['Gestion du stress', 'Charge mentale'],
-    nuisances: ['Réunions fréquentes'],
-    typeChangement: 'En cours',
-    motif: '-',
-    motifsChangementPoste: '-',
+    id: 'ant3',
+    date: '2022-03-15',
+    type: 'Accident',
+    maladie: null,
+    descriptionMaladie: null,
+    interventionChirurgicale: null,
+    descriptionIntervention: null,
+    accidents: 'Chute de vélo, fracture du poignet gauche. Plâtre pendant 6 semaines.',
+  },
+  {
+    id: 'ant4',
+    date: '2015-01-01',
+    type: 'Médical',
+    maladie: 'Varicelle',
+    descriptionMaladie: 'Maladie infantile classique, sans complications notoires.',
+    interventionChirurgicale: null,
+    descriptionIntervention: null,
+    accidents: null,
   },
 ];
 
-const formatDate = (dateString) => {
-  if (!dateString) return 'En cours';
+// Helper function to format date strings
+const formatDate = (dateString: string | null) => {
+  if (!dateString) return '-';
   return new Date(dateString).toLocaleDateString('fr-FR', {
     year: 'numeric',
-    month: 'short', // Using short month for brevity
+    month: 'long',
     day: 'numeric',
   });
 };
 
-const AntecedentsF = ({ patientId }) => {
-  // TODO: Fetch data based on patientId in a real app
-  const postesData = mockPostesOccupesData; 
+// Helper function to determine badge variant based on antecedent type
+const getTypeVariant = (type: string | null) => {
+  switch (type) {
+    case 'Médical':
+      return 'secondary';
+    case 'Chirurgical':
+      return 'outline';
+    case 'Accident':
+      return 'destructive';
+    default:
+      return 'default';
+  }
+};
 
-  if (!postesData || postesData.length === 0) {
+const AntecedentsF = ({ agentId }: { agentId: string }) => {
+  // TODO: Fetch real data based on agentId in a real application
+  const antecedentsData = mockAntecedentsData;
+
+  // Handle case where there is no data
+  if (!antecedentsData || antecedentsData.length === 0) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Postes Occupés</CardTitle>
+          <CardTitle>Saisir les antécédents personnels de l'agent</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-muted-foreground">Aucun poste occupé n'a été enregistré pour ce patient.</p>
+          <p className="text-muted-foreground">Aucun antécédent n'a été enregistré pour cet agent.</p>
         </CardContent>
       </Card>
     );
@@ -77,51 +92,37 @@ const AntecedentsF = ({ patientId }) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Historique des Postes Occupés</CardTitle>
-        <CardDescription>Liste des fonctions exercées par le patient.</CardDescription>
+        <CardTitle>Saisir les antécédents personnels de l'agent</CardTitle>
+        <CardDescription>
+          Historique des antécédents médicaux, chirurgicaux et accidentels de l'agent.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="min-w-[180px]">Intitulé Fonction</TableHead>
-                <TableHead className="min-w-[100px]">Du</TableHead>
-                <TableHead className="min-w-[100px]">Au</TableHead>
-                <TableHead className="min-w-[200px]">Risques Professionnels</TableHead>
-                <TableHead className="min-w-[180px]">Nuisances</TableHead>
-                <TableHead className="min-w-[150px]">Type Changement</TableHead>
-                <TableHead className="min-w-[180px]">Motif</TableHead>
-                <TableHead className="min-w-[250px]">Détails Changement</TableHead>
+                <TableHead className="min-w-[120px]">Date</TableHead>
+                <TableHead className="min-w-[120px]">Type d'antécédent</TableHead>
+                <TableHead className="min-w-[180px]">Maladie</TableHead>
+                <TableHead className="min-w-[250px]">Description Maladie</TableHead>
+                <TableHead className="min-w-[200px]">Intervention Chirurgicale</TableHead>
+                <TableHead className="min-w-[250px]">Description de l'Intervention</TableHead>
+                <TableHead className="min-w-[250px]">Accidents</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {postesData.map((poste) => (
-                <TableRow key={poste.id}>
-                  <TableCell className="font-medium">{poste.intituleFonction}</TableCell>
-                  <TableCell>{formatDate(poste.du)}</TableCell>
-                  <TableCell>{poste.au ? formatDate(poste.au) : <Badge variant="outline">En cours</Badge>}</TableCell>
+              {antecedentsData.map((item) => (
+                <TableRow key={item.id}>
+                  <TableCell>{formatDate(item.date)}</TableCell>
                   <TableCell>
-                    {Array.isArray(poste.risquesProfessionnels) && poste.risquesProfessionnels.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {poste.risquesProfessionnels.map((risque, index) => (
-                          <Badge key={index} variant="destructive" className="text-xs font-normal">{risque}</Badge>
-                        ))}
-                      </div>
-                    ) : '-'}
+                    <Badge variant={getTypeVariant(item.type)}>{item.type || '-'}</Badge>
                   </TableCell>
-                  <TableCell>
-                    {Array.isArray(poste.nuisances) && poste.nuisances.length > 0 ? (
-                       <div className="flex flex-wrap gap-1">
-                        {poste.nuisances.map((nuisance, index) => (
-                          <Badge key={index} variant="secondary" className="text-xs font-normal">{nuisance}</Badge>
-                        ))}
-                      </div>
-                    ) : '-'}
-                  </TableCell>
-                  <TableCell>{poste.typeChangement || '-'}</TableCell>
-                  <TableCell>{poste.motif || '-'}</TableCell>
-                  <TableCell className="text-sm text-muted-foreground">{poste.motifsChangementPoste || '-'}</TableCell>
+                  <TableCell className="font-medium">{item.maladie || '-'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{item.descriptionMaladie || '-'}</TableCell>
+                  <TableCell className="font-medium">{item.interventionChirurgicale || '-'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{item.descriptionIntervention || '-'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{item.accidents || '-'}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
