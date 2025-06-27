@@ -16,7 +16,6 @@ import MedViPerPage from "./pages/medecin/MedViPerPage";
 import DossierDetailsPage from "./pages/medecin/DossierDetailsPage";
 import NouvelleConsultation from "./pages/medecin/Nouvelleconsultation";
 import PrescriptionsPage from "./pages/medecin/PrescriptionsPage";
-import NouveauPatientPage from "./pages/medecin/NouveauPatientPage";
 import MedReportsPage from "./pages/medecin/MedReportsPage";
 import DoctorDashboard from "./components/dashboard/DoctorDashboard";
 
@@ -47,7 +46,6 @@ const protectedRoutes = [
   { path: "/dashboard", element: <DoctorDashboard /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
   { path: "/visite-perdue", element: <VisitePerdPage /> },
-  { path: "/nouveau-patient", element: <NouveauPatientPage /> },
   { path: "/settings", element: <SettingsPage /> },
   { path: "/admin/doctors", element: <DoctorsPage /> },
   { path: "/admin/doctors/add", element: <AddDoctorPage /> },
