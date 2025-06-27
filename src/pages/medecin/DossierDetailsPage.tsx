@@ -131,9 +131,38 @@ const DossierDetailsPage = () => {
       <div className="p-4 md:p-6 space-y-6">
         {/* Title + Button */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {patientData.prenom} {patientData.nom} — âge {getAge(patientData.dnaiss)} {patientData.chronique ? '(Chronique)' : ''}
-          </h1>
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 border-4 border-white shadow-lg">
+              <AvatarImage src={patientData.profileImageUrl} alt="Avatar" />
+              <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                {(patientData.prenom?.[0] || '') + (patientData.nom?.[0] || '')}
+              </AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                {patientData.prenom} {patientData.nom}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-gray-600">
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Âge:</span>
+                  <span>{getAge(patientData.dnaiss)} ans</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Sexe:</span>
+                  <span>{patientData.sexe}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Groupe:</span>
+                  <span>{patientData.gsang}</span>
+                </span>
+                {patientData.chronique && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                    Chronique
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
           <Button onClick={handleNewConsultation}>Nouvelle Consultation</Button>
         </div>
 
@@ -156,16 +185,6 @@ const DossierDetailsPage = () => {
 
           <TabsContent value="info" className="mt-4">
             <Card>
-              <CardHeader className="flex flex-col sm:flex-row items-start gap-4">
-                <Avatar className="h-24 w-24 border flex-shrink-0">
-                  <AvatarImage src={patientData.profileImageUrl} alt="Avatar" />
-                  <AvatarFallback>{(patientData.prenom?.[0] || '') + (patientData.nom?.[0] || '')}</AvatarFallback>
-                </Avatar>
-                <div className="flex-grow">
-                  <CardTitle className="text-xl">Informations Générales et Personnelles</CardTitle>
-                  <CardDescription>Détails complets du patient.</CardDescription>
-                </div>
-              </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-6">
                   <InfoField label="Prénom" value={patientData.prenom} />
@@ -218,11 +237,11 @@ const DossierDetailsPage = () => {
           </TabsContent>
 
           <TabsContent value="antecedentsP" className="mt-4">
-            <AntecedentsP patientId={patientData} />
+            <AntecedentsP />
           </TabsContent>
 
           <TabsContent value="antecedentsF" className="mt-4">
-            <AntecedentsF patientId={patientData} />
+            <AntecedentsF agentId={patientData.id} />
           </TabsContent>
 
           <TabsContent value="visite1" className="mt-4">

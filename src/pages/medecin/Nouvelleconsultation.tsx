@@ -2,10 +2,11 @@
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   Stethoscope, Pill, Navigation, Microscope, Image, Ambulance, HeartPulse, ArrowLeft
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose
@@ -78,7 +79,20 @@ interface ExplorationData {
   prenom: string;
   age: string;
   date: string;
+  analyseType: 'interne' | 'externe' | '';
   tests: string[];
+  commentaires: string;
+}
+
+interface ImagerieData {
+  nom: string;
+  prenom: string;
+  age: string;
+  date: string;
+  imagerieType: 'radiographie' | 'echographie' | 'scanner' | 'irm' | 'autres' | '';
+  examens: string[];
+  region: string;
+  indication: string;
   commentaires: string;
 }
 
@@ -93,7 +107,7 @@ const printStyles = `
 @media print {
   @page {
     size: A5 portrait;
-    margin: 0cm;
+    margin: 0.5cm;
   }
 
   body * {
@@ -119,9 +133,11 @@ const printStyles = `
   }
 
   .print-area > div {
-    width: 14.8cm;
-    height: 21cm;
+    width: 13.8cm;
+    height: 20cm;
     box-shadow: none;
+    page-break-after: avoid;
+    page-break-inside: avoid;
   }
 
   .dialog-print-hide {
@@ -132,15 +148,16 @@ const printStyles = `
 
 const types: ServiceType[] = [
   { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Consultation générale', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
-  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'طلب أو تجديد وصفة طبية', action: 'Demander' },
+  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'Demande ou renouvellement d\'ordonnance médicale', action: 'Demander' },
   { icon: <Navigation className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Orientation', desc: 'إحالة أو توجيه لطبيب مختص', action: 'Demander' },
-  { icon: <Microscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Exploration', desc: 'طلب تحاليل أو فحوصات مخبرية', action: 'Demander' },
+  { icon: <Microscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'ANALYSE', desc: 'طلب تحاليل أو فحوصات مخبرية', action: 'Demander' },
   { icon: <Image className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Imagerie', desc: 'طلب تصوير (أشعة، IRM…)', action: 'Demander' },
   { icon: <Ambulance className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Evacuation', desc: 'إخلاء أو نقل طبي', action: 'Demander' },
   { icon: <HeartPulse className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Soins', desc: 'رعاية تمريضية أو متابعة', action: 'Demander' }
 ];
 
-const testOptions: string[] = [
+const testOptions = {
+  interne: [
   "Hémogramme complet", "Glycémie à jeun", "Cholestérol total", "HDL Cholestérol", "LDL Cholestérol", "Triglycérides",
   "Créatinine", "Urée", "Acide urique", "Bilan hépatique (ASAT, ALAT)", "Gamma GT", "Phosphatases alcalines",
   "Ionogramme sanguin", "Calcium total", "Phosphore", "Ferritine", "VS (Vitesse de sédimentation)", "CRP (Protéine C réactive)",
@@ -148,8 +165,53 @@ const testOptions: string[] = [
   "Bilan lipidique complet", "TSH (Thyroïde)", "FT3 - FT4", "ECBU (Examen d'urines)", "Coproculture", "Bilan inflammatoire",
   "Test de grossesse (Beta HCG)", "Test rapide Covid-19", "Sérologie Covid-19", "Hémoculture", "Glycémie postprandiale",
   "Microalbuminurie", "Protéinurie"
-];
+  ],
+  externe: [
+    "IRM Cérébrale", "Scanner Thoracique", "Échographie Abdominale", "Échographie Cardiaque", "Échographie Doppler",
+    "Radiographie Thorax", "Radiographie Rachis", "Radiographie Membres", "Mammographie", "Densitométrie Osseuse",
+    "Fibroscopie Gastrique", "Coloscopie", "Bronchoscopie", "Cystoscopie", "Électrocardiogramme", "Électroencéphalogramme",
+    "Électromyogramme", "Test d'effort", "Échographie Obstétricale", "Échographie Pelvienne", "Échographie Thyroïdienne",
+    "Échographie Testiculaire", "Échographie Rénale", "Échographie Hépatique", "Échographie Vésiculaire",
+    "Scanner Cérébral", "Scanner Abdominal", "Scanner Thoracique", "Scanner Rachidien", "Scanner Sinus",
+    "IRM Rachidienne", "IRM Abdominale", "IRM Cardiaque", "IRM Articulaire", "Angiographie", "Coronarographie"
+  ]
+};
 
+const imagerieOptions = {
+  radiographie: [
+    "Radiographie Thorax", "Radiographie Rachis Cervical", "Radiographie Rachis Dorsal", "Radiographie Rachis Lombaire",
+    "Radiographie Bassin", "Radiographie Crâne", "Radiographie Sinus", "Radiographie Mâchoire", "Radiographie Dents",
+    "Radiographie Membre Supérieur", "Radiographie Membre Inférieur", "Radiographie Épaules", "Radiographie Genoux",
+    "Radiographie Cheville", "Radiographie Pied", "Radiographie Main", "Radiographie Poignet", "Radiographie Coude",
+    "Radiographie Hanche", "Radiographie Colonne Vertébrale", "Radiographie Côtes", "Radiographie Sternum"
+  ],
+  echographie: [
+    "Échographie Abdominale", "Échographie Pelvienne", "Échographie Obstétricale", "Échographie Cardiaque",
+    "Échographie Thyroïdienne", "Échographie Mammaire", "Échographie Testiculaire", "Échographie Rénale",
+    "Échographie Hépatique", "Échographie Vésiculaire", "Échographie Pancréatique", "Échographie Rate",
+    "Échographie Doppler Artériel", "Échographie Doppler Veineux", "Échographie Doppler Cardiaque",
+    "Échographie Articulaire", "Échographie Tendons", "Échographie Musculaire", "Échographie Ganglions",
+    "Échographie Prostate", "Échographie Utérus", "Échographie Ovaire"
+  ],
+  scanner: [
+    "Scanner Cérébral", "Scanner Thoracique", "Scanner Abdominal", "Scanner Pelvien", "Scanner Rachidien",
+    "Scanner Sinus", "Scanner Orbite", "Scanner Mâchoire", "Scanner Cou", "Scanner Épaules", "Scanner Genoux",
+    "Scanner Hanche", "Scanner Bassin", "Scanner Membres", "Scanner Angiographie", "Scanner Cardiaque",
+    "Scanner Pulmonaire", "Scanner Hépatique", "Scanner Rénal", "Scanner Pancréatique", "Scanner Splénique"
+  ],
+  irm: [
+    "IRM Cérébrale", "IRM Rachidienne", "IRM Thoracique", "IRM Abdominale", "IRM Pelvienne", "IRM Cardiaque",
+    "IRM Articulaire", "IRM Membre Supérieur", "IRM Membre Inférieur", "IRM Épaules", "IRM Genoux", "IRM Hanche",
+    "IRM Bassin", "IRM Crâne", "IRM Sinus", "IRM Orbite", "IRM Mâchoire", "IRM Cou", "IRM Colonne Vertébrale",
+    "IRM Angiographie", "IRM Spectroscopie", "IRM Diffusion", "IRM Perfusion"
+  ],
+  autres: [
+    "Mammographie", "Densitométrie Osseuse", "Scintigraphie", "Tomographie par Émission de Positons (TEP)",
+    "Angiographie", "Coronarographie", "Arthrographie", "Myélographie", "Cystographie", "Urographie",
+    "Cholangiographie", "Sialographie", "Hystérosalpingographie", "Électrocardiogramme", "Électroencéphalogramme",
+    "Électromyogramme", "Test d'effort", "Holter ECG", "Holter Tension", "Échographie de Stress"
+  ]
+};
 
 const natureOptions: string[] = [
   'Visite périodique',
@@ -161,6 +223,7 @@ const natureOptions: string[] = [
 
 const NouvelleConsultation: React.FC = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [selectedType, setSelectedType] = useState<ServiceType | null>(null);
   const [formData, setFormData] = useState<FormData>({ nom: '', prenoms: '', age: '', date: '', medicaments: '' });
@@ -210,10 +273,61 @@ const NouvelleConsultation: React.FC = () => {
     prenom: '',
     age: '',
     date: today,
+    analyseType: '',
     tests: [],
     commentaires: ''
   });
   const [explorationOpen, setExplorationOpen] = useState(false);
+  const [imagerieData, setImagerieData] = useState<ImagerieData>({
+    nom: '',
+    prenom: '',
+    age: '',
+    date: today,
+    imagerieType: '',
+    examens: [],
+    region: '',
+    indication: '',
+    commentaires: ''
+  });
+  const [imagerieOpen, setImagerieOpen] = useState(false);
+
+  // Patient data - similar to DossierDetailsPage
+  const patientData = {
+    id,
+    profileImageUrl: `https://api.dicebear.com/7.x/initials/svg?seed=Patient${id}&radius=50&backgroundColor=00897b,039be5,3949ab,e53935,fb8c00&backgroundType=gradientLinear&fontSize=40`,
+    prenom: 'Ali',
+    nom: 'Mezhoud',
+    sexe: 'Masculin',
+    nbreEnf: 2,
+    dnaiss: '1980-05-15',
+    gsang: 'O+',
+    nss: '1800515123456',
+    serviceNational: 'Accompli',
+    adresse: '123 Rue Principale, Ville, Pays',
+    formationScolaire: true,
+    formationProfessionnelle: false,
+    qualificationPersonnelle: 'Baccalauréat Scientifique, Diplôme d\'ingénieur en informatique.',
+    activitesProfessionnellesAnterieures: 'Développeur Web chez Tech Solutions (2015-2020)\nChef de projet chez Innovatech (2020-2023)',
+    handicapMoteur: false,
+    handicapAuditif: true,
+    handicapVisuel: false,
+    contactGsm: '0601020304',
+    contactPoste: '1234',
+    contactEmail: 'ali.mezhoud@example.com',
+    affectationStructure: 'Hôpital Central - Service Cardiologie',
+    affectationDepartRetraite: '2045-12-31',
+    affectationDateRecrutement: '2010-01-20',
+    chronique: true,
+  };
+
+  const getAge = (birthDateString: string) => {
+    const today = new Date();
+    const birthDate = new Date(birthDateString);
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const m = today.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) age--;
+    return age;
+  };
 
   useEffect(() => {
     const style = document.createElement('style');
@@ -240,8 +354,13 @@ const NouvelleConsultation: React.FC = () => {
       setSelectedType(type);
       return;
     }
-    if (type.title === 'Exploration') {
+    if (type.title === 'ANALYSE') {
       setExplorationOpen(true);
+      setSelectedType(type);
+      return;
+    }
+    if (type.title === 'Imagerie') {
+      setImagerieOpen(true);
       setSelectedType(type);
       return;
     }
@@ -295,8 +414,27 @@ const NouvelleConsultation: React.FC = () => {
           : prev.tests.filter((t) => t !== value);
         return { ...prev, tests: newTests };
       });
+    } else if (name === 'analyseType') {
+      setExplorationData((prev) => ({ ...prev, analyseType: value as 'interne' | 'externe', tests: [] }));
     } else {
       setExplorationData((prev) => ({ ...prev, [name]: value }));
+    }
+  };
+
+  const handleImagerieInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, type } = e.target;
+    if (type === 'checkbox' && e.target instanceof HTMLInputElement) {
+      const checked = e.target.checked;
+      setImagerieData((prev) => {
+        const newExamens = checked
+          ? [...prev.examens, value]
+          : prev.examens.filter((e) => e !== value);
+        return { ...prev, examens: newExamens };
+      });
+    } else if (name === 'imagerieType') {
+      setImagerieData((prev) => ({ ...prev, imagerieType: value as any, examens: [] }));
+    } else {
+      setImagerieData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -306,8 +444,49 @@ const NouvelleConsultation: React.FC = () => {
 
   return (
     <AppLayout title="Nouvelle Consultation">
-      <div className="p-4 max-w-5xl mx-auto flex flex-col min-h-[80vh]">
-        <h2 className="text-2xl font-bold mb-8 text-center">Choisissez le type de service</h2>
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Title + Button */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 border-4 border-white shadow-lg">
+              <AvatarImage src={patientData.profileImageUrl} alt="Avatar" />
+              <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
+                {(patientData.prenom?.[0] || '') + (patientData.nom?.[0] || '')}
+              </AvatarFallback>
+            </Avatar>
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
+                {patientData.prenom} {patientData.nom}
+              </h1>
+              <div className="flex flex-wrap items-center gap-4 text-gray-600">
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Âge:</span>
+                  <span>{getAge(patientData.dnaiss)} ans</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Sexe:</span>
+                  <span>{patientData.sexe}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <span className="font-medium">Groupe:</span>
+                  <span>{patientData.gsang}</span>
+                </span>
+                {patientData.chronique && (
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
+                    Chronique
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+          <Button variant="secondary" size="lg" className="gap-2 px-8 py-3 rounded-full shadow" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-5 h-5" /> Retour
+          </Button>
+        </div>
+
+        {/* Service Selection */}
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-4 text-center">Choisissez le type de service</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 flex-1">
           {types.map((type) => (
             <Card key={type.title} className="flex flex-col items-center p-6 text-center shadow-md hover:shadow-lg transition-shadow">
@@ -318,16 +497,12 @@ const NouvelleConsultation: React.FC = () => {
             </Card>
           ))}
         </div>
-        <div className="flex justify-start mt-10">
-          <Button variant="secondary" size="lg" className="gap-2 px-8 py-3 rounded-full shadow" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-5 h-5" /> Retour
-          </Button>
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="dialog-print-hide">
             <DialogHeader>
-              <DialogTitle>{selectedType?.title === 'Ordonnance' ? 'وصفة طبية جديدة' : 'Demande de service'}</DialogTitle>
+              <DialogTitle>{selectedType?.title === 'Ordonnance' ? 'Ordonnance Médicale' : 'Demande de service'}</DialogTitle>
               <DialogDescription>
                 {selectedType && (
                   <div className="flex flex-col items-center mb-4">
@@ -341,14 +516,14 @@ const NouvelleConsultation: React.FC = () => {
             {selectedType?.title === 'Ordonnance' && (
               <div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input className="border p-2" name="nom" placeholder="اسم المريض" value={formData.nom} onChange={handleInputChange} />
-                  <input className="border p-2" name="prenoms" placeholder="اللقب" value={formData.prenoms} onChange={handleInputChange} />
-                  <input className="border p-2" name="age" placeholder="العمر" value={formData.age} onChange={handleInputChange} />
+                  <input className="border p-2" name="nom" placeholder="Nom du patient" value={formData.nom} onChange={handleInputChange} />
+                  <input className="border p-2" name="prenoms" placeholder="Prénoms" value={formData.prenoms} onChange={handleInputChange} />
+                  <input className="border p-2" name="age" placeholder="Âge" value={formData.age} onChange={handleInputChange} />
                   <input className="border p-2" name="date" type="date" value={formData.date} onChange={handleInputChange} />
                 </div>
-                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="دواء - كمية - مدة..." value={formData.medicaments} onChange={handleInputChange} />
+                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="Médicament - Quantité - Durée..." value={formData.medicaments} onChange={handleInputChange} />
                 <div className="mt-4 text-end">
-                  <Button onClick={handlePrint}>طباعة</Button>
+                  <Button onClick={handlePrint}>Imprimer</Button>
                 </div>
               </div>
             )}
@@ -385,10 +560,6 @@ const NouvelleConsultation: React.FC = () => {
                     <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.prenoms}</div>
                   </div>
                   <div className="flex flex-row items-center w-full">
-                    <div className="font-semibold min-w-[70px] line-through">Malade (AEC) :</div>
-                    <div className="w-full h-7"></div>
-                  </div>
-                  <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px]">Age :</div>
                     <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.age}</div>
                   </div>
@@ -407,9 +578,9 @@ const NouvelleConsultation: React.FC = () => {
               <table className="w-full border text-sm">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="border p-1">اسم الدواء</th>
-                    <th className="border p-1">الكمية</th>
-                    <th className="border p-1">الفترة</th>
+                    <th className="border p-1">Médicament</th>
+                    <th className="border p-1">Quantité</th>
+                    <th className="border p-1">Durée</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -477,7 +648,7 @@ const NouvelleConsultation: React.FC = () => {
               </div>
               <div className="flex justify-between mt-4">
                 <span className="font-bold">LE MEDECIN</span>
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
               </div>
               <div className="flex justify-end mt-2">
                 <DialogClose asChild>
@@ -584,7 +755,7 @@ const NouvelleConsultation: React.FC = () => {
                 <div>Signature du Médecin</div>
               </div>
               <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
                 <DialogClose asChild>
                   <Button variant="outline">Fermer</Button>
                 </DialogClose>
@@ -655,7 +826,7 @@ const NouvelleConsultation: React.FC = () => {
                 <div>
                   <div className="font-bold text-xs">sonatrach</div>
                   <div className="text-xs">EXPLORATION – PRODUCTION</div>
-                  <div className="text-xs">DIRECTION REGIONALE</div>
+                  <div className="text-xs">DIRECTION REGIONAL</div>
                   <div className="text-xs">HAOUD BERKAOUI</div>
                   <div className="text-xs">DIVISION PERSONNEL</div>
                   <div className="text-xs">SERVICE SANTE/CMT</div>
@@ -700,7 +871,7 @@ const NouvelleConsultation: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
                 <DialogClose asChild>
                   <Button variant="outline">Fermer</Button>
                 </DialogClose>
@@ -716,7 +887,7 @@ const NouvelleConsultation: React.FC = () => {
                 <div>
                   <div className="font-bold text-xs">sonatrach</div>
                   <div className="text-xs">EXPLORATION – PRODUCTION</div>
-                  <div className="text-xs">DIRECTION REGIONALE</div>
+                  <div className="text-xs">DIRECTION REGIONAL</div>
                   <div className="text-xs">HAOUD BERKAOUI</div>
                   <div className="text-xs">DIVISION PERSONNEL</div>
                   <div className="text-xs">SERVICE SANTE/CMT</div>
@@ -789,8 +960,37 @@ const NouvelleConsultation: React.FC = () => {
 
               <div>
                 <div className="font-semibold mb-2">Type d'analyse / نوع التحليل :</div>
+                <div className="flex gap-4 mb-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="analyseType"
+                      value="interne"
+                      checked={explorationData.analyseType === 'interne'}
+                      onChange={handleExplorationInput}
+                    />
+                    Analyse Interne / تحليل داخلي
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      name="analyseType"
+                      value="externe"
+                      checked={explorationData.analyseType === 'externe'}
+                      onChange={handleExplorationInput}
+                    />
+                    Analyse Externe / تحليل خارجي
+                  </label>
+                </div>
+
+                {explorationData.analyseType && (
+                  <div>
+                    <div className="font-semibold mb-2">
+                      {explorationData.analyseType === 'interne' ? 'Analyses Internes' : 'Analyses Externes'} / 
+                      {explorationData.analyseType === 'interne' ? 'التحاليل الداخلية' : 'التحاليل الخارجية'} :
+                    </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto pr-2">
-                  {testOptions.map((opt) => (
+                      {testOptions[explorationData.analyseType].map((opt) => (
                     <label key={opt} className="flex items-center gap-2 text-sm">
                       <input
                         type="checkbox"
@@ -803,6 +1003,8 @@ const NouvelleConsultation: React.FC = () => {
                     </label>
                   ))}
                 </div>
+                  </div>
+                )}
               </div>
 
               <textarea
@@ -816,7 +1018,7 @@ const NouvelleConsultation: React.FC = () => {
 
               <div className="flex justify-between mt-4">
                 <span className="font-bold">LE MÉDECIN / الطبيب</span>
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
               </div>
 
               <div className="flex justify-end">
@@ -830,25 +1032,25 @@ const NouvelleConsultation: React.FC = () => {
 
         {explorationOpen && (
           <div className="print-area hidden">
-            <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
-              <div className="flex justify-between items-start mb-8">
-                <div className="text-xs min-w-[200px] space-y-1">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-black text-white font-bold text-xs px-2 py-1 rounded">S</span>
-                    <span className="font-bold tracking-tight">sonatrach</span>
+            <div className="font-sans text-black bg-white mx-auto p-1" style={{ width: '13.8cm', height: '20cm', fontSize: '10px' }}>
+              <div className="flex justify-between items-start mb-1">
+                <div className="text-xs min-w-[140px] space-y-0">
+                  <div className="flex items-center gap-1 mb-0">
+                    <span className="bg-black text-white font-bold text-xs px-1 py-0.5 rounded">S</span>
+                    <span className="font-bold tracking-tight text-xs">sonatrach</span>
                   </div>
-                  <div className="font-semibold">Direction Régionale Haoud Berkaoui</div>
-                  <div>Centre de Médecine de Travail</div>
-                  <div className="mt-2">Nom du Médecin</div>
-                  <div className="text-muted-foreground">(Cachet)</div>
+                  <div className="font-semibold text-xs">Direction Régionale Haoud Berkaoui</div>
+                  <div className="text-xs">Centre de Médecine de Travail</div>
+                  <div className="mt-0 text-xs">Nom du Médecin</div>
+                  <div className="text-muted-foreground text-xs">(Cachet)</div>
                 </div>
 
-                <div className="text-xs w-[340px] space-y-2">
-                  <div className="font-bold text-base underline">DEMANDE D'ANALYSE MÉDICALE</div>
+                <div className="text-xs w-[260px] space-y-0">
+                  <div className="font-bold text-xs underline">DEMANDE D'ANALYSE MÉDICALE</div>
                   {["Nom", "Prénoms", "Age", "Date"].map((label) => (
                     <div key={label} className="flex items-center">
-                      <div className="font-semibold min-w-[70px]">{label} :</div>
-                      <div className="w-full text-base font-normal px-1 border-b-2 border-black min-h-[2em]">
+                      <div className="font-semibold min-w-[40px] text-xs">{label} :</div>
+                      <div className="w-full text-xs font-normal px-1 border-b border-black min-h-[0.8em]">
                         {explorationData[label.toLowerCase()]}
                       </div>
                     </div>
@@ -856,29 +1058,188 @@ const NouvelleConsultation: React.FC = () => {
                 </div>
               </div>
 
-              <div className="text-center my-12">
-                <div className="tracking-[0.4em] font-bold text-lg mb-1">DEMANDE D'ANALYSE</div>
-                <div className="w-40 border-b-2 border-black mx-auto mb-2"></div>
+              <div className="text-center my-2">
+                <div className="tracking-[0.1em] font-bold text-xs mb-0">DEMANDE D'ANALYSE</div>
+                <div className="w-20 border-b border-black mx-auto mb-0"></div>
               </div>
 
-              <div className="text-sm">
-                <div className="font-semibold mb-2">Analyses demandées :</div>
-                <ul className="list-disc pl-5">
+              <div className="text-xs">
+                <div className="font-semibold mb-0">
+                  Type d'analyse : {explorationData.analyseType === 'interne' ? 'Analyses Internes' : 'Analyses Externes'}
+                </div>
+                <div className="font-semibold mb-0">Analyses demandées :</div>
+                <div className="grid grid-cols-2 gap-x-1 gap-y-0 text-xs leading-tight">
                   {explorationData.tests.map((test, i) => (
-                    <li key={i}>{test}</li>
+                    <div key={i} className="flex items-start">
+                      <span className="mr-0.5 text-xs">•</span>
+                      <span className="text-xs leading-tight">{test}</span>
+                    </div>
                   ))}
-                </ul>
+                </div>
 
                 {explorationData.commentaires && (
-                  <div className="mt-4">
-                    <div className="font-semibold">Commentaires :</div>
-                    <div>{explorationData.commentaires}</div>
+                  <div className="mt-0.5">
+                    <div className="font-semibold text-xs">Commentaires :</div>
+                    <div className="text-xs">{explorationData.commentaires}</div>
                   </div>
                 )}
               </div>
 
-              <div className="flex justify-end mt-12">
-                <span className="font-bold">LE MÉDECIN</span>
+              <div className="flex justify-end mt-2">
+                <span className="font-bold text-xs">LE MÉDECIN</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <Dialog open={imagerieOpen} onOpenChange={setImagerieOpen}>
+          <DialogContent className="dialog-print-hide max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>DEMANDE D'IMAGERIE</DialogTitle>
+              <DialogDescription>طلب تصوير (أشعة، IRM…)</DialogDescription>
+            </DialogHeader>
+
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                {["nom", "prenom", "age"].map((field) => (
+                  <input
+                    key={field}
+                    name={field}
+                    className="border-b border-black px-2 py-1 text-sm"
+                    placeholder={`${field.charAt(0).toUpperCase() + field.slice(1)} / ${field === "nom" ? "الاسم" : field === "prenom" ? "اللقب" : "العمر"}`}
+                    value={imagerieData[field]}
+                    onChange={handleImagerieInput}
+                  />
+                ))}
+                <input
+                  type="date"
+                  className="border-b border-black px-2 py-1 text-sm"
+                  name="date"
+                  value={imagerieData.date}
+                  onChange={handleImagerieInput}
+                />
+              </div>
+
+              <div>
+                <div className="font-semibold mb-2">Type d'imagerie / نوع التصوير :</div>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
+                  {Object.entries(imagerieOptions).map(([type, options]) => (
+                    <label key={type} className="flex items-center gap-2 text-sm">
+                      <input
+                        type="radio"
+                        name="imagerieType"
+                        value={type}
+                        checked={imagerieData.imagerieType === type}
+                        onChange={handleImagerieInput}
+                      />
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </label>
+                  ))}
+                </div>
+
+                {imagerieData.imagerieType && (
+                  <div>
+                    <div className="font-semibold mb-2">
+                      {imagerieData.imagerieType.charAt(0).toUpperCase() + imagerieData.imagerieType.slice(1)} :
+                    </div>
+                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto pr-2">
+                      {imagerieOptions[imagerieData.imagerieType].map((opt) => (
+                        <label key={opt} className="flex items-center gap-2 text-sm">
+                          <input
+                            type="checkbox"
+                            name="examens"
+                            value={opt}
+                            checked={imagerieData.examens.includes(opt)}
+                            onChange={handleImagerieInput}
+                          />
+                          {opt}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <textarea
+                name="commentaires"
+                className="border w-full p-2 text-sm"
+                rows={4}
+                placeholder="Commentaires supplémentaires / تعليقات إضافية"
+                value={imagerieData.commentaires}
+                onChange={handleImagerieInput}
+              />
+
+              <div className="flex justify-between mt-4">
+                <span className="font-bold">LE MÉDECIN / الطبيب</span>
+                <Button onClick={handlePrint}>Imprimer</Button>
+              </div>
+
+              <div className="flex justify-end">
+                <DialogClose asChild>
+                  <Button variant="outline">Fermer</Button>
+                </DialogClose>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {imagerieOpen && (
+          <div className="print-area hidden">
+            <div className="font-sans text-black bg-white mx-auto p-1" style={{ width: '13.8cm', height: '20cm', fontSize: '10px' }}>
+              <div className="flex justify-between items-start mb-1">
+                <div className="text-xs min-w-[140px] space-y-0">
+                  <div className="flex items-center gap-1 mb-0">
+                    <span className="bg-black text-white font-bold text-xs px-1 py-0.5 rounded">S</span>
+                    <span className="font-bold tracking-tight text-xs">sonatrach</span>
+                  </div>
+                  <div className="font-semibold text-xs">Direction Régionale Haoud Berkaoui</div>
+                  <div className="text-xs">Centre de Médecine de Travail</div>
+                  <div className="mt-0 text-xs">Nom du Médecin</div>
+                  <div className="text-muted-foreground text-xs">(Cachet)</div>
+                </div>
+
+                <div className="text-xs w-[260px] space-y-0">
+                  <div className="font-bold text-xs underline">DEMANDE D'IMAGERIE</div>
+                  {["Nom", "Prénoms", "Age", "Date"].map((label) => (
+                    <div key={label} className="flex items-center">
+                      <div className="font-semibold min-w-[40px] text-xs">{label} :</div>
+                      <div className="w-full text-xs font-normal px-1 border-b border-black min-h-[0.8em]">
+                        {imagerieData[label.toLowerCase()]}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="text-center my-2">
+                <div className="tracking-[0.1em] font-bold text-xs mb-0">DEMANDE D'IMAGERIE</div>
+                <div className="w-20 border-b border-black mx-auto mb-0"></div>
+              </div>
+
+              <div className="text-xs">
+                <div className="font-semibold mb-0">
+                  Type d'imagerie : {imagerieData.imagerieType.charAt(0).toUpperCase() + imagerieData.imagerieType.slice(1)}
+                </div>
+                <div className="font-semibold mb-0">Examens demandés :</div>
+                <div className="grid grid-cols-2 gap-x-1 gap-y-0 text-xs leading-tight">
+                  {imagerieData.examens.map((exam, i) => (
+                    <div key={i} className="flex items-start">
+                      <span className="mr-0.5 text-xs">•</span>
+                      <span className="text-xs leading-tight">{exam}</span>
+                    </div>
+                  ))}
+                </div>
+
+                {imagerieData.commentaires && (
+                  <div className="mt-0.5">
+                    <div className="font-semibold text-xs">Commentaires :</div>
+                    <div className="text-xs">{imagerieData.commentaires}</div>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-end mt-2">
+                <span className="font-bold text-xs">LE MÉDECIN</span>
               </div>
             </div>
           </div>
