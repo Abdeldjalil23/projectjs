@@ -148,7 +148,7 @@ const printStyles = `
 
 const types: ServiceType[] = [
   { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Consultation générale', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
-  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'طلب أو تجديد وصفة طبية', action: 'Demander' },
+  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'Demande ou renouvellement d\'ordonnance médicale', action: 'Demander' },
   { icon: <Navigation className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Orientation', desc: 'إحالة أو توجيه لطبيب مختص', action: 'Demander' },
   { icon: <Microscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'ANALYSE', desc: 'طلب تحاليل أو فحوصات مخبرية', action: 'Demander' },
   { icon: <Image className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Imagerie', desc: 'طلب تصوير (أشعة، IRM…)', action: 'Demander' },
@@ -444,20 +444,20 @@ const NouvelleConsultation: React.FC = () => {
 
   return (
     <AppLayout title="Nouvelle Consultation">
-      <div className="p-4 max-w-5xl mx-auto flex flex-col min-h-[80vh]">
-        {/* Patient Information Header */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 mb-8 p-6 bg-white rounded-lg border border-gray-200 shadow-sm">
-          <div className="flex items-center gap-6">
-            <Avatar className="h-20 w-20 border-4 border-white shadow-lg">
+      <div className="p-4 md:p-6 space-y-6">
+        {/* Title + Button */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Avatar className="h-16 w-16 border-4 border-white shadow-lg">
               <AvatarImage src={patientData.profileImageUrl} alt="Avatar" />
               <AvatarFallback className="text-lg font-bold bg-gradient-to-br from-blue-500 to-indigo-600 text-white">
                 {(patientData.prenom?.[0] || '') + (patientData.nom?.[0] || '')}
               </AvatarFallback>
             </Avatar>
-            <div className="space-y-2">
-              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+            <div className="space-y-1">
+              <h1 className="text-2xl font-bold tracking-tight text-gray-900">
                 {patientData.prenom} {patientData.nom}
-              </h2>
+              </h1>
               <div className="flex flex-wrap items-center gap-4 text-gray-600">
                 <span className="flex items-center gap-1">
                   <span className="font-medium">Âge:</span>
@@ -479,6 +479,9 @@ const NouvelleConsultation: React.FC = () => {
               </div>
             </div>
           </div>
+          <Button variant="secondary" size="lg" className="gap-2 px-8 py-3 rounded-full shadow" onClick={() => navigate(-1)}>
+            <ArrowLeft className="w-5 h-5" /> Retour
+          </Button>
         </div>
 
         {/* Service Selection */}
@@ -496,16 +499,10 @@ const NouvelleConsultation: React.FC = () => {
         </div>
         </div>
 
-        <div className="flex justify-start mt-10">
-          <Button variant="secondary" size="lg" className="gap-2 px-8 py-3 rounded-full shadow" onClick={() => navigate(-1)}>
-            <ArrowLeft className="w-5 h-5" /> Retour
-          </Button>
-        </div>
-
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogContent className="dialog-print-hide">
             <DialogHeader>
-              <DialogTitle>{selectedType?.title === 'Ordonnance' ? 'وصفة طبية جديدة' : 'Demande de service'}</DialogTitle>
+              <DialogTitle>{selectedType?.title === 'Ordonnance' ? 'Ordonnance Médicale' : 'Demande de service'}</DialogTitle>
               <DialogDescription>
                 {selectedType && (
                   <div className="flex flex-col items-center mb-4">
@@ -519,14 +516,14 @@ const NouvelleConsultation: React.FC = () => {
             {selectedType?.title === 'Ordonnance' && (
               <div>
                 <div className="grid grid-cols-2 gap-4">
-                  <input className="border p-2" name="nom" placeholder="اسم المريض" value={formData.nom} onChange={handleInputChange} />
-                  <input className="border p-2" name="prenoms" placeholder="اللقب" value={formData.prenoms} onChange={handleInputChange} />
-                  <input className="border p-2" name="age" placeholder="العمر" value={formData.age} onChange={handleInputChange} />
+                  <input className="border p-2" name="nom" placeholder="Nom du patient" value={formData.nom} onChange={handleInputChange} />
+                  <input className="border p-2" name="prenoms" placeholder="Prénoms" value={formData.prenoms} onChange={handleInputChange} />
+                  <input className="border p-2" name="age" placeholder="Âge" value={formData.age} onChange={handleInputChange} />
                   <input className="border p-2" name="date" type="date" value={formData.date} onChange={handleInputChange} />
                 </div>
-                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="دواء - كمية - مدة..." value={formData.medicaments} onChange={handleInputChange} />
+                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="Médicament - Quantité - Durée..." value={formData.medicaments} onChange={handleInputChange} />
                 <div className="mt-4 text-end">
-                  <Button onClick={handlePrint}>طباعة</Button>
+                  <Button onClick={handlePrint}>Imprimer</Button>
                 </div>
               </div>
             )}
@@ -563,10 +560,6 @@ const NouvelleConsultation: React.FC = () => {
                     <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.prenoms}</div>
                   </div>
                   <div className="flex flex-row items-center w-full">
-                    <div className="font-semibold min-w-[70px] line-through">Malade (AEC) :</div>
-                    <div className="w-full h-7"></div>
-                  </div>
-                  <div className="flex flex-row items-center w-full">
                     <div className="font-semibold min-w-[70px]">Age :</div>
                     <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.age}</div>
                   </div>
@@ -585,9 +578,9 @@ const NouvelleConsultation: React.FC = () => {
               <table className="w-full border text-sm">
                 <thead>
                   <tr className="bg-gray-100">
-                    <th className="border p-1">اسم الدواء</th>
-                    <th className="border p-1">الكمية</th>
-                    <th className="border p-1">الفترة</th>
+                    <th className="border p-1">Médicament</th>
+                    <th className="border p-1">Quantité</th>
+                    <th className="border p-1">Durée</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -655,7 +648,7 @@ const NouvelleConsultation: React.FC = () => {
               </div>
               <div className="flex justify-between mt-4">
                 <span className="font-bold">LE MEDECIN</span>
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
               </div>
               <div className="flex justify-end mt-2">
                 <DialogClose asChild>
@@ -762,7 +755,7 @@ const NouvelleConsultation: React.FC = () => {
                 <div>Signature du Médecin</div>
               </div>
               <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
                 <DialogClose asChild>
                   <Button variant="outline">Fermer</Button>
                 </DialogClose>
@@ -878,7 +871,7 @@ const NouvelleConsultation: React.FC = () => {
                 </div>
               </div>
               <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
                 <DialogClose asChild>
                   <Button variant="outline">Fermer</Button>
                 </DialogClose>
@@ -1025,7 +1018,7 @@ const NouvelleConsultation: React.FC = () => {
 
               <div className="flex justify-between mt-4">
                 <span className="font-bold">LE MÉDECIN / الطبيب</span>
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
               </div>
 
               <div className="flex justify-end">
@@ -1178,7 +1171,7 @@ const NouvelleConsultation: React.FC = () => {
 
               <div className="flex justify-between mt-4">
                 <span className="font-bold">LE MÉDECIN / الطبيب</span>
-                <Button onClick={handlePrint}>طباعة</Button>
+                <Button onClick={handlePrint}>Imprimer</Button>
               </div>
 
               <div className="flex justify-end">
