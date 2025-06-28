@@ -1,153 +1,167 @@
-import { useState } from "react";
-// Removed useNavigate as we're handling views internally now
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { MoreHorizontal } from "lucide-react";
 import {
-  Users,
-  User,
-  Building2,
-  AlertTriangle,
-  UserCog,
-} from "lucide-react";
-// Import your new UsersTable component
-import { UsersTable } from "@/pages/admin/UsersTable"; 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-// Note: Adjust the import path based on where you saved UsersTable.tsx
-
-// Mock data for all system users (doctors and admins)
+// --- Mock Data ---
+// In a real application, you would fetch this data from your API.
 const allUsersData = [
-  { id: 1, name: 'Dr. Mohammed Ali', email: 'mohammed.ali@sonatrach.dz', avatar: 'MA', role: 'doctor' as const, specialty: 'General Medicine', status: 'active' as const },
-  { id: 2, name: 'Dr. Fatima Zahra', email: 'fatima.zahra@sonatrach.dz', avatar: 'FZ', role: 'doctor' as const, specialty: 'Dentist', status: 'active' as const },
-  { id: 3, name: 'Dr. Karim Benzema', email: 'karim.benzema@sonatrach.dz', avatar: 'KB', role: 'doctor' as const, specialty: 'Psychologist', status: 'inactive' as const },
-  { id: 4, name: 'Dr. Nadia Saoudi', email: 'nadia.saoudi@sonatrach.dz', avatar: 'NS', role: 'doctor' as const, specialty: 'General Medicine', status: 'active' as const },
-  { id: 5, name: 'Admin User', email: 'admin@sonatrach.dz', avatar: 'AU', role: 'admin' as const, status: 'active' as const },
-  { id: 6, name: 'Super Admin', email: 'super.admin@sonatrach.dz', avatar: 'SA', role: 'admin' as const, status: 'active' as const },
+  { id: 1, name: 'Dr. Mohammed Ali', email: 'mohammed.ali@sonatrach.dz', avatar: 'MA', role: 'doctor' as const },
+  { id: 2, name: 'Amira Bouzid (Admin)', email: 'amira.bouzid@sonatrach.dz', avatar: 'AB', role: 'admin' as const },
+  { id: 3, name: 'Dr. Fatima Zahra', email: 'fatima.zahra@sonatrach.dz', avatar: 'FZ', role: 'doctor' as const },
+  { id: 4, name: 'Yacine Brahimi (Admin)', email: 'yacine.brahimi@sonatrach.dz', avatar: 'YB', role: 'admin' as const },
+  { id: 5, name: 'Dr. Karim Benzema', email: 'karim.benzema@sonatrach.dz', avatar: 'KB', role: 'doctor' as const },
+  { id: 6, name: 'Dr. Nadia Saoudi', email: 'nadia.saoudi@sonatrach.dz', avatar: 'NS', role: 'doctor' as const },
 ];
+// Type for better TypeScript IntelliSense
+type UserRole = 'all' | 'doctor' | 'admin';
 
-export const AdminDashboard = () => {
-  // State to manage which view is active: 'dashboard' or a specific user list
-  const [view, setView] = useState('dashboard');
+export const UsersManagementPage = () => {
+  const navigate = useNavigate();
+  // State to keep track of the current filter
+  const [activeFilter, setActiveFilter] = useState<UserRole>('all');
 
-  const doctorsData = allUsersData.filter(user => user.role === 'doctor');
-  // In a real app, employees might be a different list, here we use all users
-  const employeesData = allUsersData; 
-
-  // Main Dashboard View Component
-  const DashboardView = () => (
-    <div className="space-y-6">
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {/* Card to show all employees */}
-        <Card
-          className="stats-card cursor-pointer hover:bg-muted/50 transition"
-          onClick={() => setView('employees')}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Employees</p>
-              <h3 className="text-2xl font-bold">{employeesData.length}</h3>
-            </div>
-            <div className="p-2 bg-medsuite-secondary rounded-full">
-              <Users className="h-5 w-5 text-medsuite-primary" />
-            </div>
-          </div>
-        </Card>
-
-        {/* Card to show doctors */}
-        <Card
-          className="stats-card cursor-pointer hover:bg-muted/50 transition"
-          onClick={() => setView('doctors')}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Number Of Doctors</p>
-              <h3 className="text-2xl font-bold">{doctorsData.length}</h3>
-            </div>
-            <div className="p-2 bg-medsuite-secondary rounded-full">
-              <User className="h-5 w-5 text-medsuite-primary" />
-            </div>
-          </div>
-        </Card>
-
-        <Card className="stats-card">
-          {/* ... other non-clickable cards ... */}
-        </Card>
-        <Card className="stats-card">
-          {/* ... other non-clickable cards ... */}
-        </Card>
-
-        {/* Card to show all system users (admins + doctors) */}
-        <Card
-          className="stats-card cursor-pointer hover:bg-muted/50 transition"
-          onClick={() => setView('all_users')}
-        >
-          <div className="flex justify-between items-start">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">System Users</p>
-              <h3 className="text-2xl font-bold">{allUsersData.length}</h3>
-            </div>
-            <div className="p-2 bg-medsuite-secondary rounded-full">
-              <UserCog className="h-5 w-5 text-medsuite-primary" />
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground">Manage Users</p>
-        </Card>
-      </div>
-
-      {/* You can add your charts and other dashboard elements here */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Health Analytics</CardTitle>
-          <CardDescription>Overview of system activity.</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">Your charts and other visual elements would go here.</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-
-  // Function to determine which view to render
-  const renderContent = () => {
-    switch (view) {
-      case 'employees':
-        return (
-          <UsersTable
-            title="All Employees"
-            description="List of all registered employees in the system."
-            users={employeesData}
-            onBack={() => setView('dashboard')}
-          />
-        );
-      case 'doctors':
-        return (
-          <UsersTable
-            title="Medical Staff"
-            description="List of all doctors registered in the system."
-            users={doctorsData}
-            onBack={() => setView('dashboard')}
-          />
-        );
-      case 'all_users':
-        return (
-          <UsersTable
-            title="All System Users"
-            description="Manage all users, including doctors and administrators."
-            users={allUsersData}
-            onBack={() => setView('dashboard')}
-          />
-        );
-      case 'dashboard':
-      default:
-        return <DashboardView />;
+  // Filter the users based on the active filter state
+  const filteredUsers = allUsersData.filter(user => {
+    if (activeFilter === 'all') {
+      return true; // Show all users
     }
-  };
+    return user.role === activeFilter; // Show only users with the matching role
+  });
 
-  return <div className="p-4 sm:p-6 lg:p-8">{renderContent()}</div>;
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle>User Management</CardTitle>
+            <CardDescription>
+              View, manage, and filter all system users.
+            </CardDescription>
+          </div>
+          <Button onClick={() => navigate('/admin/users')}>
+            Manage Users
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {/* --- Filter Dropdown --- */}
+        <div className="flex items-center gap-2 mb-4">
+          <label htmlFor="role-filter" className="text-sm font-medium">
+            Filter by role:
+          </label>
+          <Select value={activeFilter} onValueChange={(value: UserRole) => setActiveFilter(value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                All Users ({allUsersData.length})
+              </SelectItem>
+              <SelectItem value="doctor">
+                Doctors ({allUsersData.filter(u => u.role === 'doctor').length})
+              </SelectItem>
+              <SelectItem value="admin">
+                Admins ({allUsersData.filter(u => u.role === 'admin').length})
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* --- Users Table --- */}
+        <div className="border rounded-md">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>User</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
+                  <TableRow key={user.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-4">
+                        <Avatar>
+                          <AvatarFallback>{user.avatar}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{user.name}</div>
+                          <div className="text-sm text-muted-foreground">{user.email}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant={user.role === 'admin' ? 'destructive' : 'secondary'}>
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => alert(`Viewing profile for ${user.name}`)}>
+                            View Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => alert(`Editing user ${user.name}`)}>
+                            Edit User
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-500">
+                            Delete User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="h-24 text-center">
+                    No users found for this filter.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
+  );
 };
 
-export default AdminDashboard;
+export default UsersManagementPage;

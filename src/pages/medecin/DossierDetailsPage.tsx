@@ -118,7 +118,6 @@ const DossierDetailsPage = () => {
     { value: 'vaccins', label: 'Vaccins' },
     { value: 'intoxications', label: 'Intoxications' },
     { value: 'visite1', label: 'Visite 1' },
-    { value: 'visite2', label: 'Visite 2' },
   ];
 
   const formatTabTitle = (str: string) => {
@@ -252,21 +251,7 @@ const DossierDetailsPage = () => {
             <Visite2 agentId={patientData.id} />
           </TabsContent>
 
-          {/* You can replace with real content later */}
-          {tabsConfig
-            .filter(tab => !['info', 'postes', 'antecedentsP'].includes(tab.value))
-            .map(tab => (
-              <TabsContent key={tab.value} value={tab.value} className="mt-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>{formatTabTitle(tab.value)}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-muted-foreground">Contenu pour "{formatTabTitle(tab.value)}" à venir...</p>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            ))}
+       
         </Tabs>
       </div>
     </AppLayout>

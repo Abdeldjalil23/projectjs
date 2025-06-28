@@ -48,7 +48,7 @@ const OrdonnancePage = () => {
     const style = document.createElement('style');
     style.innerHTML = printStyles;
     document.head.appendChild(style);
-    return () => document.head.removeChild(style);
+    return () => {document.head.removeChild(style);}
   }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
