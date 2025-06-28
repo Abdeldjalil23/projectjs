@@ -106,10 +106,11 @@ const DetailsConsolidationTrim = () => {
   };
 
   const tabsConfig = [
-    { value: 'generalInfo', label: 'Infos Générales' },
+    
     { value: 'activitieClinic', label: 'Activité Clinique' },
     { value: 'conclusionMed', label: 'Conclusion Médicale' },
     { value: 'formation', label: 'Formation' },
+    { value: 'autres', label: 'autres' },
   ];
 
   const formatTabTitle = (str: string) => {
@@ -122,7 +123,7 @@ const DetailsConsolidationTrim = () => {
       <div className="p-4 md:p-6 space-y-6">
         
 
-        <Tabs defaultValue="generalInfo" className="w-full">
+        <Tabs defaultValue="autres" className="w-full">
           <div className="overflow-x-auto border-b border-gray-200 dark:border-gray-700">
             <TabsList className="inline-flex h-auto p-0 bg-transparent rounded-none">
               {tabsConfig.map(tab => (
@@ -137,9 +138,7 @@ const DetailsConsolidationTrim = () => {
             </TabsList>
           </div>
 
-          <TabsContent value="generalInfo" className="mt-4">
-            <GeneralInfo12467810 />
-          </TabsContent>
+          
 
           <TabsContent value="activitieClinic" className="mt-4">
             <ActivitieClinic3 />
@@ -153,6 +152,9 @@ const DetailsConsolidationTrim = () => {
             <Formation9 />
           </TabsContent>
 
+          <TabsContent value="autres" className="mt-4">
+            <GeneralInfo12467810 />
+          </TabsContent>
         </Tabs>
       </div>
     </AppLayout>
