@@ -244,7 +244,7 @@ const DossierDetailsPage = () => {
           </TabsContent>
 
           <TabsContent value="visite1" className="mt-4">
-            <Visite1 agentId={patientData.id} />
+            <Visite1 />
           </TabsContent>
 
           <TabsContent value="visite2" className="mt-4">
