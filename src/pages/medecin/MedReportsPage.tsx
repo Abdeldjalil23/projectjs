@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import {
+import { 
   Tabs, TabsList, TabsTrigger, TabsContent,
 } from '@/components/ui/tabs';
 import ActivitieClinic3 from '@/pages/medecin/consolidationTrimesterielle/activitieClinic3';
@@ -136,8 +136,8 @@ const DetailsConsolidationTrim = () => {
                 </TabsTrigger>
               ))}
             </TabsList>
-          </div>
-
+        </div>
+        
           
 
           <TabsContent value="activitieClinic" className="mt-4">

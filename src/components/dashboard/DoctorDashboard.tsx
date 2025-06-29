@@ -13,8 +13,8 @@ export const DoctorDashboard = () => {
   const [consultationTab, setConsultationTab] = useState('my');
 
   const upcomingAppointments = [
-    { id: 3, patient: 'Mohammed Hassan', time: '11:00 AM', status: 'Confirmed', type: 'Consultation', avatar: 'MH' },
-    { id: 4, patient: 'Fatima Zahra', time: '12:30 PM', status: 'Confirmed', type: 'Check-up', avatar: 'FZ' },
+    { id: 3, patient: 'Mohammed Hassan', status: 'Confirmed', type: 'Consultation', avatar: 'MH' },
+    { id: 4, patient: 'Fatima Zahra', status: 'Confirmed', type: 'Check-up', avatar: 'FZ' },
   ];
 
   const recentPatients = [
@@ -27,34 +27,25 @@ export const DoctorDashboard = () => {
     {
       id: 1,
       date: new Date('2025-06-23'),
-      time: '10:00 AM',
       agent: 'Dr. Sofia Bensalem',
       patient: 'Karim Salah',
-      type: 'General',
       status: 'Completed',
-      location: 'Room 203',
       avatar: 'KS',
     },
     {
       id: 2,
       date: new Date('2025-06-25'),
-      time: '11:00 AM',
       agent: 'Dr. Sofia Bensalem',
       patient: 'Mohammed Hassan',
-      type: 'Follow-up',
       status: 'Scheduled',
-      location: 'Room 105',
       avatar: 'MH',
     },
     {
       id: 3,
       date: new Date('2025-06-25'),
-      time: '12:30 PM',
       agent: 'Dr. Ahmed Zaki',
       patient: 'Fatima Zahra',
-      type: 'Check-up',
       status: 'Scheduled',
-      location: 'Room 108',
       avatar: 'FZ',
     },
   ];
@@ -138,17 +129,6 @@ export const DoctorDashboard = () => {
                       <h4 className="font-semibold text-base">
                         {userRole === 'patient' ? consultation.agent : consultation.patient}
                       </h4>
-                    </div>
-                    <div className="flex flex-wrap gap-4 items-center text-sm text-muted-foreground mt-1">
-                      <span className="flex items-center">
-                        <Clock className="mr-1 h-4 w-4" />
-                        {consultation.time}
-                      </span>
-                      <span className="flex items-center">
-                        <MapPin className="mr-1 h-4 w-4" />
-                        {consultation.location}
-                      </span>
-                      <Badge variant="outline">{consultation.type}</Badge>
                     </div>
                   </div>
 

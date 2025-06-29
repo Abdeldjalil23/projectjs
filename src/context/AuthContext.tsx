@@ -2,7 +2,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { NavigateFunction } from 'react-router-dom';
 
-export type UserRole = 'admin' | 'doctor' | 'patient' | null;
+export type UserRole = 'admin' | 'doctor' | 'patient' | 'social' | null;
 
 interface AuthContextType {
   userRole: UserRole;

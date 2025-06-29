@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
-import { Briefcase, Stethoscope } from 'lucide-react';
+import { Briefcase, Stethoscope, Users } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import {
@@ -28,7 +28,7 @@ export const LoginScreen = () => {
   const [password, setPassword] = useState('');
   const [specialty, setSpecialty] = useState('');
 
-  const specialties = ['MEDECINE', 'DENTISTE', 'INFERMIER', 'SOSIALE'];
+  const specialties = ['MEDECINE', 'DENTISTE', 'INFERMIER'];
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,6 +57,8 @@ export const LoginScreen = () => {
       navigate('/');
     } else if (selectedRole === 'doctor') {
       navigate('/');
+    } else if (selectedRole === 'social') {
+      navigate('/social/dashboard');
     }
   };
 
@@ -80,7 +82,7 @@ export const LoginScreen = () => {
               className="mb-6"
               onValueChange={(value) => setSelectedRole(value as UserRole)}
             >
-              <TabsList className="grid w-full grid-cols-2">
+              <TabsList className="grid w-full grid-cols-3">
                 <TabsTrigger value="doctor" className="flex items-center gap-1">
                   <Stethoscope className="h-4 w-4" />
                   <span className="hidden sm:inline">Doctor</span>
@@ -88,6 +90,10 @@ export const LoginScreen = () => {
                 <TabsTrigger value="admin" className="flex items-center gap-1">
                   <Briefcase className="h-4 w-4" />
                   <span className="hidden sm:inline">Admin</span>
+                </TabsTrigger>
+                <TabsTrigger value="social" className="flex items-center gap-1">
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Social</span>
                 </TabsTrigger>
               </TabsList>
 
@@ -99,6 +105,11 @@ export const LoginScreen = () => {
               <TabsContent value="admin">
                 <p className="text-sm text-muted-foreground mb-4">
                   Oversee company healthcare operations
+                </p>
+              </TabsContent>
+              <TabsContent value="social">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Access social services and patient support
                 </p>
               </TabsContent>
             </Tabs>
