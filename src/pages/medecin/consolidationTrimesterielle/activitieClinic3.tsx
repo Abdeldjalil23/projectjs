@@ -59,7 +59,8 @@ const ActivitieClinic3 = () => {
           </AccordionContent>
         </AccordionItem>
 
-        {/* Identification de la nuisance */}
+        {/* Identification de la nuisa
+        nce */}
         <AccordionItem value="identification-nuisance">
           <AccordionTrigger>Identification de la nuisance</AccordionTrigger>
           <AccordionContent>
