@@ -103,6 +103,17 @@ interface ServiceType {
   action: string;
 }
 
+interface ConsultationData {
+  consultationNumber: string;
+  visitNumber: string;
+  date: string;
+  doctor: string;
+  specialty: string;
+  natureConsultation: string;
+  diagnostic: string;
+  workStoppageDays: string;
+}
+
 const printStyles = `
 @media print {
   @page {
@@ -147,7 +158,7 @@ const printStyles = `
 `;
 
 const types: ServiceType[] = [
-  // { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Consultation générale', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
+  { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Diagnostic', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
   { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'Demande ou renouvellement d\'ordonnance médicale', action: 'Demander' },
   { icon: <Navigation className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Orientation', desc: 'إحالة أو توجيه لطبيب مختص', action: 'Demander' },
   { icon: <Microscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'ANALYSE', desc: 'طلب تحاليل أو فحوصات مخبرية', action: 'Demander' },
@@ -290,6 +301,17 @@ const NouvelleConsultation: React.FC = () => {
     commentaires: ''
   });
   const [imagerieOpen, setImagerieOpen] = useState(false);
+  const [consultationData, setConsultationData] = useState<ConsultationData>({
+    consultationNumber: '',
+    visitNumber: '',
+    date: today,
+    doctor: '',
+    specialty: '',
+    natureConsultation: '',
+    diagnostic: '',
+    workStoppageDays: ''
+  });
+  const [consultationOpen, setConsultationOpen] = useState(false);
 
   // Patient data - similar to DossierDetailsPage
   const patientData = {
@@ -339,6 +361,11 @@ const NouvelleConsultation: React.FC = () => {
   }, []);
 
   const handleDemander = (type: ServiceType) => {
+    if (type.title === 'Diagnostic') {
+      setConsultationOpen(true);
+      setSelectedType(type);
+      return;
+    }
     if (type.title === 'Orientation') {
       setOrientationOpen(true);
       setSelectedType(type);
@@ -438,6 +465,11 @@ const NouvelleConsultation: React.FC = () => {
     }
   };
 
+  const handleConsultationInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setConsultationData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -535,71 +567,174 @@ const NouvelleConsultation: React.FC = () => {
           </DialogContent>
         </Dialog>
 
-        <div className="print-area hidden">
-          <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
-            <div className="flex flex-row justify-between items-start mb-8 w-full">
-              <div className="flex flex-col items-start gap-1 text-xs min-w-[200px]">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="bg-black text-white font-bold text-xs px-2 py-1 rounded">S</span>
-                  <span className="font-bold text-xs tracking-tight">sonatrach</span>
+        <Dialog open={consultationOpen} onOpenChange={setConsultationOpen}>
+          <DialogContent className="dialog-print-hide max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>CONSULTATION MÉDICALE</DialogTitle>
+              <DialogDescription>مقابلة مع الطبيب العام</DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-1">Numéro de Consultation:</label>
+                  <input
+                    className="border p-2 w-full"
+                    name="consultationNumber"
+                    placeholder="Numéro de consultation"
+                    value={consultationData.consultationNumber}
+                    onChange={handleConsultationInput}
+                  />
                 </div>
-                <div className="font-semibold">Direction Régionale Haoud Berkaoui</div>
-                <div>Centre de Médecine de Travail</div>
-                <div className="mt-2">Nom du Médecin</div>
-                <div className="text-muted-foreground">(Cachet)</div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Numéro de Visite:</label>
+                  <input
+                    className="border p-2 w-full"
+                    name="visitNumber"
+                    placeholder="Numéro de visite"
+                    value={consultationData.visitNumber}
+                    onChange={handleConsultationInput}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Date:</label>
+                  <input
+                    type="date"
+                    className="border p-2 w-full"
+                    name="date"
+                    value={consultationData.date}
+                    onChange={handleConsultationInput}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Médecin:</label>
+                  <input
+                    className="border p-2 w-full"
+                    name="doctor"
+                    placeholder="Nom du médecin"
+                    value={consultationData.doctor}
+                    onChange={handleConsultationInput}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Spécialité:</label>
+                  <input
+                    className="border p-2 w-full"
+                    name="specialty"
+                    placeholder="Spécialité médicale"
+                    value={consultationData.specialty}
+                    onChange={handleConsultationInput}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-1">Nature de Consultation:</label>
+                  <input
+                    className="border p-2 w-full"
+                    name="natureConsultation"
+                    placeholder="Type de consultation"
+                    value={consultationData.natureConsultation}
+                    onChange={handleConsultationInput}
+                  />
+                </div>
               </div>
-              <div className="flex flex-col items-end gap-1 w-[340px]">
-                <div className="font-bold text-base mb-2 underline underline-offset-2">FEUILLE DE MALADIE</div>
-                <div className="flex flex-col gap-2 w-full text-xs">
-                  <div className="flex flex-row items-center w-full">
-                    <div className="font-semibold min-w-[70px]">Nom :</div>
-                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.nom}</div>
-                  </div>
-                  <div className="flex flex-row items-center w-full">
-                    <div className="font-semibold min-w-[70px]">Prénoms :</div>
-                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.prenoms}</div>
-                  </div>
-                  <div className="flex flex-row items-center w-full">
-                    <div className="font-semibold min-w-[70px]">Age :</div>
-                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.age}</div>
-                  </div>
-                  <div className="flex flex-row items-center w-full">
-                    <div className="font-semibold min-w-[70px]">Date :</div>
-                    <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{formData.date}</div>
-                  </div>
-                </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Diagnostic:</label>
+                <textarea
+                  className="border p-2 w-full"
+                  name="diagnostic"
+                  rows={4}
+                  placeholder="Diagnostic médical..."
+                  value={consultationData.diagnostic}
+                  onChange={handleConsultationInput}
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">Nombre de Jours - Arrêt de Travail:</label>
+                <input
+                  className="border p-2 w-full"
+                  name="workStoppageDays"
+                  placeholder="Nombre de jours"
+                  value={consultationData.workStoppageDays}
+                  onChange={handleConsultationInput}
+                />
+                <span className="text-sm text-gray-500 ml-2">jours</span>
+              </div>
+              <div className="flex justify-between mt-4">
+                <span className="font-bold">LE MÉDECIN</span>
+                <Button onClick={handlePrint}>Imprimer</Button>
+              </div>
+              <div className="flex justify-end">
+                <DialogClose asChild>
+                  <Button variant="outline">Fermer</Button>
+                </DialogClose>
               </div>
             </div>
-            <div className="flex flex-col items-center my-12 w-full">
-              <div className="tracking-[0.4em] font-bold text-lg mb-1">ORDONNANCE</div>
-              <div className="w-40 border-b-2 border-black mb-2"></div>
-            </div>
-            <div className="w-full mt-8">
-              <table className="w-full border text-sm">
-                <thead>
-                  <tr className="bg-gray-100">
-                    <th className="border p-1">Médicament</th>
-                    <th className="border p-1">Quantité</th>
-                    <th className="border p-1">Durée</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {formData.medicaments.split('\n').map((line, idx) => {
-                    const [nom, quantite, periode] = line.split('-').map(s => s.trim());
-                    if (!nom) return null;
-                    return (
-                      <tr key={idx}>
-                        <td className="border p-1">{nom}</td>
-                        <td className="border p-1">{quantite || ''}</td>
-                        <td className="border p-1">{periode || ''}</td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+          </DialogContent>
+        </Dialog>
+
+        {consultationOpen && (
+          <div className="print-area hidden">
+            <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
+              <div className="flex flex-row justify-between items-start mb-8 w-full">
+                <div className="flex flex-col items-start gap-1 text-xs min-w-[200px]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="bg-black text-white font-bold text-xs px-2 py-1 rounded">S</span>
+                    <span className="font-bold text-xs tracking-tight">sonatrach</span>
+                  </div>
+                  <div className="font-semibold">Direction Régionale Haoud Berkaoui</div>
+                  <div>Centre de Médecine de Travail</div>
+                  <div className="mt-2">Nom du Médecin</div>
+                  <div className="text-muted-foreground">(Cachet)</div>
+                </div>
+                <div className="flex flex-col items-end gap-1 w-[340px]">
+                  <div className="font-bold text-base mb-2 underline underline-offset-2">CONSULTATION MÉDICALE</div>
+                  <div className="flex flex-col gap-2 w-full text-xs">
+                    <div className="flex flex-row items-center w-full">
+                      <div className="font-semibold min-w-[100px]">Numéro Consultation :</div>
+                      <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{consultationData.consultationNumber}</div>
+                    </div>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="font-semibold min-w-[100px]">Numéro Visite :</div>
+                      <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{consultationData.visitNumber}</div>
+                    </div>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="font-semibold min-w-[100px]">Date :</div>
+                      <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{consultationData.date}</div>
+                    </div>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="font-semibold min-w-[100px]">Médecin :</div>
+                      <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{consultationData.doctor}</div>
+                    </div>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="font-semibold min-w-[100px]">Spécialité :</div>
+                      <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{consultationData.specialty}</div>
+                    </div>
+                    <div className="flex flex-row items-center w-full">
+                      <div className="font-semibold min-w-[100px]">Nature Consultation :</div>
+                      <div className="w-full text-base font-normal px-1" style={{ borderBottom: '2px solid #000', minHeight: '2em' }}>{consultationData.natureConsultation}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col items-center my-8 w-full">
+                <div className="tracking-[0.4em] font-bold text-lg mb-1">DIAGNOSTIC</div>
+                <div className="w-40 border-b-2 border-black mb-2"></div>
+              </div>
+              <div className="w-full mb-6">
+                <div className="font-semibold mb-2">Diagnostic :</div>
+                <div className="border border-black p-4 min-h-[100px] text-sm">
+                  {consultationData.diagnostic}
+                </div>
+              </div>
+              <div className="w-full mb-6">
+                <div className="font-semibold mb-2">Nombre de Jours - Arrêt de Travail :</div>
+                <div className="flex items-center gap-2">
+                  <div className="border-b border-black px-2 py-1 min-w-[100px] text-center">{consultationData.workStoppageDays}</div>
+                  <span className="text-sm">jours</span>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         <Dialog open={orientationOpen} onOpenChange={setOrientationOpen}>
           <DialogContent className="dialog-print-hide max-w-lg">
