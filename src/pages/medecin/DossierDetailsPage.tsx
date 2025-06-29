@@ -16,6 +16,9 @@ import PostesOccupeesPage   from '@/pages/medecin/contentDoss/PostesOccupesTab';
 import AntecedentsP from '@/pages/medecin/contentDoss/AntecedentsP';
 import AntecedentsF from '@/pages/medecin/contentDoss/AntecedentsF';
 import Visite1 from '@/pages/medecin/contentDoss/Visite1';
+import Accidents from '@/pages/medecin/contentDoss/Accidents';
+import Vaccins from '@/pages/medecin/contentDoss/Vaccins';
+import Intoxications from '@/pages/medecin/contentDoss/Intoxications';
 
 
 // ========== Reusable Fields ==========
@@ -240,6 +243,18 @@ const DossierDetailsPage = () => {
 
           <TabsContent value="antecedentsF" className="mt-4">
             <AntecedentsF agentId={patientData.id} />
+          </TabsContent>
+
+          <TabsContent value="accidents" className="mt-4">
+            <Accidents />
+          </TabsContent>
+
+          <TabsContent value="vaccins" className="mt-4">
+            <Vaccins />
+          </TabsContent>
+
+          <TabsContent value="intoxications" className="mt-4">
+            <Intoxications />
           </TabsContent>
 
           <TabsContent value="visite1" className="mt-4">
