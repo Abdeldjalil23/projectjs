@@ -42,6 +42,7 @@ import SocialResourcesPage from "./pages/social/SocialResourcesPage";
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
+import { ChroniqueProvider } from "./context/ChroniqueContext";
 import path from "path";
 
 const queryClient = new QueryClient();
@@ -80,22 +81,24 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProviderWithNavigate>
-          <Routes>
-            {/* Route login public */}
-            <Route path="/login" element={<LoginPage />} />
+          <ChroniqueProvider>
+            <Routes>
+              {/* Route login public */}
+              <Route path="/login" element={<LoginPage />} />
 
-            {/* Routes protégées */}
-            {protectedRoutes.map(({ path, element }) => (
-              <Route
-                key={path}
-                path={path}
-                element={<PrivateRoute>{element}</PrivateRoute>}
-              />
-            ))}
+              {/* Routes protégées */}
+              {protectedRoutes.map(({ path, element }) => (
+                <Route
+                  key={path}
+                  path={path}
+                  element={<PrivateRoute>{element}</PrivateRoute>}
+                />
+              ))}
 
-            {/* Route 404 */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
+              {/* Route 404 */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </ChroniqueProvider>
         </AuthProviderWithNavigate>
       </BrowserRouter>
     </TooltipProvider>
