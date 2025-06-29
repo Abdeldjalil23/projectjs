@@ -14,66 +14,62 @@ import {
 } from "@/components/ui/table";
 
 const VisitePeriodiquePage = () => {
-  // const { userRole } = useAuth(); // You might use this to fetch/filter data
-
-  // Sample data adjusted for the new columns
-  // You'll need to fetch or structure your actual data similarly
   const visites = [
     {
-      numeroVisite: 'VP2024-001',
+      numeroVisite: '001',
       type: 'Visite annuelle',
       date: new Date('2024-07-15'),
       agent: {
-        matricule: 'M10234',
+        matricule: '1023S',
         nom: 'Touati',
         prenom: 'Noureddine',
-        structure: 'Département IT',
+        structure: 'OP',
       },
       medecin: 'Dr. Amel Kherbache',
       infirmier: 'Inf. Samira Lido',
     },
     {
-      numeroVisite: 'VP2024-002',
-      type: 'Suivi post-opératoire',
+      numeroVisite: '002',
+      type: 'Visite particulière',
       date: new Date('2024-07-22'),
       agent: {
-        matricule: 'M10235',
+        matricule: '1023A',
         nom: 'Gaci',
         prenom: 'Imane',
-        structure: 'Service Commercial',
+        structure: 'IT',
       },
       medecin: 'Dr. Amel Kherbache',
       infirmier: 'Inf. Karim Belkacem',
     },
     {
-      numeroVisite: 'VP2024-003',
-      type: 'Visite d\'embauche',
+      numeroVisite: '003',
+      type: 'Visite annuelle',
       date: new Date('2024-06-10'),
       agent: {
-        matricule: 'M10236',
+        matricule: '1023H',
         nom: 'Benmohamed',
         prenom: 'Ali',
-        structure: 'Direction Générale',
+        structure: 'DP',
       },
       medecin: 'Dr. Farid Lounis',
       infirmier: 'Inf. Samira Lido',
     },
     {
-      numeroVisite: 'VP2024-004',
-      type: 'Contrôle Périodique',
+      numeroVisite: '004',
+      type: 'Visite particulière',
       date: new Date('2024-08-01'),
       agent: {
-        matricule: 'M10237',
+        matricule: '1023G',
         nom: 'Salah',
         prenom: 'Fatima',
-        structure: 'Ressources Humaines',
+        structure: 'EP',
       },
       medecin: 'Dr. Sonia Cherif',
       infirmier: 'Inf. Karim Belkacem',
     },
   ];
 
-  const pageTitle = 'Suivi des Visites Médicales'; // Updated title for a more general/admin view
+  const pageTitle = 'Suivi des Visites Médicales'; 
 
   return (
     <AppLayout title={pageTitle}>
