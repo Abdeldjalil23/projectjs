@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,7 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useChronique } from '@/context/ChroniqueContext';
 import { useParams } from 'react-router-dom';
 
 const initialState = {
@@ -123,20 +122,38 @@ const diseaseSubcategories = {
 const Chronique = () => {
   const { id } = useParams();
   const patientId = parseInt(id || '0');
-  const { saveChroniqueData, getChroniqueData } = useChronique();
   const [form, setForm] = useState(initialState);
   const [saved, setSaved] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   // Load existing data when component mounts
   useEffect(() => {
-    const existingData = getChroniqueData(patientId);
+    const existingData = localStorage.getItem(`chronique_${patientId}`);
     if (existingData) {
-      setForm({
-        maladies: existingData.maladies,
-        observationsGenerales: existingData.observationsGenerales,
-      });
+      try {
+        const parsedData = JSON.parse(existingData);
+        if (parsedData.maladies && parsedData.maladies.length > 0) {
+          setForm({
+            maladies: parsedData.maladies,
+            observationsGenerales: parsedData.observationsGenerales || '',
+          });
+          setIsEditMode(true);
+        } else {
+          setIsEditMode(false);
+        }
+      } catch (error) {
+        console.error('Error parsing stored data:', error);
+        setIsEditMode(false);
+      }
+    } else {
+      setIsEditMode(false);
     }
-  }, [patientId, getChroniqueData]);
+  }, [patientId]);
+
+  // Debug useEffect to monitor isEditMode changes
+  useEffect(() => {
+    console.log('isEditMode changed to:', isEditMode);
+  }, [isEditMode]);
 
   const handleMaladieChange = (maladieId, field, value) => {
     setForm(prev => ({
@@ -183,18 +200,39 @@ const Chronique = () => {
     }));
   };
 
-  const handleSave = (e) => {
+  const handleModifier = useCallback(() => {
+    console.log('=== MODIFIER CLICKED ===');
+    console.log('Current isEditMode before change:', isEditMode);
+    console.log('Setting isEditMode to false');
+    setIsEditMode(false);
+    console.log('isEditMode should now be false');
+  }, []);
+
+  const handleSave = useCallback((e) => {
     e.preventDefault();
+    console.log('=== SAVE CLICKED ===');
+    console.log('Current isEditMode before save:', isEditMode);
     
-    // Save to context
-    saveChroniqueData(patientId, {
+    // Save to localStorage
+    const dataToSave = {
       patientId,
       maladies: form.maladies,
       observationsGenerales: form.observationsGenerales,
-    });
+    };
+    
+    localStorage.setItem(`chronique_${patientId}`, JSON.stringify(dataToSave));
     
     setSaved(true);
+    setIsEditMode(true);
+    console.log('Setting isEditMode to true after save');
     setTimeout(() => setSaved(false), 2000);
+  }, [patientId, form.maladies, form.observationsGenerales]);
+
+  const isFormValid = () => {
+    // Check if at least one maladie has required fields filled
+    return form.maladies.some(maladie => 
+      maladie.typeMaladie && maladie.dateDiagnostic
+    );
   };
 
   return (
@@ -209,7 +247,7 @@ const Chronique = () => {
               <div key={maladie.id} className="border rounded-lg p-4">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-semibold">Maladie #{maladie.id}</h3>
-                  {form.maladies.length > 1 && (
+                  {form.maladies.length > 1 && !isEditMode && (
                     <Button 
                       type="button" 
                       variant="destructive" 
@@ -224,7 +262,11 @@ const Chronique = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <Label>Type de maladie</Label>
-                    <Select value={maladie.typeMaladie} onValueChange={v => handleMaladieChange(maladie.id, 'typeMaladie', v)}>
+                    <Select 
+                      value={maladie.typeMaladie} 
+                      onValueChange={v => handleMaladieChange(maladie.id, 'typeMaladie', v)}
+                      disabled={isEditMode}
+                    >
                       <SelectTrigger>
                         <SelectValue placeholder="Sélectionner le type de maladie" />
                       </SelectTrigger>
@@ -251,7 +293,11 @@ const Chronique = () => {
                   {maladie.typeMaladie && maladie.typeMaladie !== 'autre' && diseaseSubcategories[maladie.typeMaladie] && (
                     <div>
                       <Label>Sous-type de maladie</Label>
-                      <Select value={maladie.sousType} onValueChange={v => handleMaladieChange(maladie.id, 'sousType', v)}>
+                      <Select 
+                        value={maladie.sousType} 
+                        onValueChange={v => handleMaladieChange(maladie.id, 'sousType', v)}
+                        disabled={isEditMode}
+                      >
                         <SelectTrigger>
                           <SelectValue placeholder="Sélectionner le sous-type" />
                         </SelectTrigger>
@@ -271,7 +317,8 @@ const Chronique = () => {
                     <Input 
                       type="date" 
                       value={maladie.dateDiagnostic} 
-                      onChange={e => handleMaladieChange(maladie.id, 'dateDiagnostic', e.target.value)} 
+                      onChange={e => handleMaladieChange(maladie.id, 'dateDiagnostic', e.target.value)}
+                      disabled={isEditMode}
                     />
                   </div>
                   
@@ -279,9 +326,10 @@ const Chronique = () => {
                     <Label>Traitement actuel</Label>
                     <Textarea 
                       value={maladie.traitementActuel} 
-                      onChange={e => handleMaladieChange(maladie.id, 'traitementActuel', e.target.value)} 
+                      onChange={e => handleMaladieChange(maladie.id, 'traitementActuel', e.target.value)}
                       placeholder="Description du traitement actuel"
                       className="min-h-[100px]"
+                      disabled={isEditMode}
                     />
                   </div>
                   
@@ -289,8 +337,9 @@ const Chronique = () => {
                     <Label>Médecin suivant</Label>
                     <Input 
                       value={maladie.medecinSuivi} 
-                      onChange={e => handleMaladieChange(maladie.id, 'medecinSuivi', e.target.value)} 
+                      onChange={e => handleMaladieChange(maladie.id, 'medecinSuivi', e.target.value)}
                       placeholder="Nom du médecin suivant"
+                      disabled={isEditMode}
                     />
                   </div>
                   
@@ -299,15 +348,17 @@ const Chronique = () => {
                     <Input 
                       type="date" 
                       value={maladie.dateDerniereSuivi} 
-                      onChange={e => handleMaladieChange(maladie.id, 'dateDerniereSuivi', e.target.value)} 
+                      onChange={e => handleMaladieChange(maladie.id, 'dateDerniereSuivi', e.target.value)}
+                      disabled={isEditMode}
                     />
                   </div>
                   
                   <div className="flex items-center gap-2">
                     <Checkbox 
                       checked={maladie.restrictionsTravail} 
-                      onCheckedChange={v => handleMaladieChange(maladie.id, 'restrictionsTravail', v)} 
-                      id={`restrictions-${maladie.id}`} 
+                      onCheckedChange={v => handleMaladieChange(maladie.id, 'restrictionsTravail', v)}
+                      id={`restrictions-${maladie.id}`}
+                      disabled={isEditMode}
                     />
                     <Label htmlFor={`restrictions-${maladie.id}`}>Restrictions sur le travail</Label>
                   </div>
@@ -316,18 +367,21 @@ const Chronique = () => {
                     <Label>Notes</Label>
                     <Textarea 
                       value={maladie.notes} 
-                      onChange={e => handleMaladieChange(maladie.id, 'notes', e.target.value)} 
+                      onChange={e => handleMaladieChange(maladie.id, 'notes', e.target.value)}
                       placeholder="Notes complémentaires"
                       className="min-h-[100px]"
+                      disabled={isEditMode}
                     />
                   </div>
                 </div>
               </div>
             ))}
             
-            <Button type="button" variant="outline" onClick={addMaladie}>
-              Ajouter une maladie
-            </Button>
+            {!isEditMode && (
+              <Button type="button" variant="outline" onClick={addMaladie}>
+                Ajouter une maladie
+              </Button>
+            )}
           </div>
 
           <div className="mt-6 space-y-4">
@@ -335,18 +389,53 @@ const Chronique = () => {
               <Label>Observations générales</Label>
               <Textarea 
                 value={form.observationsGenerales} 
-                onChange={e => handleChange('observationsGenerales', e.target.value)} 
+                onChange={e => handleChange('observationsGenerales', e.target.value)}
                 placeholder="Observations générales sur les maladies chroniques"
                 className="min-h-[100px]"
+                disabled={isEditMode}
               />
             </div>
           </div>
         </CardContent>
       </Card>
-      <div className="flex justify-end">
-        <Button type="submit">Enregistrer</Button>
+      <div className="flex justify-end gap-2">
+        {isEditMode ? (
+          <>
+            <Button type="button" onClick={handleModifier} variant="outline">
+              Modifier
+            </Button>
+            <Button 
+              type="button" 
+              onClick={() => {
+                console.log('Test button clicked');
+                setIsEditMode(false);
+              }} 
+              variant="secondary"
+              size="sm"
+            >
+              Test
+            </Button>
+          </>
+        ) : (
+          <Button type="submit" disabled={!isFormValid()}>
+            Enregistrer
+          </Button>
+        )}
       </div>
       {saved && <div className="text-green-600 font-bold">Enregistré avec succès !</div>}
+      {isEditMode && (
+        <div className="text-blue-600 text-sm italic">
+          Mode lecture - Cliquez sur "Modifier" pour éditer les données
+        </div>
+      )}
+      {!isEditMode && (
+        <div className="text-orange-600 text-sm italic">
+          Mode édition - Remplissez les champs requis et cliquez sur "Enregistrer"
+        </div>
+      )}
+      <div className="text-gray-500 text-xs">
+        Debug: isEditMode = {isEditMode.toString()}
+      </div>
     </form>
   );
 };
