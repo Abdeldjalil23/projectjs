@@ -22,7 +22,10 @@ const initialState = {
 };
 
 const Accidents = () => {
-  const [form, setForm] = useState(initialState);
+  const [form, setForm] = useState({
+    ...initialState,
+    date: new Date().toISOString().split('T')[0] // Auto-set current date
+  });
   const [saved, setSaved] = useState(false);
 
   const handleChange = (field, value) => {
@@ -32,11 +35,9 @@ const Accidents = () => {
   const handleSave = (e) => {
     e.preventDefault();
     
-    // Auto-set current date if no date is provided
-    if (!form.date) {
-      const today = new Date().toISOString().split('T')[0];
-      setForm(prev => ({ ...prev, date: today }));
-    }
+    // Auto-update to current date when saving
+    const today = new Date().toISOString().split('T')[0];
+    setForm(prev => ({ ...prev, date: today }));
     
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);

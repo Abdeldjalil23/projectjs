@@ -19,6 +19,7 @@ import Visite1 from '@/pages/medecin/contentDoss/Visite1';
 import Accidents from '@/pages/medecin/contentDoss/Accidents';
 import Vaccins from '@/pages/medecin/contentDoss/Vaccins';
 import Intoxications from '@/pages/medecin/contentDoss/Intoxications';
+import Chronique from '@/pages/medecin/contentDoss/Chronique';
 
 
 // ========== Reusable Fields ==========
@@ -120,6 +121,7 @@ const DossierDetailsPage = () => {
     { value: 'vaccins', label: 'Vaccins' },
     { value: 'intoxications', label: 'Intoxications' },
     { value: 'visite1', label: 'Visite 1' },
+    { value: 'chronique', label: 'Chronique' },
   ];
 
   const formatTabTitle = (str: string) => {
@@ -259,6 +261,10 @@ const DossierDetailsPage = () => {
 
           <TabsContent value="visite1" className="mt-4">
             <Visite1 />
+          </TabsContent>
+
+          <TabsContent value="chronique" className="mt-4">
+            <Chronique />
           </TabsContent>
 
        
