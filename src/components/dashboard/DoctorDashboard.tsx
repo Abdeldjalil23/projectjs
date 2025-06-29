@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Calendar, CheckCircle, Clock, Users, MapPin, Plus, ArrowLeft } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Users, MapPin, Plus, ArrowLeft, UserCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
@@ -67,15 +67,15 @@ export const DoctorDashboard = () => {
   const getTitle = () => {
     switch (selectedStat) {
       case 'appointments':
-        return 'Total Employees';
+        return 'Employés Totaux';
       case 'patients':
-        return "Today's Patients";
+        return 'Patients du Jour';
       case 'completed':
-        return 'Completed Appointments';
+        return 'Terminés';
       case 'pending':
-        return 'Pending Appointments';
+        return 'En Attente';
       default:
-        return 'Total Employees';
+        return 'Employés Totaux';
     }
   };
 
@@ -115,7 +115,9 @@ export const DoctorDashboard = () => {
                   <TableHead>Traitement</TableHead>
                 </>
               )}
-              <TableHead>Actions</TableHead>
+              {(selectedStat === 'appointments' || selectedStat === 'patients') && (
+                <TableHead>Actions</TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,12 +138,13 @@ export const DoctorDashboard = () => {
                     <TableCell>{item.treatment}</TableCell>
                   </>
                 )}
-                <TableCell>
-                  <Button variant="secondary" size="sm">
-                    {selectedStat === 'completed' ? 'Voir rapport' : 
-                     selectedStat === 'pending' ? 'Confirmer' : 'Détails'}
-                  </Button>
-                </TableCell>
+                {(selectedStat === 'appointments' || selectedStat === 'patients') && (
+                  <TableCell>
+                    <Button variant="secondary" size="sm">
+                      Détails
+                    </Button>
+                  </TableCell>
+                )}
               </TableRow>
             ))}
           </TableBody>
@@ -156,25 +159,25 @@ export const DoctorDashboard = () => {
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {[
           {
-            title: "Total Employees",
+            title: "Employés Totaux",
             value: totalAppointments.length,
-            icon: <Calendar className="h-5 w-5 text-medsuite-primary" />,
+            icon: <UserCheck className="h-5 w-5 text-medsuite-primary" />,
             type: 'appointments'
           },
           {
-            title: "Today's Patients",
+            title: "Patients du Jour",
             value: todaysPatients.length,
             icon: <Users className="h-5 w-5 text-medsuite-primary" />,
             type: 'patients'
           },
           {
-            title: "Completed",
+            title: "Terminés",
             value: completedAppointments.length,
             icon: <CheckCircle className="h-5 w-5 text-medsuite-primary" />,
             type: 'completed'
           },
           {
-            title: "Pending",
+            title: "En Attente",
             value: pendingAppointments.length,
             icon: <Clock className="h-5 w-5 text-medsuite-primary" />,
             type: 'pending'
