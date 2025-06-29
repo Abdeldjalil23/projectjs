@@ -109,111 +109,111 @@ export const SocialDashboard = () => {
         {/* User Management Section */}
         <Card className="shadow-md hover:shadow-lg transition-shadow duration-300">
           <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4">
-            <div>
+          <div>
               <CardTitle className="text-xl">User Management</CardTitle>
               <CardDescription className="text-sm text-muted-foreground">
-                View, manage, and filter all system users.
-              </CardDescription>
-            </div>
-            <Button onClick={() => navigate('/admin/users')}>
-              Manage Users
-            </Button>
-          </CardHeader>
+              View, manage, and filter all system users.
+            </CardDescription>
+          </div>
+          <Button onClick={() => navigate('/admin/users')}>
+            Manage Users
+          </Button>
+      </CardHeader>
 
           <CardContent className="space-y-4">
             {/* Filter Dropdown */}
             <div className="flex items-center gap-2">
-              <label htmlFor="role-filter" className="text-sm font-medium">
-                Filter by role:
-              </label>
-              <Select value={activeFilter} onValueChange={(value: UserRole) => setActiveFilter(value)}>
-                <SelectTrigger className="w-[180px]">
-                  <SelectValue placeholder="Select role" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">
-                    All Users ({allUsersData.length})
-                  </SelectItem>
-                  <SelectItem value="doctor">
-                    Doctors ({allUsersData.filter(u => u.role === 'doctor').length})
-                  </SelectItem>
-                  <SelectItem value="admin">
-                    Admins ({allUsersData.filter(u => u.role === 'admin').length})
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <label htmlFor="role-filter" className="text-sm font-medium">
+            Filter by role:
+          </label>
+          <Select value={activeFilter} onValueChange={(value: UserRole) => setActiveFilter(value)}>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                All Users ({allUsersData.length})
+              </SelectItem>
+              <SelectItem value="doctor">
+                Doctors ({allUsersData.filter(u => u.role === 'doctor').length})
+              </SelectItem>
+              <SelectItem value="admin">
+                Admins ({allUsersData.filter(u => u.role === 'admin').length})
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
             {/* Users Table */}
             <div className="border rounded-xl overflow-hidden">
-              <Table>
-                <TableHeader>
+          <Table>
+            <TableHeader>
                   <TableRow className="bg-muted/50">
                     <TableHead className="font-semibold">User</TableHead>
                     <TableHead className="font-semibold">Role</TableHead>
                     <TableHead className="text-right font-semibold">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user) => (
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredUsers.length > 0 ? (
+                filteredUsers.map((user) => (
                       <TableRow key={user.id} className="hover:bg-muted/30 transition-colors">
-                        <TableCell>
-                          <div className="flex items-center gap-4">
-                            <Avatar>
-                              <AvatarFallback>{user.avatar}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <div className="font-medium">{user.name}</div>
-                              <div className="text-sm text-muted-foreground">{user.email}</div>
-                            </div>
-                          </div>
-                        </TableCell>
-                        <TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-4">
+                        <Avatar>
+                          <AvatarFallback>{user.avatar}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                          <div className="font-medium">{user.name}</div>
+                          <div className="text-sm text-muted-foreground">{user.email}</div>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
                           <Badge 
                             variant={user.role === 'admin' ? 'destructive' : 'secondary'}
                             className="px-3 py-1 rounded-full text-sm font-medium"
                           >
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
+                        {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                      </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0 hover:bg-muted">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                              <DropdownMenuItem onClick={() => alert(`Viewing profile for ${user.name}`)}>
-                                View Profile
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => alert(`Editing user ${user.name}`)}>
-                                Edit User
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem className="text-red-500">
-                                Delete User
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem onClick={() => alert(`Viewing profile for ${user.name}`)}>
+                            View Profile
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => alert(`Editing user ${user.name}`)}>
+                            Edit User
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-red-500">
+                            Delete User
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
                       <TableCell colSpan={3} className="h-24 text-center text-muted-foreground">
-                        No users found for this filter.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
+                    No users found for this filter.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
       </div>
     </AppLayout>
   );

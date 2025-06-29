@@ -15,10 +15,11 @@ import {
 import PostesOccupeesPage   from '@/pages/medecin/contentDoss/PostesOccupesTab';
 import AntecedentsP from '@/pages/medecin/contentDoss/AntecedentsP';
 import AntecedentsF from '@/pages/medecin/contentDoss/AntecedentsF';
-import Visite1 from '@/pages/medecin/contentDoss/Visite1';
+import Visite from '@/pages/medecin/contentDoss/Visite1';
 import Accidents from '@/pages/medecin/contentDoss/Accidents';
 import Vaccins from '@/pages/medecin/contentDoss/Vaccins';
 import Intoxications from '@/pages/medecin/contentDoss/Intoxications';
+import Chronique from '@/pages/medecin/contentDoss/Chronique';
 
 
 // ========== Reusable Fields ==========
@@ -119,7 +120,8 @@ const DossierDetailsPage = () => {
     { value: 'accidents', label: 'Accidents' },
     { value: 'vaccins', label: 'Vaccins' },
     { value: 'intoxications', label: 'Intoxications' },
-    { value: 'visite1', label: 'Visite 1' },
+    { value: 'visite1', label: 'Visite' },
+    { value: 'chronique', label: 'Chronique' },
   ];
 
   const formatTabTitle = (str: string) => {
@@ -156,11 +158,7 @@ const DossierDetailsPage = () => {
                   <span className="font-medium">Groupe:</span>
                   <span>{patientData.gsang}</span>
                 </span>
-                {patientData.chronique && (
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
-                    Chronique
-                  </span>
-                )}
+                
               </div>
             </div>
           </div>
@@ -258,7 +256,11 @@ const DossierDetailsPage = () => {
           </TabsContent>
 
           <TabsContent value="visite1" className="mt-4">
-            <Visite1 />
+            <Visite />
+          </TabsContent>
+
+          <TabsContent value="chronique" className="mt-4">
+            <Chronique />
           </TabsContent>
 
        
