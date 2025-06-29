@@ -23,19 +23,16 @@ const ActivitieClinic3 = () => {
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
-      <Card>
+      <Card className="p-4">
         <CardHeader>
           <CardTitle>Activité clinique de médecine de travail</CardTitle>
         </CardHeader>
-      </Card>
-
-      <Accordion type="multiple" className="w-full">
-        {/* 3.1 Visites d'embauche */}
-        <AccordionItem value="visites-embauche">
-          <AccordionTrigger>3.1 Visites d'embauche</AccordionTrigger>
-          <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
+        <CardContent className="space-y-8 pt-0">
+          <Accordion type="multiple" className="w-full">
+            {/* 3.1 Visites d'embauche */}
+            <AccordionItem value="visites-embauche">
+              <AccordionTrigger>3.1 Visites d'embauche</AccordionTrigger>
+              <AccordionContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -54,18 +51,13 @@ const ActivitieClinic3 = () => {
                     </TableRow>
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-        {/* Identification de la nuisa
-        nce */}
-        <AccordionItem value="identification-nuisance">
-          <AccordionTrigger>Identification de la nuisance</AccordionTrigger>
-          <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
+            {/* Identification de la nuisance */}
+            <AccordionItem value="identification-nuisance">
+              <AccordionTrigger>Identification de la nuisance</AccordionTrigger>
+              <AccordionContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -284,160 +276,156 @@ const ActivitieClinic3 = () => {
                   <p>(*) Préciser le dernier contrôle dosimétrique, date</p>
                   <p>(**) Travaux dans les postes de sécurité: Conducteurs d'engins; tableau de commande, TC</p>
                 </div>
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-        {/* 3.2 Visites périodiques */}
-        <AccordionItem value="visites-periodiques">
-          <AccordionTrigger>3.2 Visites périodiques</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-6">
-              {/* 3.2.1 Visite annuelle */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>3.2.1 Visite annuelle</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Effectif soumis à la visite (organiques)</TableHead>
-                        <TableHead>Personnel examiné</TableHead>
-                        <TableHead>Taux de couverture</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                  
-                  <Table className="mt-4">
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Effectif soumis à la visite (SIE)</TableHead>
-                        <TableHead>Personnel examiné</TableHead>
-                        <TableHead>Taux de couverture</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                  
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    Note: Visite obligatoire pour tous les travailleurs; pour les travailleurs qui nécessitent une surveillance médicale particulière, leur première visite est reportée sur le tableau de la visite annuelle, les autres visites sont enregistrées sur le tableau des visites particulières.
-                  </p>
-                </CardContent>
-              </Card>
+            {/* 3.2 Visites périodiques */}
+            <AccordionItem value="visites-periodiques">
+              <AccordionTrigger>3.2 Visites périodiques</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-6">
+                  {/* 3.2.1 Visite annuelle */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>3.2.1 Visite annuelle</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Effectif soumis à la visite (organiques)</TableHead>
+                            <TableHead>Personnel examiné</TableHead>
+                            <TableHead>Taux de couverture</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                      
+                      <Table className="mt-4">
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Effectif soumis à la visite (SIE)</TableHead>
+                            <TableHead>Personnel examiné</TableHead>
+                            <TableHead>Taux de couverture</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                      
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        Note: Visite obligatoire pour tous les travailleurs; pour les travailleurs qui nécessitent une surveillance médicale particulière, leur première visite est reportée sur le tableau de la visite annuelle, les autres visites sont enregistrées sur le tableau des visites particulières.
+                      </p>
+                    </CardContent>
+                  </Card>
 
-              {/* 3.2.2 Visites particulières */}
-              <Card>
-                <CardHeader>
-                  <CardTitle>3.2.2 Visites particulières</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Population</TableHead>
-                        <TableHead>Effectif soumis à la visite</TableHead>
-                        <TableHead>Personnel examiné</TableHead>
-                        <TableHead>Nombre de visites</TableHead>
-                        <TableHead>Taux de couverture</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>Apprentis</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Travailleurs fortement exposés aux risques professionnels</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Travailleurs responsables de la sécurité (*)</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Travailleurs âgés de moins de 18 ans</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Travailleurs âgés de plus de 55 ans</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Handicapés physiques</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Malades chroniques</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Femmes enceintes</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>Mères d'un enfant de moins de 02 ans</TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="Nombre" /></TableCell>
-                        <TableCell><Input placeholder="%" /></TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                  
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    Note: (*) Personnel chargé de la sûreté des installations et des personnes (SIE); le taux de couverture représente le nombre des travailleurs examinés sur l'effectif.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
+                  {/* 3.2.2 Visites particulières */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>3.2.2 Visites particulières</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Population</TableHead>
+                            <TableHead>Effectif soumis à la visite</TableHead>
+                            <TableHead>Personnel examiné</TableHead>
+                            <TableHead>Nombre de visites</TableHead>
+                            <TableHead>Taux de couverture</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>Apprentis</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Travailleurs fortement exposés aux risques professionnels</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Travailleurs responsables de la sécurité (*)</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Travailleurs âgés de moins de 18 ans</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Travailleurs âgés de plus de 55 ans</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Handicapés physiques</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Malades chroniques</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Femmes enceintes</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>Mères d'un enfant de moins de 02 ans</TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="Nombre" /></TableCell>
+                            <TableCell><Input placeholder="%" /></TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                      
+                      <p className="mt-3 text-sm text-muted-foreground">
+                        Note: (*) Personnel chargé de la sûreté des installations et des personnes (SIE); le taux de couverture représente le nombre des travailleurs examinés sur l'effectif.
+                      </p>
+                    </CardContent>
+                  </Card>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
 
-        {/* 3.3 Visites de reprise de travail */}
-        <AccordionItem value="visites-reprise">
-          <AccordionTrigger>3.3 Visites de reprise de travail</AccordionTrigger>
-          <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
+            {/* 3.3 Visites de reprise de travail */}
+            <AccordionItem value="visites-reprise">
+              <AccordionTrigger>3.3 Visites de reprise de travail</AccordionTrigger>
+              <AccordionContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -458,17 +446,13 @@ const ActivitieClinic3 = () => {
                     </TableRow>
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-        {/* 3.4 Visites spontanées */}
-        <AccordionItem value="visites-spontanees">
-          <AccordionTrigger>3.4 Visites spontanées</AccordionTrigger>
-          <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
+            {/* 3.4 Visites spontanées */}
+            <AccordionItem value="visites-spontanees">
+              <AccordionTrigger>3.4 Visites spontanées</AccordionTrigger>
+              <AccordionContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -485,17 +469,13 @@ const ActivitieClinic3 = () => {
                     </TableRow>
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-        {/* 3.5 Urgences médico-chirurgicales */}
-        <AccordionItem value="urgences">
-          <AccordionTrigger>3.5 Urgences médico-chirurgicales</AccordionTrigger>
-          <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
+            {/* 3.5 Urgences médico-chirurgicales */}
+            <AccordionItem value="urgences">
+              <AccordionTrigger>3.5 Urgences médico-chirurgicales</AccordionTrigger>
+              <AccordionContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -520,17 +500,13 @@ const ActivitieClinic3 = () => {
                     </TableRow>
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
+              </AccordionContent>
+            </AccordionItem>
 
-        {/* 3.6 Visites médicales de soins */}
-        <AccordionItem value="visites-soins">
-          <AccordionTrigger>3.6 Visites médicales de soins</AccordionTrigger>
-          <AccordionContent>
-            <Card>
-              <CardContent className="pt-6">
+            {/* 3.6 Visites médicales de soins */}
+            <AccordionItem value="visites-soins">
+              <AccordionTrigger>3.6 Visites médicales de soins</AccordionTrigger>
+              <AccordionContent>
                 <Table>
                   <TableHeader>
                     <TableRow>
@@ -545,12 +521,11 @@ const ActivitieClinic3 = () => {
                     </TableRow>
                   </TableBody>
                 </Table>
-              </CardContent>
-            </Card>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
-
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+      </Card>
       <div className="flex justify-end">
         <Button type="submit">Enregistrer</Button>
       </div>
