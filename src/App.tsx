@@ -32,6 +32,9 @@ import VisitePerdPage from "./pages/admin/AdminViPerdPage";
 import UsersPage from "./pages/admin/UsersPage";
 import AdminViPerdPage from "./pages/admin/AdminViPerdPage";
 
+// Pages social
+import SocialDashboard from "./components/dashboard/SocialDashboard";
+
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
@@ -45,6 +48,7 @@ const protectedRoutes = [
   { path: "/medecin/reports", element: <MedReportsPage /> },
   { path: "/dashboard", element: <DoctorDashboard /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
+  { path: "/social/dashboard", element: <SocialDashboard /> },
   { path: "/visite-perdue", element: <VisitePerdPage /> },
   { path: "/settings", element: <SettingsPage /> },
   { path: "/admin/doctors", element: <DoctorsPage /> },

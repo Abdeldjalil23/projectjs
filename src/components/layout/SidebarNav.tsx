@@ -43,6 +43,15 @@ export const SidebarNav = () => {
           { title: 'Manage Users', icon: User, url: '/admin/users' },
        ]);
       }
+      else if (userRole === 'social') {
+        setMenuItems([
+          { title: 'Dashboard', icon: Home, url: '/social/dashboard' },
+          { title: 'Patient Support', icon: HeartPulse, url: '/social/patients' },
+          { title: 'Social Services', icon: Users, url: '/social/services' },
+          { title: 'Reports', icon: FileText, url: '/social/reports' },
+          { title: 'Resources', icon: FileText, url: '/social/resources' }
+       ]);
+      }
   }, [userRole]);
 
   const userRoleLabel = () => {
@@ -51,6 +60,8 @@ export const SidebarNav = () => {
         return 'Doctor';
       case 'admin':
         return 'Administrator';
+      case 'social':
+        return 'Social Worker';
       default:
         return '';
     }
