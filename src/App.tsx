@@ -25,7 +25,6 @@ import AdminDashboard from "./components/dashboard/AdminDashboard";
 import ReportsPage from "./pages/admin/ReportsPage";
 import VisitePerdPage from "./pages/admin/AdminViPerdPage";
 import AdminViPerdPage from "./pages/admin/AdminViPerdPage";
-import PharmacyPage from "./pages/admin/Pharmacy";
 import RequestsPriseEnChargePage from "./pages/admin/RequestsPriseEnCharge";
 
 // Pages social
@@ -55,14 +54,12 @@ const protectedRoutes = [
   { path: "/social/reports", element: <SocialReportsPage /> },
   { path: "/social/resources", element: <SocialResourcesPage /> },
   { path: "/visite-perdue", element: <VisitePerdPage /> },
-  { path: "/pharmacy-page", element: <PharmacyPage /> },
   { path: "/settings", element: <SettingsPage /> },
   { path: "/admin/reports", element: <ReportsPage /> },
   { path: "/dossiers-medicaux", element: <DossiersMedicauxPage /> },
   { path: "/dossier/:id", element: <DossierDetailsPage /> },
   { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation /> },
   { path: "/admin/visite-perdue", element: <AdminViPerdPage /> },
-  { path: "/admin/pharmacy-page", element: <PharmacyPage /> },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
   { path: "/visite-periodique", element: <MedViPerPage /> },
 ];
