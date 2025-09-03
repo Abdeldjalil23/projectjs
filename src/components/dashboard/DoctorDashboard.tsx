@@ -84,43 +84,43 @@ export const DoctorDashboard = () => {
             <TableRow>
               <TableHead>Patient</TableHead>
               <TableHead>Date</TableHead>
-                             {selectedStat === 'ordonnance' && (
-                 <>
-                   <TableHead>Médicaments</TableHead>
-                 </>
-               )}
-               {selectedStat === 'orientation' && (
-                 <>
-                   <TableHead>Spécialité</TableHead>
-                   <TableHead>Motif</TableHead>
-                 </>
-               )}
-               {selectedStat === 'analyse' && (
-                 <>
-                   <TableHead>Type</TableHead>
-                   <TableHead>Tests</TableHead>
-                 </>
-               )}
-               {selectedStat === 'imagerie' && (
-                 <>
-                   <TableHead>Type</TableHead>
-                   <TableHead>Région</TableHead>
-                   <TableHead>Motif</TableHead>
-                 </>
-               )}
-               {selectedStat === 'evacuation' && (
-                 <>
-                   <TableHead>Destination</TableHead>
-                   <TableHead>Motif</TableHead>
-                   <TableHead>Transport</TableHead>
-                 </>
-               )}
-               {selectedStat === 'soins' && (
-                 <>
-                   <TableHead>Type</TableHead>
-                   <TableHead>Détails</TableHead>
-                 </>
-               )}
+              {selectedStat === 'ordonnance' && (
+                <>
+                  <TableHead>Médicaments</TableHead>
+                </>
+              )}
+              {selectedStat === 'orientation' && (
+                <>
+                  <TableHead>Spécialité</TableHead>
+                  <TableHead>Motif</TableHead>
+                </>
+              )}
+              {selectedStat === 'analyse' && (
+                <>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Tests</TableHead>
+                </>
+              )}
+              {selectedStat === 'imagerie' && (
+                <>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Région</TableHead>
+                  <TableHead>Motif</TableHead>
+                </>
+              )}
+              {selectedStat === 'evacuation' && (
+                <>
+                  <TableHead>Destination</TableHead>
+                  <TableHead>Motif</TableHead>
+                  <TableHead>Transport</TableHead>
+                </>
+              )}
+              {selectedStat === 'soins' && (
+                <>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Détails</TableHead>
+                </>
+              )}
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -130,52 +130,52 @@ export const DoctorDashboard = () => {
                 <TableCell className="font-medium">{item.patient}</TableCell>
                 <TableCell>{new Date(item.date).toLocaleDateString('fr-FR')}</TableCell>
                 
-                                 {selectedStat === 'ordonnance' && (
-                   <>
-                     <TableCell>{item.medicaments}</TableCell>
-                   </>
-                 )}
-                 
-                 {selectedStat === 'orientation' && (
-                   <>
-                     <TableCell>{item.specialite}</TableCell>
-                     <TableCell>{item.motif}</TableCell>
-                   </>
-                 )}
-                 
-                 {selectedStat === 'analyse' && (
-                   <>
-                     <TableCell>{item.type}</TableCell>
-                     <TableCell>{item.tests}</TableCell>
-                   </>
-                 )}
-                 
-                 {selectedStat === 'imagerie' && (
-                   <>
-                     <TableCell>{item.type}</TableCell>
-                     <TableCell>{item.region}</TableCell>
-                     <TableCell>{item.motif}</TableCell>
-                   </>
-                 )}
-                 
-                 {selectedStat === 'evacuation' && (
-                   <>
-                     <TableCell>{item.destination}</TableCell>
-                     <TableCell>{item.motif}</TableCell>
-                     <TableCell>{item.transport}</TableCell>
-                   </>
-                 )}
-                 
-                 {selectedStat === 'soins' && (
-                   <>
-                     <TableCell>{item.type}</TableCell>
-                     <TableCell>
-                       {item.region && `${item.region} - `}
-                       {item.medicament || item.description}
-                     </TableCell>
-                   </>
-                 )}
+                {selectedStat === 'ordonnance' && (
+                  <>
+                    <TableCell>{item.medicaments}</TableCell>
+                  </>
+                )}
                 
+                {selectedStat === 'orientation' && (
+                  <>
+                    <TableCell>{item.specialite}</TableCell>
+                    <TableCell>{item.motif}</TableCell>
+                  </>
+                )}
+                
+                {selectedStat === 'analyse' && (
+                  <>
+                    <TableCell>{item.type}</TableCell>
+                    <TableCell>{item.tests}</TableCell>
+                  </>
+                )}
+                
+                {selectedStat === 'imagerie' && (
+                  <>
+                    <TableCell>{item.type}</TableCell>
+                    <TableCell>{item.region}</TableCell>
+                    <TableCell>{item.motif}</TableCell>
+                  </>
+                )}
+                
+                {selectedStat === 'evacuation' && (
+                  <>
+                    <TableCell>{item.destination}</TableCell>
+                    <TableCell>{item.motif}</TableCell>
+                    <TableCell>{item.transport}</TableCell>
+                  </>
+                )}
+                
+                {selectedStat === 'soins' && (
+                  <>
+                    <TableCell>{item.type}</TableCell>
+                    <TableCell>
+                      {item.region && `${item.region} - `}
+                      {item.medicament || item.description}
+                    </TableCell>
+                  </>
+                )}
+               
                 <TableCell>
                   <Button variant="secondary" size="sm">
                     Détails
@@ -237,10 +237,10 @@ export const DoctorDashboard = () => {
             onClick={() => handleStatClick(stat.type)}
           >
             <div className="flex justify-between items-center p-4">
-                              <div>
-                  <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-                  <h3 className="text-3xl font-bold mt-1">{stat.value}</h3>
-                </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
+                <h3 className="text-3xl font-bold mt-1">{stat.value}</h3>
+              </div>
               <div className="p-3 bg-medsuite-secondary rounded-full shadow-sm">
                 {stat.icon}
               </div>
