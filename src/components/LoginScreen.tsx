@@ -1,17 +1,18 @@
 // src/pages/LoginPage.tsx
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // ✅ التوجيه
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
-  Card, CardContent, CardDescription, CardFooter,
-  CardHeader, CardTitle
+ 
+
+ Card, CardContent, CardDescription, CardHeader, CardTitle
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
-import { Briefcase, Stethoscope, Users } from 'lucide-react';
+import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react'; 
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import {
@@ -21,14 +22,14 @@ import {
 
 export const LoginScreen = () => {
   const { login } = useAuth();
-  const navigate = useNavigate(); // ✅
+  const navigate = useNavigate();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
   const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
   const [specialty, setSpecialty] = useState('');
 
-  const specialties = ['MEDECINE', 'DENTISTE', 'INFERMIER'];
+  const specialties = ['MEDECINE', 'INFERMIER']; // Removed DENTISTE as it’s a separate role
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,12 +54,21 @@ export const LoginScreen = () => {
     login(selectedRole);
     toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
 
-    if (selectedRole === 'admin') {
-      navigate('/');
-    } else if (selectedRole === 'doctor') {
-      navigate('/');
-    } else if (selectedRole === 'social') {
-      navigate('/social/dashboard');
+    switch (selectedRole) {
+      case 'admin':
+        navigate('/admin/dashboard');
+        break;
+      case 'doctor':
+        navigate('/doctor/dashboard');
+        break;
+      case 'social':
+        navigate('/social/dashboard');
+        break;
+      case 'dentist':
+        navigate('/dentist/dashboard');
+        break;
+      default:
+        navigate('/');
     }
   };
 
@@ -82,7 +92,7 @@ export const LoginScreen = () => {
               className="mb-6"
               onValueChange={(value) => setSelectedRole(value as UserRole)}
             >
-              <TabsList className="grid w-full grid-cols-3">
+              <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="doctor" className="flex items-center gap-1">
                   <Stethoscope className="h-4 w-4" />
                   <span className="hidden sm:inline">Doctor</span>
@@ -95,21 +105,30 @@ export const LoginScreen = () => {
                   <Users className="h-4 w-4" />
                   <span className="hidden sm:inline">Social</span>
                 </TabsTrigger>
+                <TabsTrigger value="dentist" className="flex items-center gap-1">
+                  <Smile className="h-4 w-4" /> 
+                  <span className="hidden sm:inline">Dentist</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="doctor">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Manage patient appointments and records
+                  Manage patient appointments and medical records
                 </p>
               </TabsContent>
               <TabsContent value="admin">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Oversee company healthcare operations
+                  Oversee healthcare system operations
                 </p>
               </TabsContent>
               <TabsContent value="social">
                 <p className="text-sm text-muted-foreground mb-4">
-                  Access social services and patient support
+                  Provide social services and patient support
+                </p>
+              </TabsContent>
+              <TabsContent value="dentist">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Manage dental appointments and patient records
                 </p>
               </TabsContent>
             </Tabs>
