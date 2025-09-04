@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
-import { Briefcase, Stethoscope, Users } from 'lucide-react';
+import { Briefcase, Stethoscope, Users} from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import {
@@ -59,6 +59,8 @@ export const LoginScreen = () => {
       navigate('/');
     } else if (selectedRole === 'social') {
       navigate('/social/dashboard');
+    } else if (selectedRole === 'dentist') {
+      navigate('/dentist/dashboard');
     }
   };
 
@@ -95,6 +97,10 @@ export const LoginScreen = () => {
                   <Users className="h-4 w-4" />
                   <span className="hidden sm:inline">Social</span>
                 </TabsTrigger>
+                <TabsTrigger value="dentist" className="flex items-center gap-1">
+                  <Users className="h-4 w-4" />
+                  <span className="hidden sm:inline">Dentist</span>
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="doctor">
@@ -110,6 +116,11 @@ export const LoginScreen = () => {
               <TabsContent value="social">
                 <p className="text-sm text-muted-foreground mb-4">
                   Access social services and patient support
+                </p>
+              </TabsContent>
+              <TabsContent value="dentist">
+                <p className="text-sm text-muted-foreground mb-4">
+                  Access dentist services and patient support
                 </p>
               </TabsContent>
             </Tabs>

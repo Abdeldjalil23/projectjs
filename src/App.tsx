@@ -18,6 +18,7 @@ import NouvelleConsultation from "./pages/medecin/Nouvelleconsultation";
 import PrescriptionsPage from "./pages/medecin/PrescriptionsPage";
 import MedReportsPage from "./pages/medecin/MedReportsPage";
 import DoctorDashboard from "./components/dashboard/DoctorDashboard";
+import DentistDashboard from "./components/dashboard/DentistDashboard";
 
 
 // Pages admin
@@ -63,6 +64,7 @@ const protectedRoutes = [
   { path: "/admin/visite-perdue", element: <AdminViPerdPage /> },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
   { path: "/visite-periodique", element: <MedViPerPage /> },
+  { path: "/dentist/dashboard", element: <DentistDashboard /> },
 ];
 
 const App = () => (
