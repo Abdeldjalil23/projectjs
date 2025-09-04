@@ -175,7 +175,7 @@ const PatientManagement: React.FC = () => {
                 {patients.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={4} className="text-center text-gray-500">
-                      No patients found.
+                      {/* No patients found. */}
                     </TableCell>
                   </TableRow>
                 ) : (
