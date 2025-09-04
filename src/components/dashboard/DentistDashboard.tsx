@@ -74,17 +74,17 @@ const DentistPage: React.FC = () => {
   useEffect(() => {
     // Simulate loading existing patients
     const defaultPatient: PatientData = {
-      id: 'P001',
-      name: 'John Doe',
-      dateOfBirth: '1990-05-15',
-      contact: 'john.doe@example.com',
+      id: '1234I',
+      name: 'Ahmed ben ali',
+      dateOfBirth: '2000-10-10',
+      contact: 'ahmed@gmail.com',
       teeth: initializeTeethData(),
     };
     const defaultPatient2: PatientData = {
-      id: 'P002',
-      name: 'Jane Smith',
-      dateOfBirth: '1985-11-20',
-      contact: 'jane.smith@example.com',
+      id: '1234F',
+      name: 'Ali haroze',
+      dateOfBirth: '2001-20-31',
+      contact: 'ali@gmail.com',
       teeth: initializeTeethData(),
     };
     setPatients([defaultPatient, defaultPatient2]); // Set both patients
