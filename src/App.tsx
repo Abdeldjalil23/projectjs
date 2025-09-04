@@ -59,6 +59,7 @@ const protectedRoutes = [
   { path: "/dossiers-medicaux", element: <DossiersMedicauxPage /> },
   { path: "/dossier/:id", element: <DossierDetailsPage /> },
   { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation /> },
+  { path: "/nouvelle-consultation", element: <NouvelleConsultation /> },
 
   { path: "/admin/visite-perdue", element: <AdminViPerdPage /> },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
