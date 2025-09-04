@@ -35,6 +35,8 @@ import SocialServicesPage from "./pages/social/SocialServicesPage";
 import SocialReportsPage from "./pages/social/SocialReportsPage";
 import SocialResourcesPage from "./pages/social/SocialResourcesPage";
 
+// Pages dentist
+import PatientManagement from "./pages/dentist/Patientmanagement";
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
@@ -65,6 +67,7 @@ const protectedRoutes = [
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
   { path: "/visite-periodique", element: <MedViPerPage /> },
   { path: "/dentist/dashboard", element: <DentistDashboard /> },
+  { path: "/dentist/patientmanagement", element: <PatientManagement /> },
 ];
 
 const App = () => (

@@ -12,8 +12,8 @@ import { Label } from '@/components/ui/label';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
-import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react'; // Replaced Tooth with Smile
-import { useAuth, UserRole } from '@/context/AuthContext'; // Rely on imported UserRole
+import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react'; 
+import { useAuth, UserRole } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import {
   Select, SelectContent, SelectItem,
@@ -106,7 +106,7 @@ export const LoginScreen = () => {
                   <span className="hidden sm:inline">Social</span>
                 </TabsTrigger>
                 <TabsTrigger value="dentist" className="flex items-center gap-1">
-                  <Smile className="h-4 w-4" /> {/* Replaced Tooth with Smile */}
+                  <Smile className="h-4 w-4" /> 
                   <span className="hidden sm:inline">Dentist</span>
                 </TabsTrigger>
               </TabsList>

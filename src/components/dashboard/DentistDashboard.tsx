@@ -208,39 +208,7 @@ const DentistPage: React.FC = () => {
         <main className="flex-1 flex p-6 space-x-6">
           {/* Left Panel: Patient Details, Patient Selector & 2D Teeth Model */}
           <div className="w-2/3 bg-white rounded-lg shadow-lg p-6 flex flex-col">
-            <section className="mb-6 border-b pb-4 flex justify-between items-center">
-              <h2 className="text-xl font-semibold text-gray-800">Patient Management</h2>
-              <Dialog open={showAddPatientDialog} onOpenChange={setShowAddPatientDialog}>
-                <DialogTrigger asChild>
-                  <Button onClick={() => setShowAddPatientDialog(true)}>Add New Patient</Button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Add New Patient</DialogTitle>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="patientName" className="text-right">Name</Label>
-                      <Input id="patientName" value={newPatientName} onChange={(e) => setNewPatientName(e.target.value)} className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="patientDob" className="text-right">Date of Birth</Label>
-                      <Input id="patientDob" type="date" value={newPatientDob} onChange={(e) => setNewPatientDob(e.target.value)} className="col-span-3" />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                      <Label htmlFor="patientContact" className="text-right">Contact</Label>
-                      <Input id="patientContact" value={newPatientContact} onChange={(e) => setNewPatientContact(e.target.value)} className="col-span-3" />
-                    </div>
-                  </div>
-                  <DialogFooter>
-                    <Button type="submit" onClick={handleAddNewPatient}>Add Patient</Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </section>
-
             <section className="mb-6 border-b pb-4">
-              {/* <h2 className="text-xl font-semibold text-gray-800 mb-4">Current Patient Details</h2> */}
               <div className="mb-4">
                 <label htmlFor="patient-select" className="block text-gray-700 text-sm font-bold mb-2">Select Patient</label>
                 <select
