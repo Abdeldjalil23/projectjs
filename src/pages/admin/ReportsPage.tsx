@@ -1022,9 +1022,9 @@ const RapportPage = () => {
             ))}
           </TabsList>
 
-          {/* <TabsContent value="clinical-activities" className="mt-4">
+          <TabsContent value="clinical-activities" className="mt-4">
             <ClinicalActivities />
-          </TabsContent> */}
+          </TabsContent>
 
           <TabsContent value="training" className="mt-4">
             <Training />
