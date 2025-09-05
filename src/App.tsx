@@ -67,7 +67,7 @@ const protectedRoutes = [
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
   { path: "/visite-periodique", element: <MedViPerPage /> },
   { path: "/dentist/dashboard", element: <DentistDashboard /> },
-  { path: "/dentist/patientmanagement", element: <PatientManagement /> },
+  { path: "/dentist/patient-management", element: <PatientManagement /> },
 ];
 
 const App = () => (
