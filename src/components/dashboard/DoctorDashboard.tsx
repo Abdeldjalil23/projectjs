@@ -9,7 +9,6 @@ import {
   CardDescription,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -137,10 +136,14 @@ const initialServices: Record<ServiceType, Service[]> = {
 };
 
 // --- Stats Widgets ---
-const StatsWidgets = ({ services, selectedStat, handleStatClick }: { 
-  services: Record<ServiceType, Service[]>, 
-  selectedStat: ServiceType, 
-  handleStatClick: (type: ServiceType) => void 
+const StatsWidgets = ({
+  services,
+  selectedStat,
+  handleStatClick,
+}: {
+  services: Record<ServiceType, Service[]>;
+  selectedStat: ServiceType;
+  handleStatClick: (type: ServiceType) => void;
 }) => {
   const stats = [
     { title: 'Ordonnances', value: services.ordonnance.length, icon: Pill, type: 'ordonnance' as ServiceType },
@@ -194,7 +197,11 @@ export const DoctorDashboard = () => {
     setTimeout(() => setIsLoading(false), 1000);
   }, []);
 
-  const statuses = [...new Set(services[selectedStat].map(s => s.status)), 'all'];
+  // Always show 'all' as the first option, then unique statuses
+  const statuses = useMemo(() => {
+    const uniqueStatuses = Array.from(new Set(services[selectedStat].map(s => s.status)));
+    return ['all', ...uniqueStatuses];
+  }, [services, selectedStat]);
 
   const filteredServices = useMemo(() => {
     return services[selectedStat].filter(service => {
@@ -224,11 +231,14 @@ export const DoctorDashboard = () => {
 
   const handleAddService = () => {
     if (newService.patient && newService.status) {
-      const newId = services[selectedStat].length + 1;
+      // Find the max id in the current list to avoid duplicate ids
+      const currentList = services[selectedStat];
+      const maxId = currentList.length > 0 ? Math.max(...currentList.map(s => s.id)) : 0;
+      const newId = maxId + 1;
       setServices({
         ...services,
         [selectedStat]: [
-          ...services[selectedStat],
+          ...currentList,
           { id: newId, ...newService },
         ],
       });
@@ -511,9 +521,11 @@ export const DoctorDashboard = () => {
                             <SelectValue placeholder="Select status" />
                           </SelectTrigger>
                           <SelectContent>
-                            {statuses.filter(s => s !== 'all').map(status => (
-                              <SelectItem key={status} value={status}>{status}</SelectItem>
-                            ))}
+                            {statuses
+                              .filter(s => s !== 'all')
+                              .map(status => (
+                                <SelectItem key={status} value={status}>{status}</SelectItem>
+                              ))}
                           </SelectContent>
                         </Select>
                       </div>
@@ -719,9 +731,10 @@ export const DoctorDashboard = () => {
                     <SelectValue placeholder="Filter by status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Statuses</SelectItem>
-                    {statuses.filter(s => s !== 'all').map(status => (
-                      <SelectItem key={status} value={status}>{status}</SelectItem>
+                    {statuses.map(status => (
+                      <SelectItem key={status} value={status}>
+                        {status === 'all' ? 'All Statuses' : status}
+                      </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>

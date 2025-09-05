@@ -1,4 +1,3 @@
-// src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -18,7 +17,6 @@ import PrescriptionsPage from "./pages/medecin/PrescriptionsPage";
 import MedReportsPage from "./pages/medecin/MedReportsPage";
 import DoctorDashboard from "./components/dashboard/DoctorDashboard";
 import DentistDashboard from "./components/dashboard/DentistDashboard";
-
 
 // Pages admin
 import AdminDashboard from "./components/dashboard/AdminDashboard";
@@ -48,6 +46,7 @@ const protectedRoutes = [
   { path: "/prescriptions", element: <PrescriptionsPage /> },
   { path: "/medecin/reports", element: <MedReportsPage /> },
   { path: "/dashboard", element: <DoctorDashboard /> },
+  { path: "/medecin/dashboard", element: <DoctorDashboard /> },
   { path: "/admin/dashboard", element: <AdminDashboard /> },
   { path: "/social/dashboard", element: <SocialDashboard /> },
   { path: "/social/patients", element: <PatientSupportPage /> },
@@ -61,7 +60,6 @@ const protectedRoutes = [
   { path: "/dossier/:id", element: <DossierDetailsPage /> },
   { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation /> },
   { path: "/nouvelle-consultation", element: <NouvelleConsultation /> },
-
   { path: "/admin/visite-perdue", element: <AdminViPerdPage /> },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
   { path: "/visite-periodique", element: <MedViPerPage /> },
@@ -69,41 +67,36 @@ const protectedRoutes = [
   { path: "/dentist/patient-management", element: <PatientManagement /> },
 ];
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-          <TooltipProvider>
+function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
         <Toaster />
         <BrowserRouter>
-        <AuthProviderWithNavigate>
-          <ChroniqueProvider>
-            <Routes>
-              {/* Route login public */}
-              <Route path="/login" element={<LoginPage />} />
+          <AuthProviderWithNavigate>
+            <ChroniqueProvider>
+              <Routes>
+                {/* Route login public */}
+                <Route path="/login" element={<LoginPage />} />
 
-              {/* Routes publiques pour les tests
-              <Route path="/hello" element={<HelloWorld />} />
-              <Route path="/simple-test" element={<SimpleTest />} />
-              <Route path="/test-dental" element={<TestDental />} />
-              <Route path="/simple-login" element={<SimpleLogin />} />
-              <Route path="/debug" element={<Debug />} /> */}
+                {/* Routes protégées */}
+                {protectedRoutes.map(({ path, element }) => (
+                  <Route
+                    key={path}
+                    path={path}
+                    element={<PrivateRoute>{element}</PrivateRoute>}
+                  />
+                ))}
 
-              {/* Routes protégées */}
-              {protectedRoutes.map(({ path, element }) => (
-                <Route
-                  key={path}
-                  path={path}
-                  element={<PrivateRoute>{element}</PrivateRoute>}
-                />
-              ))}
-
-              {/* Route 404 */}
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </ChroniqueProvider>
-        </AuthProviderWithNavigate>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+                {/* Route 404 */}
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ChroniqueProvider>
+          </AuthProviderWithNavigate>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  );
+}
 
 export default App;

@@ -1,4 +1,4 @@
-// src/pages/LoginPage.tsx
+// LoginScreen component for Sonatrach MedSuite
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -34,8 +34,12 @@ export const LoginScreen = () => {
 
     const idPattern = /^\d{4}[A-Z]$/;
 
-    if (!ID || !password) {
-      toast.error('Please enter both ID and password');
+    if (!ID.trim()) {
+      toast.error('Please enter your ID');
+      return;
+    }
+    if (!password) {
+      toast.error('Please enter your password');
       return;
     }
 
@@ -57,7 +61,7 @@ export const LoginScreen = () => {
         navigate('/admin/dashboard');
         break;
       case 'doctor':
-        navigate('/doctor/dashboard');
+        navigate('/medecin/dashboard');
         break;
       case 'social':
         navigate('/social/dashboard');
