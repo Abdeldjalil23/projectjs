@@ -36,7 +36,7 @@ import SocialReportsPage from "./pages/social/SocialReportsPage";
 import SocialResourcesPage from "./pages/social/SocialResourcesPage";
 
 // Pages dentist
-import PatientManagement from "./pages/dentist/Patientmanagement";
+import PatientManagement from "./pages/dentist/PatientManagement";
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
