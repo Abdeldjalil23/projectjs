@@ -52,7 +52,7 @@ export const SidebarNav = () => {
       else if (userRole === 'dentist') {
         setMenuItems([
           { title: 'Dashboard', icon: Home, url: '/dentist/dashboard' },
-          { title: 'Patient Management', icon: HeartPulse, url: '/dentist/patient-management' }
+          { title: 'Patient Management', icon: HeartPulse, url: '/dentist/Patientmanagement' }
        ]);
       }
   }, [userRole]);
