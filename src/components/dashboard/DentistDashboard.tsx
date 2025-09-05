@@ -20,6 +20,9 @@ import AppLayout from '@/components/layout/AppLayout';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import SimpleDentalChart from '@/components/dental/SimpleDentalChart';
+import DentalChart3D from '@/components/dental/DentalChart3D';
+import ToothInfoPanel from '@/components/dental/ToothInfoPanel';
 
 interface ToothCondition {
   id: number;
@@ -69,6 +72,7 @@ const DentistPage: React.FC = () => {
   const [newPatientName, setNewPatientName] = useState('');
   const [newPatientDob, setNewPatientDob] = useState('');
   const [newPatientContact, setNewPatientContact] = useState('');
+  const [is3DView, setIs3DView] = useState(true);
 
   // Load initial patient data or from a "database"
   useEffect(() => {
@@ -117,23 +121,6 @@ const DentistPage: React.FC = () => {
     ));
   };
 
-  const handleConditionChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    if (selectedTooth) {
-      updatePatientTeethData(selectedTooth.toString(), { conditionId: parseInt(event.target.value) });
-    }
-  };
-
-  const handleDiagnosisChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (selectedTooth) {
-      updatePatientTeethData(selectedTooth.toString(), { diagnosis: event.target.value });
-    }
-  };
-
-  const handleTreatmentPlanChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    if (selectedTooth) {
-      updatePatientTeethData(selectedTooth.toString(), { treatmentPlan: event.target.value });
-    }
-  };
 
   const addHistoryEntry = (toothNumber: number, entry: string) => {
     if (!currentPatient) return;
@@ -271,24 +258,56 @@ const DentistPage: React.FC = () => {
             )}
 
             <section className="flex-1">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">Dental Chart (2D Model)</h2>
-              <div className="relative w-full h-96 bg-gray-50 border border-gray-200 rounded-md flex items-center justify-center overflow-hidden">
-                <div className="grid grid-cols-8 gap-2 p-4 max-w-lg">
-                  <div className="col-span-8 text-center text-sm text-gray-500 mb-2">Upper Jaw</div>
-                  {[18, 17, 16, 15, 14, 13, 12, 11].map(renderTooth)}
-                  {[21, 22, 23, 24, 25, 26, 27, 28].map(renderTooth)}
-
-                  <div className="col-span-8 text-center text-sm text-gray-500 mt-4 mb-2">Lower Jaw</div>
-                  {[48, 47, 46, 45, 44, 43, 42, 41].map(renderTooth)}
-                  {[31, 32, 33, 34, 35, 36, 37, 38].map(renderTooth)}
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-800">
+                  Dental Chart {is3DView ? '(3D Model)' : '(2D Model)'}
+                </h2>
+                <div className="flex gap-2">
+                  <Button
+                    variant={is3DView ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIs3DView(true)}
+                    className="bg-blue-500 hover:bg-blue-600 text-white"
+                  >
+                    3D View
+                  </Button>
+                  <Button
+                    variant={!is3DView ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => setIs3DView(false)}
+                  >
+                    2D View
+                  </Button>
                 </div>
-
-                {selectedTooth && (
-                  <div className="absolute top-2 right-2 bg-blue-500 text-white text-sm px-3 py-1 rounded-full animate-bounce">
-                    Tooth {selectedTooth} selected!
-                  </div>
-                )}
               </div>
+              
+              {is3DView ? (
+                <DentalChart3D
+                  teeth={currentPatient?.teeth || {}}
+                  onToothSelect={handleToothSelect}
+                  selectedTooth={selectedTooth}
+                  toothConditions={toothConditions}
+                />
+              ) : (
+                <div className="relative w-full h-96 bg-gray-50 border border-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                  <div className="grid grid-cols-8 gap-2 p-4 max-w-lg">
+                    <div className="col-span-8 text-center text-sm text-gray-500 mb-2">Upper Jaw</div>
+                    {[18, 17, 16, 15, 14, 13, 12, 11].map(renderTooth)}
+                    {[21, 22, 23, 24, 25, 26, 27, 28].map(renderTooth)}
+
+                    <div className="col-span-8 text-center text-sm text-gray-500 mt-4 mb-2">Lower Jaw</div>
+                    {[48, 47, 46, 45, 44, 43, 42, 41].map(renderTooth)}
+                    {[31, 32, 33, 34, 35, 36, 37, 38].map(renderTooth)}
+                  </div>
+
+                  {selectedTooth && (
+                    <div className="absolute top-2 right-2 bg-blue-500 text-white text-sm px-3 py-1 rounded-full animate-bounce">
+                      Tooth {selectedTooth} selected!
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <div className="mt-4 flex flex-wrap gap-2 justify-center">
                 {toothConditions.map((condition) => (
                   <span
@@ -304,83 +323,32 @@ const DentistPage: React.FC = () => {
           </div>
 
           {/* Right Panel: Tooth Details & Records */}
-          <div className="w-1/3 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Tooth Details & Records</h2>
-            {!selectedPatientId ? (
-              <p className="text-gray-600">Please select a patient to view their dental records.</p>
-            ) : !selectedTooth ? (
-              <p className="text-gray-600">Select a tooth on the dental chart to view and edit its details.</p>
-            ) : (
-              <div>
-                <h3 className="text-lg font-medium text-blue-700 mb-4">Details for Tooth {selectedTooth}</h3>
-
-                <div className="mb-4">
-                  <label htmlFor="tooth-condition" className="block text-gray-700 text-sm font-bold mb-2">
-                    Condition/Stage
-                  </label>
-                  <select
-                    id="tooth-condition"
-                    className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                    value={currentToothData?.conditionId || ''}
-                    onChange={handleConditionChange}
-                  >
-                    <option value="">Select a condition</option>
-                    {toothConditions.map((condition) => (
-                      <option key={condition.id} value={condition.id}>
-                        {condition.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="mb-4">
-                  <label htmlFor="diagnosis" className="block text-gray-700 text-sm font-bold mb-2">
-                    Diagnosis
-                  </label>
-                  <textarea
-                    id="diagnosis"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24"
-                    placeholder="Enter diagnosis for this tooth..."
-                    value={currentToothData?.diagnosis || ''}
-                    onChange={handleDiagnosisChange}
-                  ></textarea>
-                </div>
-
-                <div className="mb-4">
-                  <label htmlFor="treatment-plan" className="block text-gray-700 text-sm font-bold mb-2">
-                    Treatment Plan
-                  </label>
-                  <textarea
-                    id="treatment-plan"
-                    className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline h-24"
-                    placeholder="Enter treatment plan for this tooth..."
-                    value={currentToothData?.treatmentPlan || ''}
-                    onChange={handleTreatmentPlanChange}
-                  ></textarea>
-                </div>
-
-                <div>
-                  <h4 className="text-md font-bold text-gray-700 mb-2">History</h4>
-                  <ul className="bg-gray-50 p-3 rounded-md border border-gray-200 max-h-40 overflow-y-auto">
-                    {currentToothData?.history.length === 0 ? (
-                      <li className="text-gray-500 italic">No history recorded for this tooth.</li>
-                    ) : (
-                      currentToothData?.history.map((entry, index) => (
-                        <li key={index} className="text-sm text-gray-700 mb-1">
-                          - {entry}
-                        </li>
-                      ))
-                    )}
-                  </ul>
-                  <button
-                    className="mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline text-sm"
-                    onClick={() => addHistoryEntry(selectedTooth, `Treatment updated on ${new Date().toLocaleDateString()}`)}
-                  >
-                    Add History Entry
-                  </button>
-                </div>
-              </div>
-            )}
+          <div className="w-1/3">
+            <ToothInfoPanel
+              toothNumber={selectedTooth}
+              toothData={currentToothData}
+              toothConditions={toothConditions}
+              onConditionChange={(conditionId) => {
+                if (selectedTooth) {
+                  updatePatientTeethData(selectedTooth.toString(), { conditionId });
+                }
+              }}
+              onDiagnosisChange={(diagnosis) => {
+                if (selectedTooth) {
+                  updatePatientTeethData(selectedTooth.toString(), { diagnosis });
+                }
+              }}
+              onTreatmentPlanChange={(treatmentPlan) => {
+                if (selectedTooth) {
+                  updatePatientTeethData(selectedTooth.toString(), { treatmentPlan });
+                }
+              }}
+              onAddHistoryEntry={(entry) => {
+                if (selectedTooth) {
+                  addHistoryEntry(selectedTooth, entry);
+                }
+              }}
+            />
           </div>
         </main>
       </div>

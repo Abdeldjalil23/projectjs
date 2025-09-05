@@ -1,6 +1,5 @@
 // src/App.tsx
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
@@ -36,12 +35,16 @@ import SocialReportsPage from "./pages/social/SocialReportsPage";
 import SocialResourcesPage from "./pages/social/SocialResourcesPage";
 
 // Pages dentist
-import PatientManagement from "./pages/dentist/Patientmanagement";
+import PatientManagement from "./pages/dentist/PatientManagement";
+import TestDental from "./pages/TestDental";
+import SimpleTest from "./pages/SimpleTest";
+import HelloWorld from "./pages/HelloWorld";
+import SimpleLogin from "./pages/SimpleLogin";
+import Debug from "./pages/Debug";
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
 import { ChroniqueProvider } from "./context/ChroniqueContext";
-import path from "path";
 
 const queryClient = new QueryClient();
 
@@ -69,19 +72,28 @@ const protectedRoutes = [
   { path: "/visite-periodique", element: <MedViPerPage /> },
   { path: "/dentist/dashboard", element: <DentistDashboard /> },
   { path: "/dentist/patientmanagement", element: <PatientManagement /> },
+  { path: "/test-dental", element: <TestDental /> },
+  { path: "/simple-test", element: <SimpleTest /> },
+  { path: "/hello", element: <HelloWorld /> },
 ];
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
+          <TooltipProvider>
+        <Toaster />
+        <BrowserRouter>
         <AuthProviderWithNavigate>
           <ChroniqueProvider>
             <Routes>
               {/* Route login public */}
               <Route path="/login" element={<LoginPage />} />
+
+              {/* Routes publiques pour les tests */}
+              <Route path="/hello" element={<HelloWorld />} />
+              <Route path="/simple-test" element={<SimpleTest />} />
+              <Route path="/test-dental" element={<TestDental />} />
+              <Route path="/simple-login" element={<SimpleLogin />} />
+              <Route path="/debug" element={<Debug />} />
 
               {/* Routes protégées */}
               {protectedRoutes.map(({ path, element }) => (

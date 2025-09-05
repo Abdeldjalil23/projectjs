@@ -19,6 +19,12 @@
     --primary: 32 87% 54%;
     --primary-foreground: 0 0% 100%;
 
+    /* MedSuite Colors */
+    --medsuite-primary: 32 87% 54%;
+    --medsuite-accent: 32 87% 44%;
+    --medsuite-dark: 0 0% 20%;
+    --medsuite-light: 0 0% 98%;
+
     --secondary: 32 80% 94%;
     --secondary-foreground: 32 87% 30%;
 
