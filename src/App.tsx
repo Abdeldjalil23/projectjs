@@ -36,11 +36,14 @@ import SocialResourcesPage from "./pages/social/SocialResourcesPage";
 
 // Pages dentist
 import PatientManagement from "./pages/dentist/PatientManagement";
+<<<<<<< HEAD
 import TestDental from "./pages/TestDental";
 import SimpleTest from "./pages/SimpleTest";
 import HelloWorld from "./pages/HelloWorld";
 import SimpleLogin from "./pages/SimpleLogin";
 import Debug from "./pages/Debug";
+=======
+>>>>>>> 264e7ed01def2adaf479074fe7424e512dbb3c7e
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
@@ -71,10 +74,14 @@ const protectedRoutes = [
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
   { path: "/visite-periodique", element: <MedViPerPage /> },
   { path: "/dentist/dashboard", element: <DentistDashboard /> },
+<<<<<<< HEAD
   { path: "/dentist/patientmanagement", element: <PatientManagement /> },
   { path: "/test-dental", element: <TestDental /> },
   { path: "/simple-test", element: <SimpleTest /> },
   { path: "/hello", element: <HelloWorld /> },
+=======
+  { path: "/dentist/patient-management", element: <PatientManagement /> },
+>>>>>>> 264e7ed01def2adaf479074fe7424e512dbb3c7e
 ];
 
 const App = () => (
