@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import AppLayout from '@/components/layout/AppLayout';
 import {
   Card,
   CardContent,
@@ -777,28 +778,27 @@ export const UsersManagementPage = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setIsLoading(false), 1000); // Simulate data fetching
+    setTimeout(() => setIsLoading(false), 1000); 
   }, []);
 
   return (
-    <div className="min-h-screen w-full bg-gray-50">
-      <main className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
-        {/* Stats Widgets */}
-        <StatsWidgets />
-
-        {/* User Management and Medicine Inventory */}
-        <div className="grid gap-6 md:grid-cols-2">
-          <UserManagementSection />
-          {isLoading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-            </div>
-          ) : (
-            <PharmacyManagement />
-          )}
-        </div>
-      </main>
-    </div>
+    <AppLayout title="Admin Dashboard">
+      <div className="min-h-screen w-full bg-gray-50">
+        <main className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
+          <StatsWidgets />
+          <div className="grid gap-6 md:grid-cols-2">
+            <UserManagementSection />
+            {isLoading ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+              </div>
+            ) : (
+              <PharmacyManagement />
+            )}
+          </div>
+        </main>
+      </div>
+    </AppLayout>
   );
 };
 

@@ -26,7 +26,7 @@ export const SidebarNav = () => {
   useEffect(() => {
     if (userRole === 'doctor') {
       setMenuItems([
-        { title: 'Dashboard', icon: Home, url: '/' },
+        { title: 'Dashboard', icon: Home, url: '/dashboard' },
         { title: 'Consultation', icon: Stethoscope, url: '/nouvelle-consultation' },
         { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
         { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
@@ -34,7 +34,7 @@ export const SidebarNav = () => {
       ]);
     } else if (userRole === 'admin') {
         setMenuItems([
-          { title: 'Dashboard', icon: Home, url: '/' },
+          { title: 'Dashboard', icon: Home, url: '/admin/dashboard' },
           { title: 'Reports', icon: FileText, url: '/admin/reports' },
           { title: 'Visite Périodique', icon: FileText, url: '/admin/visite-perdue' },
           { title: 'Requests prise en charge', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },

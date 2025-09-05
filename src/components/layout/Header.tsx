@@ -20,7 +20,6 @@ export const Header = ({ title }: HeaderProps) => {
     switch(userRole) {
       case 'doctor': return 'DR';
       case 'admin': return 'AD';
-      case 'patient': return 'PT';
       default: return 'US';
     }
   };
@@ -29,7 +28,6 @@ export const Header = ({ title }: HeaderProps) => {
     switch(userRole) {
       case 'doctor': return 'Dr. Sarah Johnson';
       case 'admin': return 'Admin Ali Hassan';
-      case 'patient': return 'Mohammed Ahmed';
       default: return 'User';
     }
   };
