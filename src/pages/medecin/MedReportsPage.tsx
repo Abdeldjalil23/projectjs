@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Search } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -63,6 +65,7 @@ const CheckboxGroup = ({ groupLabel, options, patientData }) => (
 const DetailsConsolidationTrim = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState('');
 
   const patientData = {
     id,
@@ -122,40 +125,56 @@ const DetailsConsolidationTrim = () => {
     <AppLayout title="Consolidation Trimestrielle">
       <div className="p-4 md:p-6 space-y-6">
         
-
-        <Tabs defaultValue="autres" className="w-full">
-          <div className="overflow-x-auto border-b border-gray-200 dark:border-gray-700">
-            <TabsList className="inline-flex h-auto p-0 bg-transparent rounded-none">
-              {tabsConfig.map(tab => (
-                <TabsTrigger
-                  key={tab.value}
-                  value={tab.value}
-                  className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary"
-                >
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
+        <div className="relative mb-6">
+          <Search className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-muted-foreground" />
+          <Input 
+            placeholder="Recherche rapide d'un champ (ex: Visites d'hygiène, Bruit, HTA...)"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 h-12 text-lg"
+          />
         </div>
-        
+
+        {searchTerm ? (
+          <div className="space-y-4 mt-6">
+            <ActivitieClinic3 searchTerm={searchTerm} />
+            <ConclusionMed5 searchTerm={searchTerm} />
+            <Formation9 searchTerm={searchTerm} />
+            <GeneralInfo12467810 searchTerm={searchTerm} />
+          </div>
+        ) : (
+          <Tabs defaultValue="autres" className="w-full">
+            <div className="overflow-x-auto border-b border-gray-200 dark:border-gray-700">
+              <TabsList className="inline-flex h-auto p-0 bg-transparent rounded-none">
+                {tabsConfig.map(tab => (
+                  <TabsTrigger
+                    key={tab.value}
+                    value={tab.value}
+                    className="whitespace-nowrap px-3 py-2.5 sm:px-4 text-sm font-medium border-b-2 border-transparent data-[state=active]:border-primary data-[state=active]:text-primary"
+                  >
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </div>
           
+            <TabsContent value="activitieClinic" className="mt-4">
+              <ActivitieClinic3 />
+            </TabsContent>
 
-          <TabsContent value="activitieClinic" className="mt-4">
-            <ActivitieClinic3 />
-          </TabsContent>
+            <TabsContent value="conclusionMed" className="mt-4">
+              <ConclusionMed5 />
+            </TabsContent>
 
-          <TabsContent value="conclusionMed" className="mt-4">
-            <ConclusionMed5 />
-          </TabsContent>
+            <TabsContent value="formation" className="mt-4">
+              <Formation9 />
+            </TabsContent>
 
-          <TabsContent value="formation" className="mt-4">
-            <Formation9 />
-          </TabsContent>
-
-          <TabsContent value="autres" className="mt-4">
-            <GeneralInfo12467810 />
-          </TabsContent>
-        </Tabs>
+            <TabsContent value="autres" className="mt-4">
+              <GeneralInfo12467810 />
+            </TabsContent>
+          </Tabs>
+        )}
       </div>
     </AppLayout>
   );

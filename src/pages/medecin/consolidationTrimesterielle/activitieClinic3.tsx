@@ -4,18 +4,86 @@ import {
 } from '@/components/ui/accordion';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Checkbox } from '@/components/ui/checkbox';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Label } from '@/components/ui/label';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 
-const ActivitieClinic3 = () => {
+const match = (str: string, st: string) => !st || str.toLowerCase().includes(st.toLowerCase());
+
+const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
   const [saved, setSaved] = useState(false);
 
-  const handleSave = (e) => {
+  // Group 3.1 Nuisances
+  const nuisances_chimiques = ['C-inorganique, organométallique', 'Hydrocarbures', 'Matières plastiques', 'Gaz et vapeurs', 'Autres (à préciser)'];
+  const nuisances_biologiques = ['Personnel de santé', 'Personnel de cuisines', "Personnel de l'assainissement", 'Autres (à préciser)'];
+  const nuisances_physiques = ['Bruit', 'Rayonnement (*)', 'Vibrations', 'Travail sur écran', 'Autres (à préciser)'];
+  const nuisances_psycho = ['Poussières', 'Autres (à préciser)'];
+  const travail_poste = ['2 x 12', '3 x 8', 'Autres (à préciser)'];
+  const postes_securite = ['Poussières', 'Autres (à préciser)'];
+
+  const nuisancesKeys = [
+    { label: 'Nuisances chimiques', items: nuisances_chimiques },
+    { label: 'Nuisances biologiques', items: nuisances_biologiques },
+    { label: 'Nuisances physiques', items: nuisances_physiques },
+    { label: 'Nuisances psycho-chimiques', items: nuisances_psycho },
+    { label: 'Travail posté', items: travail_poste },
+    { label: 'Postes de sécurité (*)', items: postes_securite },
+  ];
+
+  const filteredNuisances = nuisancesKeys.map(k => ({
+    ...k,
+    items: k.items.filter(i => match(i, searchTerm))
+  })).filter(k => k.items.length > 0 || match(k.label, searchTerm));
+
+
+  // Group 3.2.2 Particulières
+  const popParticulieres = [
+    'Apprentis',
+    'Travailleurs fortement exposés aux risques professionnels',
+    'Travailleurs responsables de la sécurité (*)',
+    'Travailleurs âgés de moins de 18 ans',
+    'Travailleurs âgés de plus de 55 ans',
+    'Handicapés physiques',
+    'Malades chroniques',
+    'Femmes enceintes',
+    "Mères d'un enfant de moins de 02 ans"
+  ];
+  const filteredParticulieres = popParticulieres.filter(p => match(p, searchTerm));
+
+  // 3.5 Urgences
+  const urgences = ['Médicales', 'Chirurgicales'];
+  const filteredUrgences = urgences.filter(u => match(u, searchTerm));
+
+  const checkMatch = (title: string, matchConditions: boolean[]) => {
+    if (!searchTerm) return true;
+    if (title.toLowerCase().includes(searchTerm.toLowerCase())) return true;
+    return matchConditions.some(c => c);
+  };
+
+  const matches = {
+    embauche: checkMatch("3.1 Visites d'embauche", [
+      match("Personnel permanent", searchTerm), match("Personnel contractuel", searchTerm), match("Apprentis", searchTerm), match("Total des visites", searchTerm)
+    ]),
+    nuisance: checkMatch("Identification de la nuisance", [filteredNuisances.length > 0]),
+    periodique: checkMatch("3.2 Visites périodiques", [
+      match("Visite annuelle", searchTerm), filteredParticulieres.length > 0
+    ]),
+    reprise: checkMatch("3.3 Visites de reprise de travail", [
+      match("Maladie professionnelle", searchTerm), match("Accidents de travail", searchTerm), match("Congé de maternité", searchTerm), match("Arrêt de travail d'au moins 21 jours", searchTerm), match("Absences répétées", searchTerm)
+    ]),
+    spontanees: checkMatch("3.4 Visites spontanées", [
+      match("À la demande de l'employeur", searchTerm), match("À la demande de l'agent", searchTerm), match("Total des visites", searchTerm)
+    ]),
+    urgences: checkMatch("3.5 Urgences médico-chirurgicales", [filteredUrgences.length > 0]),
+    soins: checkMatch("3.6 Visites médicales de soins", [
+      match("Travailleurs Sonatrach", searchTerm), match("Total", searchTerm)
+    ]),
+  };
+
+  const defaultValues = Object.entries(matches).filter(([_, v]) => v).map(([k]) => k);
+
+  if (searchTerm && defaultValues.length === 0) return null;
+
+  const handleSave = (e: any) => {
     e.preventDefault();
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -28,501 +96,264 @@ const ActivitieClinic3 = () => {
           <CardTitle>Activité clinique de médecine de travail</CardTitle>
         </CardHeader>
         <CardContent className="space-y-8 pt-0">
-          <Accordion type="multiple" className="w-full">
-            {/* 3.1 Visites d'embauche */}
-            <AccordionItem value="visites-embauche">
-              <AccordionTrigger>3.1 Visites d'embauche</AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Personnel permanent</TableHead>
-                      <TableHead>Personnel contractuel</TableHead>
-                      <TableHead>Apprentis</TableHead>
-                      <TableHead>Total des visites</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Total" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
+          <Accordion type="multiple" value={searchTerm ? defaultValues : undefined} className="w-full">
+            {matches.embauche && (
+              <AccordionItem value="embauche">
+                <AccordionTrigger>3.1 Visites d'embauche</AccordionTrigger>
+                <AccordionContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Personnel permanent</TableHead>
+                        <TableHead>Personnel contractuel</TableHead>
+                        <TableHead>Apprentis</TableHead>
+                        <TableHead>Total des visites</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Total" /></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
-            {/* Identification de la nuisance */}
-            <AccordionItem value="identification-nuisance">
-              <AccordionTrigger>Identification de la nuisance</AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Nuisances</TableHead>
-                      <TableHead>Personnel exposé</TableHead>
-                      <TableHead>Personnel examiné</TableHead>
-                      <TableHead>Nombre visites</TableHead>
-                      <TableHead>Taux couverture</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {/* Nuisances chimiques */}
-                    <TableRow className="bg-gray-50">
-                      <TableCell className="font-semibold">Nuisances chimiques</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• C-inorganique, organométallique</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Hydrocarbures</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Matières plastiques</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Gaz et vapeurs</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Autres (à préciser)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
+            {matches.nuisance && (
+              <AccordionItem value="nuisance">
+                <AccordionTrigger>Identification de la nuisance</AccordionTrigger>
+                <AccordionContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Nuisances</TableHead>
+                        <TableHead>Personnel exposé</TableHead>
+                        <TableHead>Personnel examiné</TableHead>
+                        <TableHead>Nombre visites</TableHead>
+                        <TableHead>Taux couverture</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredNuisances.map((category) => (
+                        <React.Fragment key={category.label}>
+                          <TableRow className="bg-gray-50">
+                            <TableCell className="font-semibold">{category.label}</TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                            <TableCell></TableCell>
+                          </TableRow>
+                          {category.items.map((item) => (
+                            <TableRow key={item}>
+                              <TableCell className="pl-6">• {item}</TableCell>
+                              <TableCell><Input placeholder="Nombre" /></TableCell>
+                              <TableCell><Input placeholder="Nombre" /></TableCell>
+                              <TableCell><Input placeholder="Nombre" /></TableCell>
+                              <TableCell><Input placeholder="%" /></TableCell>
+                            </TableRow>
+                          ))}
+                        </React.Fragment>
+                      ))}
+                    </TableBody>
+                  </Table>
+                  
+                  <div className="mt-4 text-sm text-muted-foreground space-y-1">
+                    <p>(*) Préciser le dernier contrôle dosimétrique, date</p>
+                    <p>(**) Travaux dans les postes de sécurité: Conducteurs d'engins; tableau de commande, TC</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
-                    {/* Nuisances biologiques */}
-                    <TableRow className="bg-gray-50">
-                      <TableCell className="font-semibold">Nuisances biologiques</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Personnel de santé</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Personnel de cuisines</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Personnel de l'assainissement</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Autres (à préciser)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
+            {matches.periodique && (
+              <AccordionItem value="periodique">
+                <AccordionTrigger>3.2 Visites périodiques</AccordionTrigger>
+                <AccordionContent>
+                  <div className="space-y-6">
+                    {(!searchTerm || match("Visite annuelle", searchTerm)) && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>3.2.1 Visite annuelle</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Effectif soumis à la visite (organiques)</TableHead>
+                                <TableHead>Personnel examiné</TableHead>
+                                <TableHead>Taux de couverture</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              <TableRow>
+                                <TableCell><Input placeholder="Nombre" /></TableCell>
+                                <TableCell><Input placeholder="Nombre" /></TableCell>
+                                <TableCell><Input placeholder="%" /></TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                          
+                          <Table className="mt-4">
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Effectif soumis à la visite (SIE)</TableHead>
+                                <TableHead>Personnel examiné</TableHead>
+                                <TableHead>Taux de couverture</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              <TableRow>
+                                <TableCell><Input placeholder="Nombre" /></TableCell>
+                                <TableCell><Input placeholder="Nombre" /></TableCell>
+                                <TableCell><Input placeholder="%" /></TableCell>
+                              </TableRow>
+                            </TableBody>
+                          </Table>
+                        </CardContent>
+                      </Card>
+                    )}
 
-                    {/* Nuisances physiques */}
-                    <TableRow className="bg-gray-50">
-                      <TableCell className="font-semibold">Nuisances physiques</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Bruit</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Rayonnement (*)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Vibrations</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Travail sur écran</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Autres (à préciser)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
+                    {filteredParticulieres.length > 0 && (
+                      <Card>
+                        <CardHeader>
+                          <CardTitle>3.2.2 Visites particulières</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Population</TableHead>
+                                <TableHead>Effectif soumis à la visite</TableHead>
+                                <TableHead>Personnel examiné</TableHead>
+                                <TableHead>Nombre de visites</TableHead>
+                                <TableHead>Taux de couverture</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {filteredParticulieres.map(p => (
+                                <TableRow key={p}>
+                                  <TableCell>{p}</TableCell>
+                                  <TableCell><Input placeholder="Nombre" /></TableCell>
+                                  <TableCell><Input placeholder="Nombre" /></TableCell>
+                                  <TableCell><Input placeholder="Nombre" /></TableCell>
+                                  <TableCell><Input placeholder="%" /></TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </CardContent>
+                      </Card>
+                    )}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
-                    {/* Nuisances psycho-chimiques */}
-                    <TableRow className="bg-gray-50">
-                      <TableCell className="font-semibold">Nuisances psycho-chimiques</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Poussières</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Autres (à préciser)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
+            {matches.reprise && (
+              <AccordionItem value="reprise">
+                <AccordionTrigger>3.3 Visites de reprise de travail</AccordionTrigger>
+                <AccordionContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Maladie professionnelle</TableHead>
+                        <TableHead>Accidents de travail</TableHead>
+                        <TableHead>Congé de maternité</TableHead>
+                        <TableHead>Arrêt de travail d'au moins 21 jours</TableHead>
+                        <TableHead>Absences répétées</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
-                    {/* Travail posté */}
-                    <TableRow className="bg-gray-50">
-                      <TableCell className="font-semibold">Travail posté</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• 2 x 12</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• 3 x 8</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Autres (à préciser)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
+            {matches.spontanees && (
+              <AccordionItem value="spontanees">
+                <AccordionTrigger>3.4 Visites spontanées</AccordionTrigger>
+                <AccordionContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>À la demande de l'employeur</TableHead>
+                        <TableHead>À la demande de l'agent</TableHead>
+                        <TableHead>Total des visites</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Total" /></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
-                    {/* Postes de sécurité */}
-                    <TableRow className="bg-gray-50">
-                      <TableCell className="font-semibold">Postes de sécurité (*)</TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                      <TableCell></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Poussières</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="pl-6">• Autres (à préciser)</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="%" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-                
-                <div className="mt-4 text-sm text-muted-foreground space-y-1">
-                  <p>(*) Préciser le dernier contrôle dosimétrique, date</p>
-                  <p>(**) Travaux dans les postes de sécurité: Conducteurs d'engins; tableau de commande, TC</p>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            {matches.urgences && (
+              <AccordionItem value="urgences">
+                <AccordionTrigger>3.5 Urgences médico-chirurgicales</AccordionTrigger>
+                <AccordionContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Désignation</TableHead>
+                        <TableHead>Prise en charge totalement</TableHead>
+                        <TableHead>Évacué vers une autre structure</TableHead>
+                        <TableHead>Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredUrgences.map(u => (
+                        <TableRow key={u}>
+                          <TableCell>{u}</TableCell>
+                          <TableCell><Input placeholder="Nombre" /></TableCell>
+                          <TableCell><Input placeholder="Nombre" /></TableCell>
+                          <TableCell><Input placeholder="Total" /></TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </AccordionContent>
+              </AccordionItem>
+            )}
 
-            {/* 3.2 Visites périodiques */}
-            <AccordionItem value="visites-periodiques">
-              <AccordionTrigger>3.2 Visites périodiques</AccordionTrigger>
-              <AccordionContent>
-                <div className="space-y-6">
-                  {/* 3.2.1 Visite annuelle */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>3.2.1 Visite annuelle</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Effectif soumis à la visite (organiques)</TableHead>
-                            <TableHead>Personnel examiné</TableHead>
-                            <TableHead>Taux de couverture</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                      
-                      <Table className="mt-4">
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Effectif soumis à la visite (SIE)</TableHead>
-                            <TableHead>Personnel examiné</TableHead>
-                            <TableHead>Taux de couverture</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                      
-                      <p className="mt-3 text-sm text-muted-foreground">
-                        Note: Visite obligatoire pour tous les travailleurs; pour les travailleurs qui nécessitent une surveillance médicale particulière, leur première visite est reportée sur le tableau de la visite annuelle, les autres visites sont enregistrées sur le tableau des visites particulières.
-                      </p>
-                    </CardContent>
-                  </Card>
-
-                  {/* 3.2.2 Visites particulières */}
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>3.2.2 Visites particulières</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Population</TableHead>
-                            <TableHead>Effectif soumis à la visite</TableHead>
-                            <TableHead>Personnel examiné</TableHead>
-                            <TableHead>Nombre de visites</TableHead>
-                            <TableHead>Taux de couverture</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell>Apprentis</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Travailleurs fortement exposés aux risques professionnels</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Travailleurs responsables de la sécurité (*)</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Travailleurs âgés de moins de 18 ans</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Travailleurs âgés de plus de 55 ans</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Handicapés physiques</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Malades chroniques</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Femmes enceintes</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell>Mères d'un enfant de moins de 02 ans</TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="Nombre" /></TableCell>
-                            <TableCell><Input placeholder="%" /></TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                      
-                      <p className="mt-3 text-sm text-muted-foreground">
-                        Note: (*) Personnel chargé de la sûreté des installations et des personnes (SIE); le taux de couverture représente le nombre des travailleurs examinés sur l'effectif.
-                      </p>
-                    </CardContent>
-                  </Card>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* 3.3 Visites de reprise de travail */}
-            <AccordionItem value="visites-reprise">
-              <AccordionTrigger>3.3 Visites de reprise de travail</AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Maladie professionnelle</TableHead>
-                      <TableHead>Accidents de travail</TableHead>
-                      <TableHead>Congé de maternité</TableHead>
-                      <TableHead>Arrêt de travail d'au moins 21 jours</TableHead>
-                      <TableHead>Absences répétées</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* 3.4 Visites spontanées */}
-            <AccordionItem value="visites-spontanees">
-              <AccordionTrigger>3.4 Visites spontanées</AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>À la demande de l'employeur</TableHead>
-                      <TableHead>À la demande de l'agent</TableHead>
-                      <TableHead>Total des visites</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Total" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* 3.5 Urgences médico-chirurgicales */}
-            <AccordionItem value="urgences">
-              <AccordionTrigger>3.5 Urgences médico-chirurgicales</AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Désignation</TableHead>
-                      <TableHead>Prise en charge totalement par des structures de Sonatrach</TableHead>
-                      <TableHead>Évacué vers une autre structure extra Sonatrach</TableHead>
-                      <TableHead>Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell>Médicales</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Total" /></TableCell>
-                    </TableRow>
-                    <TableRow>
-                      <TableCell>Chirurgicales</TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Total" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* 3.6 Visites médicales de soins */}
-            <AccordionItem value="visites-soins">
-              <AccordionTrigger>3.6 Visites médicales de soins</AccordionTrigger>
-              <AccordionContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Travailleurs Sonatrach</TableHead>
-                      <TableHead>Total</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell><Input placeholder="Nombre" /></TableCell>
-                      <TableCell><Input placeholder="Total" /></TableCell>
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </AccordionContent>
-            </AccordionItem>
+            {matches.soins && (
+              <AccordionItem value="soins">
+                <AccordionTrigger>3.6 Visites médicales de soins</AccordionTrigger>
+                <AccordionContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Travailleurs Sonatrach</TableHead>
+                        <TableHead>Total</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell><Input placeholder="Nombre" /></TableCell>
+                        <TableCell><Input placeholder="Total" /></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </AccordionContent>
+              </AccordionItem>
+            )}
           </Accordion>
         </CardContent>
       </Card>

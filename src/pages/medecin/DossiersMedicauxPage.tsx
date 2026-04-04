@@ -17,7 +17,7 @@ const DossiersMedicauxPage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
 
-  const isPatient = userRole === 'patient';
+  const isPatient = userRole === "patient";
 
   const records = [
     {

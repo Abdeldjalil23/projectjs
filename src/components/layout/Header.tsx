@@ -40,14 +40,7 @@ export const Header = ({ title }: HeaderProps) => {
       </div>
       
       <div className="flex items-center gap-4">
-        <div className="relative hidden md:flex items-center">
-          <Search className="absolute left-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            type="search"
-            placeholder="Search..."
-            className="w-[200px] pl-8 bg-background sm:w-[260px] focus-visible:ring-medsuite-primary"
-          />
-        </div>
+
         
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-5 w-5" />
