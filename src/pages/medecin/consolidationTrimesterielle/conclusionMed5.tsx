@@ -160,24 +160,24 @@ const ConclusionMed5 = ({ searchTerm = '' }: { searchTerm?: string }) => {
   return (
     <Card className="p-4">
       <CardHeader>
-        <CardTitle>5. Conclusions médicales</CardTitle>
+        <CardTitle>Conclusions médicales</CardTitle>
       </CardHeader>
       <CardContent className="space-y-8 pt-0">
         <Accordion type="multiple" value={searchTerm ? defaultValues : undefined} className="w-full space-y-2">
           {matches.aptitudes && (
             <AccordionItem value="aptitudes">
-              <AccordionTrigger>5.1 Décisions d'aptitudes</AccordionTrigger>
+              <AccordionTrigger>Décisions d'aptitudes</AccordionTrigger>
               <AccordionContent>{makeTableInputs(aptRows, aptCols, form, setForm, 'aptitudes', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.maladies && (
             <AccordionItem value="maladies">
-              <AccordionTrigger>5.2 Déclarations de maladies professionnelles et maladies à caractère professionnel</AccordionTrigger>
+              <AccordionTrigger>Déclarations de maladies professionnelles et maladies à caractère professionnel</AccordionTrigger>
               <AccordionContent>
-                {matches.maladies && makeTableInputs(malProfRows, malProfCols, form, setForm, 'maladies_prof', searchTerm) && <div className="mb-2 font-medium">5.2.1 Maladies professionnelles</div>}
+                {matches.maladies && makeTableInputs(malProfRows, malProfCols, form, setForm, 'maladies_prof', searchTerm) && <div className="mb-2 font-medium">1 Maladies professionnelles</div>}
                 {makeTableInputs(malProfRows, malProfCols, form, setForm, 'maladies_prof', searchTerm)}
-                {matches.maladies && makeTableInputs(malCaracRows, malCaracCols, form, setForm, 'maladies_carac', searchTerm) && <div className="mb-2 mt-4 font-medium">5.2.2 Maladies à caractère professionnel</div>}
+                {matches.maladies && makeTableInputs(malCaracRows, malCaracCols, form, setForm, 'maladies_carac', searchTerm) && <div className="mb-2 mt-4 font-medium">2 Maladies à caractère professionnel</div>}
                 {makeTableInputs(malCaracRows, malCaracCols, form, setForm, 'maladies_carac', searchTerm)}
               </AccordionContent>
             </AccordionItem>
@@ -185,42 +185,42 @@ const ConclusionMed5 = ({ searchTerm = '' }: { searchTerm?: string }) => {
 
           {matches.accidents && (
             <AccordionItem value="accidents">
-              <AccordionTrigger>5.3 Déclarations d'accidents de travail</AccordionTrigger>
+              <AccordionTrigger>Déclarations d'accidents de travail</AccordionTrigger>
               <AccordionContent>{makeTableInputs(accTravRows, accTravCols, form, setForm, 'accidents_travail', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.obligatoires && (
             <AccordionItem value="obligatoires">
-              <AccordionTrigger>5.4 Maladies à déclarations obligatoires</AccordionTrigger>
+              <AccordionTrigger>Maladies à déclarations obligatoires</AccordionTrigger>
               <AccordionContent>{makeTableInputs(malOblRows, malOblCols, form, setForm, 'maladies_oblig', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.orientations && (
             <AccordionItem value="orientations">
-              <AccordionTrigger>5.5 Orientations spécialisées</AccordionTrigger>
+              <AccordionTrigger>Orientations spécialisées</AccordionTrigger>
               <AccordionContent>{makeTableInputs(orientRows, orientCols, form, setForm, 'orientations', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.affections && (
             <AccordionItem value="affections">
-              <AccordionTrigger>5.6 Affections chroniques dépistées</AccordionTrigger>
+              <AccordionTrigger>Affections chroniques dépistées</AccordionTrigger>
               <AccordionContent>{makeTableInputs(affecRows, affecCols, form, setForm, 'affections_chroniques', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.reclassements && (
             <AccordionItem value="reclassements">
-              <AccordionTrigger>5.7 Reclassements professionnels</AccordionTrigger>
+              <AccordionTrigger>Reclassements professionnels</AccordionTrigger>
               <AccordionContent>{makeTableInputs(reclRows, reclCols, form, setForm, 'reclassements', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.longue_duree && (
             <AccordionItem value="longue_duree">
-              <AccordionTrigger>5.8 Maladies de longue durée et invalidité</AccordionTrigger>
+              <AccordionTrigger>Maladies de longue durée et invalidité</AccordionTrigger>
               <AccordionContent>{makeTableInputs(mldRows, mldCols, form, setForm, 'maladies_longue_duree', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}

@@ -99,7 +99,7 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
           <Accordion type="multiple" value={searchTerm ? defaultValues : undefined} className="w-full">
             {matches.embauche && (
               <AccordionItem value="embauche">
-                <AccordionTrigger>3.1 Visites d'embauche</AccordionTrigger>
+                <AccordionTrigger>Visites d'embauche</AccordionTrigger>
                 <AccordionContent>
                   <Table>
                     <TableHeader>
@@ -171,13 +171,13 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
 
             {matches.periodique && (
               <AccordionItem value="periodique">
-                <AccordionTrigger>3.2 Visites périodiques</AccordionTrigger>
+                <AccordionTrigger>Visites périodiques</AccordionTrigger>
                 <AccordionContent>
                   <div className="space-y-6">
                     {(!searchTerm || match("Visite annuelle", searchTerm)) && (
                       <Card>
                         <CardHeader>
-                          <CardTitle>3.2.1 Visite annuelle</CardTitle>
+                          <CardTitle>1 Visite annuelle</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <Table>
@@ -220,7 +220,7 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
                     {filteredParticulieres.length > 0 && (
                       <Card>
                         <CardHeader>
-                          <CardTitle>3.2.2 Visites particulières</CardTitle>
+                          <CardTitle>2 Visites particulières</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <Table>
@@ -255,7 +255,7 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
 
             {matches.reprise && (
               <AccordionItem value="reprise">
-                <AccordionTrigger>3.3 Visites de reprise de travail</AccordionTrigger>
+                <AccordionTrigger>Visites de reprise de travail</AccordionTrigger>
                 <AccordionContent>
                   <Table>
                     <TableHeader>
@@ -283,7 +283,7 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
 
             {matches.spontanees && (
               <AccordionItem value="spontanees">
-                <AccordionTrigger>3.4 Visites spontanées</AccordionTrigger>
+                <AccordionTrigger>Visites spontanées</AccordionTrigger>
                 <AccordionContent>
                   <Table>
                     <TableHeader>
@@ -307,7 +307,7 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
 
             {matches.urgences && (
               <AccordionItem value="urgences">
-                <AccordionTrigger>3.5 Urgences médico-chirurgicales</AccordionTrigger>
+                <AccordionTrigger>Urgences médico-chirurgicales</AccordionTrigger>
                 <AccordionContent>
                   <Table>
                     <TableHeader>
@@ -335,7 +335,7 @@ const ActivitieClinic3 = ({ searchTerm = '' }: { searchTerm?: string }) => {
 
             {matches.soins && (
               <AccordionItem value="soins">
-                <AccordionTrigger>3.6 Visites médicales de soins</AccordionTrigger>
+                <AccordionTrigger>Visites médicales de soins</AccordionTrigger>
                 <AccordionContent>
                   <Table>
                     <TableHeader>

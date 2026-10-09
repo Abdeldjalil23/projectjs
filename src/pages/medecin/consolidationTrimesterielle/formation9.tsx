@@ -118,27 +118,27 @@ const Formation9 = ({ searchTerm = '' }: { searchTerm?: string }) => {
   return (
     <Card className="p-4">
       <CardHeader>
-        <CardTitle>9. Formation</CardTitle>
+        <CardTitle>Formation</CardTitle>
       </CardHeader>
       <CardContent className="space-y-8 pt-0">
         <Accordion type="multiple" value={searchTerm ? defaultValues : undefined} className="w-full space-y-2">
           {matches.f91 && (
             <AccordionItem value="f91">
-              <AccordionTrigger>9.1 Formation et travaux du médecin</AccordionTrigger>
+              <AccordionTrigger>Formation et travaux du médecin</AccordionTrigger>
               <AccordionContent>{makeTableInputs(f91Rows, f91Cols, form, setForm, 'f91', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.f92 && (
             <AccordionItem value="f92">
-              <AccordionTrigger>9.2 Formations animées par le médecin</AccordionTrigger>
+              <AccordionTrigger>Formations animées par le médecin</AccordionTrigger>
               <AccordionContent>{makeTableInputs(f92Rows, f92Cols, form, setForm, 'f92', searchTerm)}</AccordionContent>
             </AccordionItem>
           )}
 
           {matches.f93 && (
             <AccordionItem value="f93">
-              <AccordionTrigger>9.3 Séance d'éducation sanitaire</AccordionTrigger>
+              <AccordionTrigger>Séance d'éducation sanitaire</AccordionTrigger>
               <AccordionContent>{makeTableInputs(f93Rows, f93Cols, form, setForm, 'f93', searchTerm, { total: true })}</AccordionContent>
             </AccordionItem>
           )}

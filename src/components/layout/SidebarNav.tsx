@@ -41,7 +41,7 @@ export const SidebarNav = () => {
     if (userRole === 'doctor') {
       setMenuItems([
         { title: 'Dashboard', icon: Home, url: '/medecin/dashboard' },
-        { title: 'Consultation', icon: Stethoscope, url: '/nouvelle-consultation' },
+        // { title: 'Consultation', icon: Stethoscope, url: '/nouvelle-consultation' },
         { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
         { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
         { title: 'Reports', icon: FileText, url: '/medecin/reports' },
