@@ -64,11 +64,7 @@ const DossiersMedicauxPage = () => {
   return (
     <AppLayout title="Dossiers Médicaux">
       <div className="p-4 md:p-6 space-y-6">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <h1 className="text-2xl font-bold tracking-tight">
-            {isPatient ? 'Mon Dossier Médical' : 'Dossiers Médicaux des Patients'}
-          </h1>
-          
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">          
         </div>
 
         <Card>
