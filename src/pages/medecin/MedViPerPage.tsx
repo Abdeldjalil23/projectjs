@@ -1,4 +1,3 @@
-import { useAuth } from '@/context/AuthContext'; // Keep if used for filtering data upstream
 import AppLayout from '@/components/layout/AppLayout';
 import {
   Card, CardHeader, CardTitle, CardDescription, CardContent,
@@ -69,61 +68,70 @@ const VisitePeriodiquePage = () => {
     },
   ];
 
-  const pageTitle = 'Suivi des Visites Médicales'; 
+  const pageTitle = 'Suivi des Visites Médicales';
 
   return (
     <AppLayout title={pageTitle}>
-      <div className="grid grid-cols-1 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle>{pageTitle}</CardTitle>
-            <CardDescription>
-              Liste des visites médicales enregistrées pour les agents.
-            </CardDescription>
-          </CardHeader>
+      <Card>
+        <CardHeader className="pb-3">
+          <CardDescription className="text-sm">
+            Liste des visites médicales enregistrées pour les agents.
+          </CardDescription>
+        </CardHeader>
 
-          <CardContent>
-            {visites.length > 0 ? (
+        <CardContent className="pt-0">
+          {visites.length > 0 ? (
+            <div className="rounded-md border overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow>
-                    <TableHead>N° Visite</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>Matricule</TableHead>
-                    <TableHead>Nom</TableHead>
-                    <TableHead>Prénom</TableHead>
-                    <TableHead>Structure</TableHead>
-                    <TableHead>Médecin</TableHead>
-                    <TableHead>Infirmier(ère)</TableHead>
+                  <TableRow className="hover:bg-transparent">
+                    <TableHead className="h-9 text-xs">N° Visite</TableHead>
+                    <TableHead className="h-9 text-xs">Type</TableHead>
+                    <TableHead className="h-9 text-xs">Date</TableHead>
+                    <TableHead className="h-9 text-xs">Matricule</TableHead>
+                    <TableHead className="h-9 text-xs">Nom</TableHead>
+                    <TableHead className="h-9 text-xs">Prénom</TableHead>
+                    <TableHead className="h-9 text-xs">Structure</TableHead>
+                    <TableHead className="h-9 text-xs">Médecin</TableHead>
+                    <TableHead className="h-9 text-xs">Infirmier(ère)</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {visites.map((visit, index) => ( // Added index as fallback key if numeroVisite isn't unique enough for some reason
-                    <TableRow key={visit.numeroVisite || index}>
-                      <TableCell className="font-medium">{visit.numeroVisite}</TableCell>
-                      <TableCell>
-                        <Badge variant="outline">{visit.type}</Badge>
+                  {visites.map((visit) => (
+                    <TableRow key={visit.numeroVisite} className="h-10">
+                      <TableCell className="py-2 text-sm font-medium">
+                        {visit.numeroVisite}
                       </TableCell>
-                      <TableCell>{visit.date.toLocaleDateString()}</TableCell>
-                      <TableCell>{visit.agent.matricule}</TableCell>
-                      <TableCell>{visit.agent.nom}</TableCell>
-                      <TableCell>{visit.agent.prenom}</TableCell>
-                      <TableCell>{visit.agent.structure}</TableCell>
-                      <TableCell>{visit.medecin}</TableCell>
-                      <TableCell>{visit.infirmier}</TableCell>
+                      <TableCell className="py-2">
+                        <Badge variant="outline" className="text-xs font-normal">
+                          {visit.type}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="py-2 text-sm">
+                        {visit.date.toLocaleDateString('fr-FR', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </TableCell>
+                      <TableCell className="py-2 text-sm">{visit.agent.matricule}</TableCell>
+                      <TableCell className="py-2 text-sm">{visit.agent.nom}</TableCell>
+                      <TableCell className="py-2 text-sm">{visit.agent.prenom}</TableCell>
+                      <TableCell className="py-2 text-sm">{visit.agent.structure}</TableCell>
+                      <TableCell className="py-2 text-sm">{visit.medecin}</TableCell>
+                      <TableCell className="py-2 text-sm">{visit.infirmier}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-            ) : (
-              <p className="text-center text-muted-foreground py-4">
-                Aucune visite à afficher.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+            </div>
+          ) : (
+            <p className="text-center text-muted-foreground py-6 text-sm">
+              Aucune visite à afficher.
+            </p>
+          )}
+        </CardContent>
+      </Card>
     </AppLayout>
   );
 };

@@ -11,6 +11,10 @@ import React, { useState, useEffect } from 'react';
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogClose
 } from '@/components/ui/dialog';
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Printer } from "lucide-react"
 
 // TypeScript interfaces for state
 interface FormData {
@@ -144,7 +148,7 @@ const printStyles = `
   }
 
   .print-area > div {
-    width: 13.8cm;
+    width: 14.8cm;
     height: 20cm;
     box-shadow: none;
     page-break-after: avoid;
@@ -159,7 +163,7 @@ const printStyles = `
 
 const types: ServiceType[] = [
   { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Diagnostic', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
-  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'Demande ou renouvellement d\'ordonnance médicale', action: 'Demander' },
+  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'طلب وصفة طبية', action: 'Demander' },
   { icon: <Navigation className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Orientation', desc: 'إحالة أو توجيه لطبيب مختص', action: 'Demander' },
   { icon: <Microscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'ANALYSE', desc: 'طلب تحاليل أو فحوصات مخبرية', action: 'Demander' },
   { icon: <Image className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Imagerie', desc: 'طلب تصوير (أشعة، IRM…)', action: 'Demander' },
@@ -478,9 +482,16 @@ const NouvelleConsultation: React.FC = () => {
     window.print();
   };
 
-  function handleSave(event: React.MouseEvent<HTMLButtonElement>): void {
-    throw new Error('Function not implemented.');
+const handleSave = () => {
+  if (!consultationData.date || !consultationData.doctor) {
+    alert("يرجى ملء التاريخ واسم الطبيب على الأقل");
+    return;
   }
+
+  console.log("البيانات المحفوظة:", consultationData);
+
+  setConsultationOpen(false);
+};
 
   return (
     <AppLayout title="Nouvelle Consultation">
@@ -540,141 +551,361 @@ const NouvelleConsultation: React.FC = () => {
         </div>
 
         <Dialog open={open} onOpenChange={setOpen}>
-          <DialogContent className="dialog-print-hide">
-            <DialogHeader>
-              <DialogTitle>{selectedType?.title === 'Ordonnance' ? 'Ordonnance Médicale' : 'Demande de service'}</DialogTitle>
-              <DialogDescription>
-                {selectedType && (
-                  <div className="flex flex-col items-center mb-4">
-                    {selectedType.icon}
-                    <div className="font-bold text-lg mt-2">{selectedType.title}</div>
-                    <div className="text-center text-muted-foreground mb-2">{selectedType.desc}</div>
-                  </div>
-                )}
+          <DialogContent className="dialog-print-hide sm:max-w-[520px] p-0 gap-0 overflow-hidden">
+            <DialogHeader className="px-4 pt-4 pb-3 border-b">
+              <DialogTitle className="text-lg font-semibold tracking-tight">
+                {selectedType?.title === 'Ordonnance' ? 'Ordonnance Médicale' : 'Demande de service'}
+              </DialogTitle>
+              <DialogDescription className="sr-only">
+                Formulaire d'ordonnance médicale
               </DialogDescription>
             </DialogHeader>
+
             {selectedType?.title === 'Ordonnance' && (
-              <div>
-                <div className="grid grid-cols-2 gap-4">
-                  <input className="border p-2" name="nom" placeholder="Nom du patient" value={formData.nom} onChange={handleInputChange} />
-                  <input className="border p-2" name="prenoms" placeholder="Prénoms" value={formData.prenoms} onChange={handleInputChange} />
-                  <input className="border p-2" name="age" placeholder="Âge" value={formData.age} onChange={handleInputChange} />
-                  <input className="border p-2" name="date" type="date" value={formData.date} onChange={handleInputChange} />
+              <div className="px-4 py-4 space-y-4">
+                {/* Header with icon + title */}
+                <div className="flex items-center gap-2.5 pb-3 border-b">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary shrink-0">
+                    {selectedType.icon}
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-sm">{selectedType.title}</h3>
+                    <p className="text-xs text-muted-foreground">{selectedType.desc}</p>
+                  </div>
                 </div>
-                <textarea className="border mt-4 w-full p-2" name="medicaments" rows={6} placeholder="Médicament - Quantité - Durée..." value={formData.medicaments} onChange={handleInputChange} />
-                <div className="mt-4 text-end">
-                  <Button onClick={handlePrint}>Imprimer</Button>
+
+                {/* Patient Information */}
+                <div className="space-y-2.5">
+                  <h4 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                    Informations Patient
+                  </h4>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label htmlFor="nom" className="text-xs">Nom</Label>
+                      <Input
+                        id="nom"
+                        name="nom"
+                        placeholder="Nom de famille"
+                        value={formData.nom}
+                        onChange={handleInputChange}
+                        className="h-9"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="prenoms" className="text-xs">Prénom(s)</Label>
+                      <Input
+                        id="prenoms"
+                        name="prenoms"
+                        placeholder="Prénom(s)"
+                        value={formData.prenoms}
+                        onChange={handleInputChange}
+                        className="h-9"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="age" className="text-xs">Âge</Label>
+                      <Input
+                        id="age"
+                        name="age"
+                        placeholder="Ex: 34 ans"
+                        value={formData.age}
+                        onChange={handleInputChange}
+                        className="h-9"
+                      />
+                    </div>
+
+                    <div className="space-y-1">
+                      <Label htmlFor="date" className="text-xs">Date</Label>
+                      <Input
+                        id="date"
+                        name="date"
+                        type="date"
+                        value={formData.date}
+                        onChange={handleInputChange}
+                        className="h-9"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Médicaments */}
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
+                      Prescription
+                    </h4>
+                    <span className="text-[10px] text-muted-foreground">
+                      Médicament • Posologie • Durée
+                    </span>
+                  </div>
+
+                  <Textarea
+                    name="medicaments"
+                    rows={6}
+                    placeholder={`Exemple :
+        1. Amoxicilline 500mg - 1 comprimé 3x/jour - 7 jours
+        2. Paracétamol 1000mg - 1 comprimé si douleur - max 3/jour
+        3. ...`}
+                    value={formData.medicaments}
+                    onChange={handleInputChange}
+                    className="resize-none font-mono text-sm leading-relaxed min-h-[120px]"
+                  />
+                </div>
+
+                {/* Actions */}
+                <div className="flex items-center justify-between pt-2 border-t">
+                  <DialogClose asChild>
+                    <Button variant="ghost" size="sm">Fermer</Button>
+                  </DialogClose>
+
+                  <Button onClick={handlePrint} size="sm" className="gap-2">
+                    <Printer className="h-3.5 w-3.5" />
+                    Imprimer l'ordonnance
+                  </Button>
                 </div>
               </div>
             )}
-            <div className="flex justify-end mt-4">
-              <DialogClose asChild>
-                <Button variant="outline">Fermer</Button>
-              </DialogClose>
-            </div>
           </DialogContent>
         </Dialog>
 
-        <Dialog open={consultationOpen} onOpenChange={setConsultationOpen}>
-          <DialogContent className="dialog-print-hide max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>CONSULTATION MÉDICALE</DialogTitle>
-              <DialogDescription>مقابلة مع الطبيب العام</DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-1">Numéro de Consultation:</label>
-                  <input
-                    className="border p-2 w-full"
-                    name="consultationNumber"
-                    placeholder="Numéro de consultation"
-                    value={consultationData.consultationNumber}
-                    onChange={handleConsultationInput}
-                  />
+        {/* ========== PRINT AREA FOR ORDONNANCE ========== */}
+        {open && selectedType?.title === 'Ordonnance' && (
+          <div className="print-area hidden">
+            <div className="font-sans text-black bg-white mx-auto p-6" style={{ width: '13.8cm', height: '20cm' }}>
+              
+              {/* Header */}
+              <div className="flex justify-between items-start mb-6">
+                <div className="text-xs space-y-0.5">
+                  <div className="flex items-center gap-1.5 mb-1">
+                    <span className="bg-black text-white font-bold text-xs px-1.5 py-0.5 rounded">S</span>
+                    <span className="font-bold tracking-tight">sonatrach</span>
+                  </div>
+                  <div className="font-semibold">Direction Régionale Haoud Berkaoui</div>
+                  <div>Centre de Médecine de Travail</div>
+                  <div className="mt-2">Nom du Médecin</div>
+                  <div className="text-muted-foreground text-xs">(Cachet)</div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Numéro de Visite:</label>
-                  <input
-                    className="border p-2 w-full"
-                    name="visitNumber"
-                    placeholder="Numéro de visite"
-                    value={consultationData.visitNumber}
-                    onChange={handleConsultationInput}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Date:</label>
-                  <input
-                    type="date"
-                    className="border p-2 w-full"
-                    name="date"
-                    value={consultationData.date}
-                    onChange={handleConsultationInput}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Médecin:</label>
-                  <input
-                    className="border p-2 w-full"
-                    name="doctor"
-                    placeholder="Nom du médecin"
-                    value={consultationData.doctor}
-                    onChange={handleConsultationInput}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Spécialité:</label>
-                  <input
-                    className="border p-2 w-full"
-                    name="specialty"
-                    placeholder="Spécialité médicale"
-                    value={consultationData.specialty}
-                    onChange={handleConsultationInput}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium mb-1">Nature de Consultation:</label>
-                  <input
-                    className="border p-2 w-full"
-                    name="natureConsultation"
-                    placeholder="Type de consultation"
-                    value={consultationData.natureConsultation}
-                    onChange={handleConsultationInput}
-                  />
+
+                <div className="text-right">
+                  <div className="font-bold text-base underline underline-offset-2 mb-1">ORDONNANCE MÉDICALE</div>
+                  <div className="text-xs text-gray-600">وصفة طبية</div>
                 </div>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Diagnostic:</label>
+
+              {/* Patient Info */}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-2 mb-6 text-sm">
+                <div className="flex gap-2">
+                  <span className="font-semibold min-w-[60px]">Nom :</span>
+                  <span className="border-b border-black flex-1 px-1">{formData.nom || '—'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold min-w-[70px]">Prénom :</span>
+                  <span className="border-b border-black flex-1 px-1">{formData.prenoms || '—'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold min-w-[60px]">Âge :</span>
+                  <span className="border-b border-black flex-1 px-1">{formData.age || '—'}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="font-semibold min-w-[70px]">Date :</span>
+                  <span className="border-b border-black flex-1 px-1">{formData.date || '—'}</span>
+                </div>
+              </div>
+
+              {/* Médicaments */}
+              <div className="mb-2">
+                <div className="font-semibold text-sm mb-1">Prescription :</div>
+                <div className="border border-black rounded p-3 min-h-[280px] text-sm leading-relaxed whitespace-pre-wrap">
+                  {formData.medicaments || 'Aucune prescription renseignée'}
+                </div>
+              </div>
+
+              {/* Footer / Signature */}
+              <div className="flex justify-end mt-10">
+                <div className="text-center">
+                  <div className="font-bold text-sm mb-8">LE MÉDECIN</div>
+                  <div className="border-t border-black w-40 pt-1 text-xs">Cachet & Signature</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        <Dialog open={consultationOpen} onOpenChange={setConsultationOpen}>
+          <DialogContent className="dialog-print-hide max-w-lg p-0 gap-0 overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-primary/10 via-primary/5 to-transparent px-4 pt-4 pb-3 border-b">
+              <DialogHeader className="space-y-1">
+                <DialogTitle className="text-lg font-semibold tracking-tight flex items-center gap-2">
+                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/15 text-primary">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M11 2v2" />
+                      <path d="M5 2v2" />
+                      <path d="M5 3H4a2 2 0 0 0-2 2v4a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6V5a2 2 0 0 0-2-2h-1" />
+                      <path d="M8 15a6 6 0 0 0 6 6v0a6 6 0 0 0 6-6" />
+                      <circle cx="20" cy="12" r="2" />
+                    </svg>
+                  </span>
+                  CONSULTATION MÉDICALE
+                </DialogTitle>
+                <DialogDescription className="text-xs text-muted-foreground">
+                  مقابلة مع الطبيب العام
+                </DialogDescription>
+              </DialogHeader>
+            </div>
+
+            <div className="px-4 py-4 space-y-4">
+              {/* Section: Informations de base */}
+              <section>
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Informations de base
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium leading-none">
+                      Numéro de Consultation
+                    </label>
+                    <input
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                      name="consultationNumber"
+                      placeholder="Ex: CONS-2024-001"
+                      value={consultationData.consultationNumber}
+                      onChange={handleConsultationInput}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium leading-none">
+                      Numéro de Visite
+                    </label>
+                    <input
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                      name="visitNumber"
+                      placeholder="Ex: VIS-001"
+                      value={consultationData.visitNumber}
+                      onChange={handleConsultationInput}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium leading-none">Date</label>
+                    <input
+                      type="date"
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                      name="date"
+                      value={consultationData.date}
+                      onChange={handleConsultationInput}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium leading-none">Médecin</label>
+                    <input
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                      name="doctor"
+                      placeholder="Nom du médecin"
+                      value={consultationData.doctor}
+                      onChange={handleConsultationInput}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium leading-none">Spécialité</label>
+                    <input
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                      name="specialty"
+                      placeholder="Médecine générale..."
+                      value={consultationData.specialty}
+                      onChange={handleConsultationInput}
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label className="text-xs font-medium leading-none">
+                      Nature de Consultation
+                    </label>
+                    <input
+                      className="flex h-9 w-full rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                      name="natureConsultation"
+                      placeholder="Première visite, Suivi..."
+                      value={consultationData.natureConsultation}
+                      onChange={handleConsultationInput}
+                    />
+                  </div>
+                </div>
+              </section>
+
+              {/* Section: Diagnostic */}
+              <section>
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Diagnostic
+                </h3>
                 <textarea
-                  className="border p-2 w-full"
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-2.5 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 resize-none transition-colors"
                   name="diagnostic"
-                  rows={4}
-                  placeholder="Diagnostic médical..."
+                  rows={3}
+                  placeholder="Décrivez le diagnostic médical..."
                   value={consultationData.diagnostic}
                   onChange={handleConsultationInput}
                 />
+              </section>
+
+              {/* Section: Arrêt de travail */}
+              <section>
+                <h3 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+                  Arrêt de travail
+                </h3>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="number"
+                    min={0}
+                    className="flex h-9 w-24 rounded-md border border-input bg-background px-2.5 py-1.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                    name="workStoppageDays"
+                    placeholder="0"
+                    value={consultationData.workStoppageDays}
+                    onChange={handleConsultationInput}
+                  />
+                  <span className="text-xs text-muted-foreground">jours d’arrêt</span>
+                </div>
+              </section>
+            </div>
+
+            {/* Footer */}
+            <div className="flex items-center justify-between gap-3 px-4 py-3 border-t bg-muted/30">
+              <div className="flex flex-col">
+                <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                  Signature
+                </span>
+                <span className="text-sm font-semibold">LE MÉDECIN</span>
               </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Nombre de Jours - Arrêt de Travail:</label>
-                <input
-                  className="border p-2 w-full"
-                  name="workStoppageDays"
-                  placeholder="Nombre de jours"
-                  value={consultationData.workStoppageDays}
-                  onChange={handleConsultationInput}
-                />
-                <span className="text-sm text-gray-500 ml-2">jours</span>
+
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConsultationOpen(false)}
+                  className="min-w-[80px]"
+                >
+                  Fermer
+                </Button>
+                <Button size="sm" onClick={handleSave} className="min-w-[95px]">
+                  Enregistrer
+                </Button>
               </div>
-              <div className="flex justify-between mt-4">
-                <span className="font-bold">LE MÉDECIN</span>
-                <Button onClick={handleSave}>Enregistrer</Button>
-              </div>
-              {/* <div className="flex justify-end">
-                <DialogClose asChild>
-                  <Button variant="outline">Fermer</Button>
-                </DialogClose>
-              </div> */}
             </div>
           </DialogContent>
         </Dialog>
@@ -744,63 +975,151 @@ const NouvelleConsultation: React.FC = () => {
           </div>
         )}
 
-        <Dialog open={orientationOpen} onOpenChange={setOrientationOpen}>
-          <DialogContent className="dialog-print-hide max-w-lg">
-            <DialogHeader>
-              <DialogTitle>LETTRE D'ORIENTATION</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-2">
-              <div className="flex flex-row justify-between items-center mb-2">
-                <div>
-                  <div className="font-bold text-xs">ENTREPRISE NATIONALE SONATRACH</div>
-                  <div className="text-xs">EXPLORATION - PRODUCTION</div>
-                  <div className="text-xs">DIVISION PRODUCTION</div>
-                  <div className="text-xs">DIRECTION REGIONAL HBK</div>
-                  <div className="text-xs">C.M.S</div>
-                </div>
-                <div className="w-16 h-16 bg-gray-200 flex items-center justify-center font-bold text-lg">S</div>
-              </div>
-              <div className="grid grid-cols-3 gap-2 mb-2">
-                <input className="border-b border-black px-1 col-span-1" name="nom" placeholder="Nom" value={orientationData.nom} onChange={handleOrientationInput} />
-                <input className="border-b border-black px-1 col-span-1" name="prenom" placeholder="Prénom" value={orientationData.prenom} onChange={handleOrientationInput} />
-                <input className="border-b border-black px-1 col-span-1" name="age" placeholder="Age" value={orientationData.age} onChange={handleOrientationInput} />
-              </div>
-              <div className="font-bold text-center my-2">LETTRE D'ORIENTATION</div>
-              <div className="mb-2">
-                <div className="font-semibold mb-1">Nature de visite :</div>
-                <div className="flex flex-col gap-1">
-                  {natureOptions.map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 text-sm">
-                      <input type="checkbox" name="nature" value={opt} checked={orientationData.nature.includes(opt)} onChange={handleOrientationInput} />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
-              </div>
-              <div className="mb-2">
-                <span>Le/La susnommé(e) nécessite un avis / consultation en </span>
-                <input className="border-b border-black px-1 w-40" name="avis" value={orientationData.avis} onChange={handleOrientationInput} placeholder="spécialité" />
-              </div>
-              <div className="mb-2">
-                <span>Le docteur destinataire : </span>
-                <input className="border-b border-black px-1 w-40" name="destinataire" value={orientationData.destinataire} onChange={handleOrientationInput} placeholder="Nom du docteur" />
-              </div>
-              <div className="mb-2">
-                <span>Date : </span>
-                <input type="date" className="border-b border-black px-1 w-40" name="date" value={orientationData.date} onChange={handleOrientationInput} />
-              </div>
-              <div className="flex justify-between mt-4">
-                <span className="font-bold">LE MEDECIN</span>
-                <Button onClick={handlePrint}>Imprimer</Button>
-              </div>
-              <div className="flex justify-end mt-2">
-                <DialogClose asChild>
-                  <Button variant="outline">Fermer</Button>
-                </DialogClose>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+<Dialog open={orientationOpen} onOpenChange={setOrientationOpen}>
+  <DialogContent className="dialog-print-hide max-w-2xl max-h-[90vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle className="text-center text-xl font-bold tracking-wide">
+        LETTRE D'ORIENTATION
+      </DialogTitle>
+    </DialogHeader>
+
+    <div className="space-y-6 text-sm">
+      {/* En-tête officiel */}
+      <div className="flex justify-between items-start border-b pb-4">
+        <div className="space-y-0.5 text-xs leading-tight">
+          <div className="font-bold uppercase">Entreprise Nationale Sonatrach</div>
+          <div>Exploration – Production</div>
+          <div>Division Production</div>
+          <div>Direction Régionale HBK</div>
+          <div>C.M.S</div>
+        </div>
+
+        {/* Logo placeholder */}
+        <div className="w-16 h-16 bg-gray-100 border border-gray-300 rounded flex items-center justify-center font-bold text-xl text-gray-500">
+          S
+        </div>
+      </div>
+
+      {/* Informations patient */}
+      <div>
+        <h3 className="font-semibold mb-3 text-base border-b pb-1">
+          Informations du patient
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="flex items-center gap-2">
+            <label className="w-16 shrink-0 font-medium">Nom :</label>
+            <input
+              name="nom"
+              value={orientationData.nom}
+              onChange={handleOrientationInput}
+              placeholder="Nom"
+              className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="w-16 shrink-0 font-medium">Prénom :</label>
+            <input
+              name="prenom"
+              value={orientationData.prenom}
+              onChange={handleOrientationInput}
+              placeholder="Prénom"
+              className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <label className="w-16 shrink-0 font-medium">Âge :</label>
+            <input
+              name="age"
+              type="number"
+              min={0}
+              value={orientationData.age}
+              onChange={handleOrientationInput}
+              placeholder="Âge"
+              className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+            />
+          </div>
+        </div>
+      </div>
+
+      {/* Nature de visite */}
+      <div>
+        <h3 className="font-semibold mb-3 text-base border-b pb-1">
+          Nature de visite
+        </h3>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          {natureOptions.map((opt) => (
+            <label
+              key={opt}
+              className="flex items-center gap-2 text-sm cursor-pointer hover:bg-gray-50 rounded px-1 py-0.5"
+            >
+              <input
+                type="checkbox"
+                name="nature"
+                value={opt}
+                checked={orientationData.nature.includes(opt)}
+                onChange={handleOrientationInput}
+                className="w-4 h-4"
+              />
+              {opt}
+            </label>
+          ))}
+        </div>
+      </div>
+
+      {/* Orientation */}
+      <div className="space-y-4">
+        <div className="flex flex-wrap items-center gap-2">
+          <span>Le/La susnommé(e) nécessite un avis / consultation en</span>
+          <input
+            name="avis"
+            value={orientationData.avis}
+            onChange={handleOrientationInput}
+            placeholder="spécialité"
+            className="border-b border-gray-400 bg-transparent py-1 w-48 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="font-medium">Le docteur destinataire :</span>
+          <input
+            name="destinataire"
+            value={orientationData.destinataire}
+            onChange={handleOrientationInput}
+            placeholder="Nom du docteur"
+            className="border-b border-gray-400 bg-transparent py-1 w-48 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="font-medium">Date :</span>
+          <input
+            type="date"
+            name="date"
+            value={orientationData.date}
+            onChange={handleOrientationInput}
+            className="border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+      </div>
+
+      {/* Signature + Actions */}
+      <div className="flex items-center justify-between pt-5 border-t">
+        <span className="font-bold text-base">LE MÉDECIN</span>
+
+        <div className="flex gap-3">
+          <Button onClick={handlePrint} className="min-w-[110px]">
+            Imprimer
+          </Button>
+          <DialogClose asChild>
+            <Button variant="outline" className="min-w-[110px]">
+              Fermer
+            </Button>
+          </DialogClose>
+        </div>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
         {orientationOpen && (
           <div className="print-area hidden">
             <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
@@ -848,64 +1167,287 @@ const NouvelleConsultation: React.FC = () => {
         )}
 
         <Dialog open={soinsOpen} onOpenChange={setSoinsOpen}>
-          <DialogContent className="dialog-print-hide max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>CERTIFICAT MEDICAL DE SOINS</DialogTitle>
-            </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-row justify-between items-center mb-2">
-                <div className="font-bold text-lg">CERTIFICAT MEDICAL DE</div>
-                <div className="flex flex-col text-xs border border-black p-2">
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="1" checked={soinsData.choix === '1'} onChange={handleSoinsInput} /> 1 Arrêt de travail</label>
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="2" checked={soinsData.choix === '2'} onChange={handleSoinsInput} /> 2 Prolongation</label>
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="3" checked={soinsData.choix === '3'} onChange={handleSoinsInput} /> 3 Reprise de travail</label>
-                  <label className="flex items-center gap-1"><input type="radio" name="choix" value="4" checked={soinsData.choix === '4'} onChange={handleSoinsInput} /> 4 Hospitalisation</label>
-                </div>
-                <div className="text-red-600 font-bold text-lg ml-4">N° <input className="border-b border-black w-20" name="signature" value={soinsData.signature} onChange={handleSoinsInput} placeholder="Numéro" /></div>
-              </div>
-              <div className="grid grid-cols-2 gap-4 mb-2">
-                <div>
-                  <div>Emis le : <input type="date" className="border-b border-black" name="emisLe" value={soinsData.emisLe} onChange={handleSoinsInput} /></div>
-                  <div>Par le docteur : <input className="border-b border-black" name="docteur" value={soinsData.docteur} onChange={handleSoinsInput} /></div>
-                </div>
-                <div>
-                  <div>Nom : <input className="border-b border-black" name="nom" value={soinsData.nom} onChange={handleSoinsInput} /></div>
-                  <div>Date accident ou maladie : <input className="border-b border-black" name="dateAccident" value={soinsData.dateAccident} onChange={handleSoinsInput} /></div>
-                </div>
-                <div>
-                  <div>Service Employeur : <input className="border-b border-black" name="service" value={soinsData.service} onChange={handleSoinsInput} /></div>
-                  <div>Compagnie : <input className="border-b border-black" name="compagnie" value={soinsData.compagnie} onChange={handleSoinsInput} /></div>
-                </div>
-              </div>
-              <div className="font-bold my-2">Je soussigné, Docteur en Médecine, Certifie que l'état de santé du susnommé justifie :</div>
-              <div className="border border-black p-4 mb-2 flex flex-col gap-3">
-                {soinsData.choix === '1' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">1</span> Traitement avec arrêt de travail de <input className="border-b border-black w-12" name="arretJours" value={soinsData.arretJours} onChange={handleSoinsInput} /> jours, sauf complications, du <input className="border-b border-black w-24" name="arretDu" value={soinsData.arretDu} onChange={handleSoinsInput} /> au <input className="border-b border-black w-24" name="arretAu" value={soinsData.arretAu} onChange={handleSoinsInput} /></div>
-                )}
-                {soinsData.choix === '2' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">2</span> Prolongation d'arrêt de travail de <input className="border-b border-black w-12" name="prolongationJours" value={soinsData.prolongationJours} onChange={handleSoinsInput} /> jours, sauf complications, du <input className="border-b border-black w-24" name="prolongationDu" value={soinsData.prolongationDu} onChange={handleSoinsInput} /> au <input className="border-b border-black w-24" name="prolongationAu" value={soinsData.prolongationAu} onChange={handleSoinsInput} /></div>
-                )}
-                {soinsData.choix === '3' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">3</span> Reprise de travail à dater du <input className="border-b border-black w-24" name="repriseDate" value={soinsData.repriseDate} onChange={handleSoinsInput} /></div>
-                )}
-                {soinsData.choix === '4' && (
-                  <div className="flex flex-wrap items-center gap-2"><span className="font-bold">4</span> Admission ou transport d'urgence à l'hôpital ou à la clinique de <input className="border-b border-black w-40" name="admissionLieu" value={soinsData.admissionLieu} onChange={handleSoinsInput} /></div>
-                )}
-              </div>
-              <div className="flex flex-row justify-between mt-4 text-xs">
-                <div>Cachet du Médecin</div>
-                <div>Ces exemplaires doivent être remis à : <input className="border-b border-black w-40" name="exemplaires" value={soinsData.exemplaires} onChange={handleSoinsInput} /></div>
-                <div>Signature du Médecin</div>
-              </div>
-              <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handlePrint}>Imprimer</Button>
-                <DialogClose asChild>
-                  <Button variant="outline">Fermer</Button>
-                </DialogClose>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+  <DialogContent className="dialog-print-hide max-w-3xl max-h-[90vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle className="text-center text-xl font-bold tracking-wide">
+        CERTIFICAT MÉDICAL DE SOINS
+      </DialogTitle>
+    </DialogHeader>
+
+    <div className="space-y-6 text-sm">
+      {/* En-tête + Type de certificat + Numéro */}
+      <div className="flex flex-col sm:flex-row justify-between items-start gap-4 border-b pb-4">
+        <div className="font-bold text-lg leading-tight">
+          CERTIFICAT MÉDICAL DE
+        </div>
+
+        {/* Choix du type */}
+        <div className="border border-black rounded-md p-3 space-y-1.5 min-w-[200px]">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="choix"
+              value="1"
+              checked={soinsData.choix === "1"}
+              onChange={handleSoinsInput}
+              className="w-4 h-4"
+            />
+            1 - Arrêt de travail
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="choix"
+              value="2"
+              checked={soinsData.choix === "2"}
+              onChange={handleSoinsInput}
+              className="w-4 h-4"
+            />
+            2 - Prolongation
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="choix"
+              value="3"
+              checked={soinsData.choix === "3"}
+              onChange={handleSoinsInput}
+              className="w-4 h-4"
+            />
+            3 - Reprise de travail
+          </label>
+          <label className="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              name="choix"
+              value="4"
+              checked={soinsData.choix === "4"}
+              onChange={handleSoinsInput}
+              className="w-4 h-4"
+            />
+            4 - Hospitalisation
+          </label>
+        </div>
+
+        {/* Numéro */}
+        <div className="flex items-center gap-2 text-red-600 font-bold text-lg">
+          <span>N°</span>
+          <input
+            name="signature"
+            value={soinsData.signature}
+            onChange={handleSoinsInput}
+            placeholder="Numéro"
+            className="border-b-2 border-red-600 bg-transparent w-24 text-center focus:outline-none"
+          />
+        </div>
+      </div>
+
+      {/* Informations générales */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+        <div className="flex items-center gap-2">
+          <label className="w-40 shrink-0 font-medium">Émis le :</label>
+          <input
+            type="date"
+            name="emisLe"
+            value={soinsData.emisLe}
+            onChange={handleSoinsInput}
+            className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="w-40 shrink-0 font-medium">Par le docteur :</label>
+          <input
+            name="docteur"
+            value={soinsData.docteur}
+            onChange={handleSoinsInput}
+            className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="w-40 shrink-0 font-medium">Nom du patient :</label>
+          <input
+            name="nom"
+            value={soinsData.nom}
+            onChange={handleSoinsInput}
+            className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="w-40 shrink-0 font-medium">Date accident / maladie :</label>
+          <input
+            type="date"
+            name="dateAccident"
+            value={soinsData.dateAccident}
+            onChange={handleSoinsInput}
+            className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="w-40 shrink-0 font-medium">Service Employeur :</label>
+          <input
+            name="service"
+            value={soinsData.service}
+            onChange={handleSoinsInput}
+            className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="w-40 shrink-0 font-medium">Compagnie :</label>
+          <input
+            name="compagnie"
+            value={soinsData.compagnie}
+            onChange={handleSoinsInput}
+            className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+          />
+        </div>
+      </div>
+
+      {/* Texte de certification */}
+      <div className="font-medium leading-relaxed border-t pt-4">
+        Je soussigné, Docteur en Médecine, certifie que l'état de santé du
+        susnommé justifie :
+      </div>
+
+      {/* Contenu dynamique selon le choix */}
+      <div className="border border-black rounded-md p-5 bg-gray-50/50 min-h-[80px]">
+        {soinsData.choix === "1" && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            <span className="font-bold text-base">1.</span>
+            <span>Traitement avec arrêt de travail de</span>
+            <input
+              name="arretJours"
+              value={soinsData.arretJours}
+              onChange={handleSoinsInput}
+              className="border-b border-black w-14 text-center bg-transparent focus:outline-none"
+              placeholder="__"
+            />
+            <span>jours, sauf complications, du</span>
+            <input
+              type="date"
+              name="arretDu"
+              value={soinsData.arretDu}
+              onChange={handleSoinsInput}
+              className="border-b border-black bg-transparent focus:outline-none"
+            />
+            <span>au</span>
+            <input
+              type="date"
+              name="arretAu"
+              value={soinsData.arretAu}
+              onChange={handleSoinsInput}
+              className="border-b border-black bg-transparent focus:outline-none"
+            />
+          </div>
+        )}
+
+        {soinsData.choix === "2" && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            <span className="font-bold text-base">2.</span>
+            <span>Prolongation d'arrêt de travail de</span>
+            <input
+              name="prolongationJours"
+              value={soinsData.prolongationJours}
+              onChange={handleSoinsInput}
+              className="border-b border-black w-14 text-center bg-transparent focus:outline-none"
+              placeholder="__"
+            />
+            <span>jours, sauf complications, du</span>
+            <input
+              type="date"
+              name="prolongationDu"
+              value={soinsData.prolongationDu}
+              onChange={handleSoinsInput}
+              className="border-b border-black bg-transparent focus:outline-none"
+            />
+            <span>au</span>
+            <input
+              type="date"
+              name="prolongationAu"
+              value={soinsData.prolongationAu}
+              onChange={handleSoinsInput}
+              className="border-b border-black bg-transparent focus:outline-none"
+            />
+          </div>
+        )}
+
+        {soinsData.choix === "3" && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            <span className="font-bold text-base">3.</span>
+            <span>Reprise de travail à dater du</span>
+            <input
+              type="date"
+              name="repriseDate"
+              value={soinsData.repriseDate}
+              onChange={handleSoinsInput}
+              className="border-b border-black bg-transparent focus:outline-none"
+            />
+          </div>
+        )}
+
+        {soinsData.choix === "4" && (
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-2">
+            <span className="font-bold text-base">4.</span>
+            <span>Admission ou transport d'urgence à l'hôpital ou à la clinique de</span>
+            <input
+              name="admissionLieu"
+              value={soinsData.admissionLieu}
+              onChange={handleSoinsInput}
+              className="border-b border-black w-48 bg-transparent focus:outline-none"
+              placeholder="Nom de l'établissement"
+            />
+          </div>
+        )}
+
+        {!soinsData.choix && (
+          <div className="text-gray-400 italic text-center py-2">
+            Veuillez sélectionner un type de certificat ci-dessus
+          </div>
+        )}
+      </div>
+
+      {/* Pied de page */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs pt-4 border-t">
+        <div className="text-center">
+          <div className="font-medium mb-8">Cachet du Médecin</div>
+          <div className="border-t border-dashed border-gray-400 w-32 mx-auto"></div>
+        </div>
+
+        <div className="text-center">
+          <div className="mb-2">Ces exemplaires doivent être remis à :</div>
+          <input
+            name="exemplaires"
+            value={soinsData.exemplaires}
+            onChange={handleSoinsInput}
+            className="border-b border-gray-400 bg-transparent w-full text-center focus:outline-none"
+            placeholder="..."
+          />
+        </div>
+
+        <div className="text-center">
+          <div className="font-medium mb-8">Signature du Médecin</div>
+          <div className="border-t border-dashed border-gray-400 w-32 mx-auto"></div>
+        </div>
+      </div>
+
+      {/* Boutons d'action */}
+      <div className="flex justify-end gap-3 pt-2">
+        <Button onClick={handlePrint} className="min-w-[110px]">
+          Imprimer
+        </Button>
+        <DialogClose asChild>
+          <Button variant="outline" className="min-w-[110px]">
+            Fermer
+          </Button>
+        </DialogClose>
+      </div>
+    </div>
+  </DialogContent>
+</Dialog>
         {soinsOpen && (
           <div className="print-area hidden">
             <div className="font-sans text-black bg-white mx-auto p-8" style={{ width: '14.8cm', height: '21cm' }}>
@@ -960,66 +1502,283 @@ const NouvelleConsultation: React.FC = () => {
         )}
 
         <Dialog open={evacOpen} onOpenChange={setEvacOpen}>
-          <DialogContent className="dialog-print-hide max-w-2xl">
+          <DialogContent className="dialog-print-hide max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>EVACUATION SANITAIRE</DialogTitle>
+              <DialogTitle className="text-center text-xl font-bold tracking-wide">
+                ÉVACUATION SANITAIRE
+              </DialogTitle>
             </DialogHeader>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-row justify-between items-center mb-2">
-                <div>
-                  <div className="font-bold text-xs">sonatrach</div>
-                  <div className="text-xs">EXPLORATION – PRODUCTION</div>
-                  <div className="text-xs">DIRECTION REGIONAL</div>
-                  <div className="text-xs">HAOUD BERKAOUI</div>
-                  <div className="text-xs">DIVISION PERSONNEL</div>
-                  <div className="text-xs">SERVICE SANTE/CMT</div>
+
+            <div className="space-y-6 text-sm">
+              {/* En-tête officiel */}
+              <div className="flex justify-between items-start border-b pb-4">
+                <div className="space-y-0.5 text-xs leading-tight">
+                  <div className="font-bold uppercase">Sonatrach</div>
+                  <div>Exploration – Production</div>
+                  <div>Direction Régionale</div>
+                  <div>Haoud Berkaoui</div>
+                  <div>Division Personnel</div>
+                  <div>Service Santé / CMT</div>
                 </div>
-                <div className="text-xs">Haoud Berkaoui Le : <input type="date" className="border-b border-black" name="date" value={evacData.date} onChange={handleEvacInput} /></div>
-              </div>
-              <div className="text-center font-bold text-lg my-2 border-b border-black">EVACUATION SANITAIRE</div>
-              <div className="grid grid-cols-2 gap-4 mb-2">
-                <div>Nom : <input className="border-b border-black" name="nom" value={evacData.nom} onChange={handleEvacInput} /></div>
-                <div>Prénom : <input className="border-b border-black" name="prenom" value={evacData.prenom} onChange={handleEvacInput} /></div>
-                <div>Fonction : <input className="border-b border-black" name="fonction" value={evacData.fonction} onChange={handleEvacInput} /></div>
-                <div>Structure : <input className="border-b border-black" name="structure" value={evacData.structure} onChange={handleEvacInput} /></div>
-              </div>
-              <div className="font-bold">Doit être évacué :</div>
-              <div className="grid grid-cols-2 gap-4 mb-2">
-                <div>Son domicile : <input className="border-b border-black" name="domicile" value={evacData.domicile} onChange={handleEvacInput} /></div>
-                <div>vers l'hôpital de : <input className="border-b border-black" name="hopital" value={evacData.hopital} onChange={handleEvacInput} /></div>
-                <div>Un spécialiste en : <input className="border-b border-black" name="specialiste" value={evacData.specialiste} onChange={handleEvacInput} /></div>
-                <div>Délai : <input className="border-b border-black" name="delai" value={evacData.delai} onChange={handleEvacInput} /></div>
-              </div>
-              <div className="flex gap-4 items-center mb-2">
-                <label className="flex items-center gap-1"><input type="checkbox" name="maladie" checked={evacData.maladie} onChange={handleEvacInput} /> Maladie</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="accident" checked={evacData.accident} onChange={handleEvacInput} /> Accident du Travail</label>
-                <div>Autres à préciser : <input className="border-b border-black" name="autres" value={evacData.autres} onChange={handleEvacInput} /></div>
-              </div>
-              <div className="font-bold">Moyens de transport à utiliser :</div>
-              <div className="flex gap-4 items-center mb-2">
-                <label className="flex items-center gap-1"><input type="checkbox" name="transport.avion" checked={evacData.transport.avion} onChange={handleEvacInput} /> Avion</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="transport.ambulance" checked={evacData.transport.ambulance} onChange={handleEvacInput} /> Ambulance</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="transport.sh" checked={evacData.transport.sh} onChange={handleEvacInput} /> Véhicule SH</label>
-                <label className="flex items-center gap-1"><input type="checkbox" name="transport.propres" checked={evacData.transport.propres} onChange={handleEvacInput} /> Propres Moyens</label>
-              </div>
-              <div className="font-bold">Accompagné par :</div>
-              <div className="flex gap-8 items-center mb-2">
-                <div>L'infirmier :
-                  <label className="ml-2"><input type="radio" name="inf" value="oui" checked={evacData.inf === 'oui'} onChange={handleEvacInput} /> Oui</label>
-                  <label className="ml-2"><input type="radio" name="inf" value="non" checked={evacData.inf === 'non'} onChange={handleEvacInput} /> Non</label>
-                </div>
-                <div>L'assistant(e) :
-                  <label className="ml-2"><input type="radio" name="assistant" value="oui" checked={evacData.assistant === 'oui'} onChange={handleEvacInput} /> Oui</label>
-                  <label className="ml-2"><input type="radio" name="assistant" value="non" checked={evacData.assistant === 'non'} onChange={handleEvacInput} /> Non</label>
+
+                <div className="flex items-center gap-2 text-xs">
+                  <span>Haoud Berkaoui, le :</span>
+                  <input
+                    type="date"
+                    name="date"
+                    value={evacData.date}
+                    onChange={handleEvacInput}
+                    className="border-b border-black bg-transparent px-1 focus:outline-none"
+                  />
                 </div>
               </div>
-              <div className="flex justify-end mt-4 gap-2">
-                <Button onClick={handlePrint}>Imprimer</Button>
-                <DialogClose asChild>
-                  <Button variant="outline">Fermer</Button>
-                </DialogClose>
+
+              {/* Informations du patient */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Informations du patient
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Nom :</label>
+                    <input
+                      name="nom"
+                      value={evacData.nom}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Prénom :</label>
+                    <input
+                      name="prenom"
+                      value={evacData.prenom}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Fonction :</label>
+                    <input
+                      name="fonction"
+                      value={evacData.fonction}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Structure :</label>
+                    <input
+                      name="structure"
+                      value={evacData.structure}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="text-end font-bold mt-4">Le Médecin</div>
+
+              {/* Destination */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Doit être évacué
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="w-36 shrink-0 font-medium">Son domicile :</label>
+                    <input
+                      name="domicile"
+                      value={evacData.domicile}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-36 shrink-0 font-medium">Vers l'hôpital de :</label>
+                    <input
+                      name="hopital"
+                      value={evacData.hopital}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-36 shrink-0 font-medium">Spécialiste en :</label>
+                    <input
+                      name="specialiste"
+                      value={evacData.specialiste}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <label className="w-36 shrink-0 font-medium">Délai :</label>
+                    <input
+                      name="delai"
+                      value={evacData.delai}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Motif */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">Motif</h3>
+                <div className="flex flex-wrap items-center gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="maladie"
+                      checked={evacData.maladie}
+                      onChange={handleEvacInput}
+                      className="w-4 h-4"
+                    />
+                    Maladie
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="accident"
+                      checked={evacData.accident}
+                      onChange={handleEvacInput}
+                      className="w-4 h-4"
+                    />
+                    Accident du Travail
+                  </label>
+                  <div className="flex items-center gap-2 flex-1 min-w-[200px]">
+                    <span className="font-medium whitespace-nowrap">Autres à préciser :</span>
+                    <input
+                      name="autres"
+                      value={evacData.autres}
+                      onChange={handleEvacInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Moyens de transport */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Moyens de transport à utiliser
+                </h3>
+                <div className="flex flex-wrap gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="transport.avion"
+                      checked={evacData.transport?.avion}
+                      onChange={handleEvacInput}
+                      className="w-4 h-4"
+                    />
+                    Avion
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="transport.ambulance"
+                      checked={evacData.transport?.ambulance}
+                      onChange={handleEvacInput}
+                      className="w-4 h-4"
+                    />
+                    Ambulance
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="transport.sh"
+                      checked={evacData.transport?.sh}
+                      onChange={handleEvacInput}
+                      className="w-4 h-4"
+                    />
+                    Véhicule SH
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="transport.propres"
+                      checked={evacData.transport?.propres}
+                      onChange={handleEvacInput}
+                      className="w-4 h-4"
+                    />
+                    Propres Moyens
+                  </label>
+                </div>
+              </div>
+
+              {/* Accompagnement */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Accompagné par
+                </h3>
+                <div className="flex flex-wrap gap-10">
+                  <div className="flex items-center gap-4">
+                    <span className="font-medium">L'infirmier :</span>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="inf"
+                        value="oui"
+                        checked={evacData.inf === "oui"}
+                        onChange={handleEvacInput}
+                      />
+                      Oui
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="inf"
+                        value="non"
+                        checked={evacData.inf === "non"}
+                        onChange={handleEvacInput}
+                      />
+                      Non
+                    </label>
+                  </div>
+
+                  <div className="flex items-center gap-4">
+                    <span className="font-medium">L'assistant(e) :</span>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="assistant"
+                        value="oui"
+                        checked={evacData.assistant === "oui"}
+                        onChange={handleEvacInput}
+                      />
+                      Oui
+                    </label>
+                    <label className="flex items-center gap-1.5 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="assistant"
+                        value="non"
+                        checked={evacData.assistant === "non"}
+                        onChange={handleEvacInput}
+                      />
+                      Non
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Signature + Actions */}
+              <div className="flex items-center justify-between pt-6 border-t mt-4">
+                <div className="font-bold text-base">Le Médecin</div>
+
+                <div className="flex gap-3">
+                  <Button onClick={handlePrint} className="min-w-[110px]">
+                    Imprimer
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline" className="min-w-[110px]">
+                      Fermer
+                    </Button>
+                  </DialogClose>
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
@@ -1074,100 +1833,163 @@ const NouvelleConsultation: React.FC = () => {
         )}
 
         <Dialog open={explorationOpen} onOpenChange={setExplorationOpen}>
-          <DialogContent className="dialog-print-hide max-w-2xl">
+          <DialogContent className="dialog-print-hide max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>DEMANDE D'ANALYSE MÉDICALE</DialogTitle>
-              <DialogDescription>طلب تحاليل أو فحوصات مخبرية</DialogDescription>
+              <DialogTitle className="text-center text-xl font-bold tracking-wide">
+                DEMANDE D'ANALYSE MÉDICALE
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                طلب تحاليل أو فحوصات مخبرية
+              </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {["nom", "prenom", "age"].map((field) => (
-                  <input
-                    key={field}
-                    name={field}
-                    className="border-b border-black px-2 py-1 text-sm"
-                    placeholder={`${field.charAt(0).toUpperCase() + field.slice(1)} / ${field === "nom" ? "الاسم" : field === "prenom" ? "اللقب" : "العمر"}`}
-                    value={explorationData[field]}
-                    onChange={handleExplorationInput}
-                  />
-                ))}
-                <input
-                  type="date"
-                  className="border-b border-black px-2 py-1 text-sm"
-                  name="date"
-                  value={explorationData.date}
-                  onChange={handleExplorationInput}
-                />
+            <div className="space-y-6 text-sm">
+              {/* Informations patient */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Informations du patient / معلومات المريض
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Nom :</label>
+                    <input
+                      name="nom"
+                      value={explorationData.nom}
+                      onChange={handleExplorationInput}
+                      placeholder="الاسم"
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Prénom :</label>
+                    <input
+                      name="prenom"
+                      value={explorationData.prenom}
+                      onChange={handleExplorationInput}
+                      placeholder="اللقب"
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Âge :</label>
+                    <input
+                      name="age"
+                      type="number"
+                      min={0}
+                      value={explorationData.age}
+                      onChange={handleExplorationInput}
+                      placeholder="العمر"
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Date :</label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={explorationData.date}
+                      onChange={handleExplorationInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* Type d'analyse */}
               <div>
-                <div className="font-semibold mb-2">Type d'analyse / نوع التحليل :</div>
-                <div className="flex gap-4 mb-4">
-                  <label className="flex items-center gap-2">
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Type d'analyse / نوع التحليل
+                </h3>
+                <div className="flex flex-wrap gap-6">
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
                       name="analyseType"
                       value="interne"
-                      checked={explorationData.analyseType === 'interne'}
+                      checked={explorationData.analyseType === "interne"}
                       onChange={handleExplorationInput}
+                      className="w-4 h-4"
                     />
                     Analyse Interne / تحليل داخلي
                   </label>
-                  <label className="flex items-center gap-2">
+                  <label className="flex items-center gap-2 cursor-pointer">
                     <input
                       type="radio"
                       name="analyseType"
                       value="externe"
-                      checked={explorationData.analyseType === 'externe'}
+                      checked={explorationData.analyseType === "externe"}
                       onChange={handleExplorationInput}
+                      className="w-4 h-4"
                     />
                     Analyse Externe / تحليل خارجي
                   </label>
                 </div>
+              </div>
 
-                {explorationData.analyseType && (
-                  <div>
-                    <div className="font-semibold mb-2">
-                      {explorationData.analyseType === 'interne' ? 'Analyses Internes' : 'Analyses Externes'} / 
-                      {explorationData.analyseType === 'interne' ? 'التحاليل الداخلية' : 'التحاليل الخارجية'} :
+              {/* Liste des analyses */}
+              {explorationData.analyseType && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                    {explorationData.analyseType === "interne"
+                      ? "Analyses Internes / التحاليل الداخلية"
+                      : "Analyses Externes / التحاليل الخارجية"}
+                  </h3>
+
+                  <div className="border rounded-md p-4 bg-gray-50/50">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 max-h-[220px] overflow-y-auto pr-2">
+                      {testOptions[explorationData.analyseType]?.map((opt) => (
+                        <label
+                          key={opt}
+                          className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white/60 rounded px-1 py-0.5"
+                        >
+                          <input
+                            type="checkbox"
+                            name="tests"
+                            value={opt}
+                            checked={explorationData.tests.includes(opt)}
+                            onChange={handleExplorationInput}
+                            className="w-4 h-4"
+                          />
+                          {opt}
+                        </label>
+                      ))}
                     </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto pr-2">
-                      {testOptions[explorationData.analyseType].map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 text-sm">
-                      <input
-                        type="checkbox"
-                        name="tests"
-                        value={opt}
-                        checked={explorationData.tests.includes(opt)}
-                        onChange={handleExplorationInput}
-                      />
-                      {opt}
-                    </label>
-                  ))}
-                </div>
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Commentaires */}
+              <div>
+                <h3 className="font-semibold mb-2 text-base border-b pb-1">
+                  Commentaires / تعليقات
+                </h3>
+                <textarea
+                  name="commentaires"
+                  rows={4}
+                  value={explorationData.commentaires}
+                  onChange={handleExplorationInput}
+                  placeholder="Commentaires supplémentaires / تعليقات إضافية..."
+                  className="w-full border rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+                />
               </div>
 
-              <textarea
-                name="commentaires"
-                className="border w-full p-2 text-sm"
-                rows={4}
-                placeholder="Commentaires supplémentaires / تعليقات إضافية"
-                value={explorationData.commentaires}
-                onChange={handleExplorationInput}
-              />
+              {/* Signature + Actions */}
+              <div className="flex items-center justify-between pt-5 border-t">
+                <span className="font-bold text-base">LE MÉDECIN / الطبيب</span>
 
-              <div className="flex justify-between mt-4">
-                <span className="font-bold">LE MÉDECIN / الطبيب</span>
-                <Button onClick={handlePrint}>Imprimer</Button>
-              </div>
-
-              <div className="flex justify-end">
-                <DialogClose asChild>
-                  <Button variant="outline">Fermer</Button>
-                </DialogClose>
+                <div className="flex gap-3">
+                  <Button onClick={handlePrint} className="min-w-[110px]">
+                    Imprimer
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline" className="min-w-[110px]">
+                      Fermer
+                    </Button>
+                  </DialogClose>
+                </div>
               </div>
             </div>
           </DialogContent>
@@ -1236,91 +2058,154 @@ const NouvelleConsultation: React.FC = () => {
         )}
 
         <Dialog open={imagerieOpen} onOpenChange={setImagerieOpen}>
-          <DialogContent className="dialog-print-hide max-w-2xl">
+          <DialogContent className="dialog-print-hide max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>DEMANDE D'IMAGERIE</DialogTitle>
-              <DialogDescription>طلب تصوير (أشعة، IRM…)</DialogDescription>
+              <DialogTitle className="text-center text-xl font-bold tracking-wide">
+                DEMANDE D'IMAGERIE
+              </DialogTitle>
+              <DialogDescription className="text-center">
+                طلب تصوير (أشعة، IRM…)
+              </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                {["nom", "prenom", "age"].map((field) => (
-                  <input
-                    key={field}
-                    name={field}
-                    className="border-b border-black px-2 py-1 text-sm"
-                    placeholder={`${field.charAt(0).toUpperCase() + field.slice(1)} / ${field === "nom" ? "الاسم" : field === "prenom" ? "اللقب" : "العمر"}`}
-                    value={imagerieData[field]}
-                    onChange={handleImagerieInput}
-                  />
-                ))}
-                <input
-                  type="date"
-                  className="border-b border-black px-2 py-1 text-sm"
-                  name="date"
-                  value={imagerieData.date}
-                  onChange={handleImagerieInput}
-                />
+            <div className="space-y-6 text-sm">
+              {/* Informations patient */}
+              <div>
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Informations du patient / معلومات المريض
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Nom :</label>
+                    <input
+                      name="nom"
+                      value={imagerieData.nom}
+                      onChange={handleImagerieInput}
+                      placeholder="الاسم"
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Prénom :</label>
+                    <input
+                      name="prenom"
+                      value={imagerieData.prenom}
+                      onChange={handleImagerieInput}
+                      placeholder="اللقب"
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Âge :</label>
+                    <input
+                      name="age"
+                      type="number"
+                      min={0}
+                      value={imagerieData.age}
+                      onChange={handleImagerieInput}
+                      placeholder="العمر"
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <label className="w-24 shrink-0 font-medium">Date :</label>
+                    <input
+                      type="date"
+                      name="date"
+                      value={imagerieData.date}
+                      onChange={handleImagerieInput}
+                      className="flex-1 border-b border-gray-400 bg-transparent py-1 focus:outline-none focus:border-black"
+                    />
+                  </div>
+                </div>
               </div>
 
+              {/* Type d'imagerie */}
               <div>
-                <div className="font-semibold mb-2">Type d'imagerie / نوع التصوير :</div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-4">
-                  {Object.entries(imagerieOptions).map(([type, options]) => (
-                    <label key={type} className="flex items-center gap-2 text-sm">
+                <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                  Type d'imagerie / نوع التصوير
+                </h3>
+                <div className="flex flex-wrap gap-x-6 gap-y-2">
+                  {Object.keys(imagerieOptions).map((type) => (
+                    <label key={type} className="flex items-center gap-2 cursor-pointer">
                       <input
                         type="radio"
                         name="imagerieType"
                         value={type}
                         checked={imagerieData.imagerieType === type}
                         onChange={handleImagerieInput}
+                        className="w-4 h-4"
                       />
                       {type.charAt(0).toUpperCase() + type.slice(1)}
                     </label>
                   ))}
                 </div>
+              </div>
 
-                {imagerieData.imagerieType && (
-                  <div>
-                    <div className="font-semibold mb-2">
-                      {imagerieData.imagerieType.charAt(0).toUpperCase() + imagerieData.imagerieType.slice(1)} :
-                    </div>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-[200px] overflow-y-auto pr-2">
-                      {imagerieOptions[imagerieData.imagerieType].map((opt) => (
-                        <label key={opt} className="flex items-center gap-2 text-sm">
+              {/* Liste des examens */}
+              {imagerieData.imagerieType && (
+                <div>
+                  <h3 className="font-semibold mb-3 text-base border-b pb-1">
+                    {imagerieData.imagerieType.charAt(0).toUpperCase() +
+                      imagerieData.imagerieType.slice(1)}{" "}
+                    / الفحوصات
+                  </h3>
+
+                  <div className="border rounded-md p-4 bg-gray-50/50">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-2 max-h-[220px] overflow-y-auto pr-2">
+                      {imagerieOptions[imagerieData.imagerieType]?.map((opt) => (
+                        <label
+                          key={opt}
+                          className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white/60 rounded px-1 py-0.5"
+                        >
                           <input
                             type="checkbox"
                             name="examens"
                             value={opt}
                             checked={imagerieData.examens.includes(opt)}
                             onChange={handleImagerieInput}
+                            className="w-4 h-4"
                           />
                           {opt}
                         </label>
                       ))}
                     </div>
                   </div>
-                )}
+                </div>
+              )}
+
+              {/* Commentaires */}
+              <div>
+                <h3 className="font-semibold mb-2 text-base border-b pb-1">
+                  Commentaires / تعليقات
+                </h3>
+                <textarea
+                  name="commentaires"
+                  rows={4}
+                  value={imagerieData.commentaires}
+                  onChange={handleImagerieInput}
+                  placeholder="Commentaires supplémentaires / تعليقات إضافية..."
+                  className="w-full border rounded-md p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none"
+                />
               </div>
 
-              <textarea
-                name="commentaires"
-                className="border w-full p-2 text-sm"
-                rows={4}
-                placeholder="Commentaires supplémentaires / تعليقات إضافية"
-                value={imagerieData.commentaires}
-                onChange={handleImagerieInput}
-              />
+              {/* Signature + Actions */}
+              <div className="flex items-center justify-between pt-5 border-t">
+                <span className="font-bold text-base">LE MÉDECIN / الطبيب</span>
 
-              <div className="flex justify-between mt-4">
-                <span className="font-bold">LE MÉDECIN / الطبيب</span>
-                <Button onClick={handlePrint}>Imprimer</Button>
-              </div>
-
-              <div className="flex justify-end">
-                <DialogClose asChild>
-                  <Button variant="outline">Fermer</Button>
-                </DialogClose>
+                <div className="flex gap-3">
+                  <Button onClick={handlePrint} className="min-w-[110px]">
+                    Imprimer
+                  </Button>
+                  <DialogClose asChild>
+                    <Button variant="outline" className="min-w-[110px]">
+                      Fermer
+                    </Button>
+                  </DialogClose>
+                </div>
               </div>
             </div>
           </DialogContent>
