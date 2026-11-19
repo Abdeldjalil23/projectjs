@@ -2,46 +2,53 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
 import NotFound from "./pages/NotFound";
-import SettingsPage from "./pages/SettingsPage";
 import LoginPage from "./components/LoginScreen";
-
-// Pages médecin
-import DossiersMedicauxPage from "./pages/medecin/DossiersMedicauxPage";
-import MedViPerPage from "./pages/medecin/MedViPerPage";
-import DossierDetailsPage from "./pages/medecin/DossierDetailsPage";
-import NouvelleConsultation from "./pages/medecin/Nouvelleconsultation";
-import PrescriptionsPage from "./pages/medecin/PrescriptionsPage";
-import MedReportsPage from "./pages/medecin/MedReportsPage";
-import DoctorDashboard from "./components/dashboard/DoctorDashboard";
-import DentistDashboard from "./components/dashboard/DentistDashboard";
-
-// Pages admin
-import AdminDashboard from "./components/dashboard/AdminDashboard";
-import ReportsPage from "./pages/admin/ReportsPage";
-import VisitePerdPage from "./pages/admin/AdminViPerdPage";
-import AdminViPerdPage from "./pages/admin/AdminViPerdPage";
-import RequestsPriseEnChargePage from "./pages/admin/RequestsPriseEnCharge";
-
-// Pages social
-import SocialDashboard from "./components/dashboard/SocialDashboard";
-import PatientSupportPage from "./pages/social/PatientSupportPage";
-import SocialServicesPage from "./pages/social/SocialServicesPage";
-import SocialReportsPage from "./pages/social/SocialReportsPage";
-import SocialResourcesPage from "./pages/social/SocialResourcesPage";
-
-// Pages dentist
-import PatientManagement from "./pages/dentist/PatientManagement";
-
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
 import { useAuth, UserRole } from "./context/AuthContext";
 import { dashboardPathFor } from "./lib/roles";
 import { ChroniqueProvider } from "./context/ChroniqueContext";
 
+// Pages are loaded on demand so the first visit downloads less code.
+const SettingsPage = lazy(() => import("./pages/SettingsPage"));
+
+// Pages médecin
+const DossiersMedicauxPage = lazy(() => import("./pages/medecin/DossiersMedicauxPage"));
+const MedViPerPage = lazy(() => import("./pages/medecin/MedViPerPage"));
+const DossierDetailsPage = lazy(() => import("./pages/medecin/DossierDetailsPage"));
+const NouvelleConsultation = lazy(() => import("./pages/medecin/Nouvelleconsultation"));
+const PrescriptionsPage = lazy(() => import("./pages/medecin/PrescriptionsPage"));
+const MedReportsPage = lazy(() => import("./pages/medecin/MedReportsPage"));
+const DoctorDashboard = lazy(() => import("./components/dashboard/DoctorDashboard"));
+const DentistDashboard = lazy(() => import("./components/dashboard/DentistDashboard"));
+
+// Pages admin
+const AdminDashboard = lazy(() => import("./components/dashboard/AdminDashboard"));
+const ReportsPage = lazy(() => import("./pages/admin/ReportsPage"));
+const AdminViPerdPage = lazy(() => import("./pages/admin/AdminViPerdPage"));
+const RequestsPriseEnChargePage = lazy(() => import("./pages/admin/RequestsPriseEnCharge"));
+
+// Pages social
+const SocialDashboard = lazy(() => import("./components/dashboard/SocialDashboard"));
+const PatientSupportPage = lazy(() => import("./pages/social/PatientSupportPage"));
+const SocialServicesPage = lazy(() => import("./pages/social/SocialServicesPage"));
+const SocialReportsPage = lazy(() => import("./pages/social/SocialReportsPage"));
+const SocialResourcesPage = lazy(() => import("./pages/social/SocialResourcesPage"));
+
+// Pages dentist
+const PatientManagement = lazy(() => import("./pages/dentist/PatientManagement"));
+
 const queryClient = new QueryClient();
+
+// Shown while the code of a page is being downloaded (pages are loaded on demand).
+const PageLoader = () => (
+  <div className="flex min-h-screen items-center justify-center">
+    <div className="h-10 w-10 animate-spin rounded-full border-4 border-medsuite-primary border-t-transparent" />
+  </div>
+);
 
 const DOCTOR: UserRole[] = ["doctor"];
 const ADMIN: UserRole[] = ["admin"];
@@ -73,7 +80,7 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[] 
   { path: "/admin/dashboard", element: <AdminDashboard />, roles: ADMIN },
   { path: "/admin/reports", element: <ReportsPage />, roles: ADMIN },
   { path: "/admin/visite-perdue", element: <AdminViPerdPage />, roles: ADMIN },
-  { path: "/visite-perdue", element: <VisitePerdPage />, roles: ADMIN },
+  { path: "/visite-perdue", element: <Navigate to="/admin/visite-perdue" replace />, roles: ADMIN },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage />, roles: ADMIN },
 
   // Social
@@ -97,6 +104,7 @@ function App() {
         <BrowserRouter>
           <AuthProviderWithNavigate>
             <ChroniqueProvider>
+              <Suspense fallback={<PageLoader />}>
               <Routes>
                 {/* Route login public */}
                 <Route path="/login" element={<LoginPage />} />
@@ -113,6 +121,7 @@ function App() {
                 {/* Route 404 */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              </Suspense>
             </ChroniqueProvider>
           </AuthProviderWithNavigate>
         </BrowserRouter>
