@@ -1,6 +1,6 @@
 // LoginScreen component for Sonatrach MedSuite
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/tabs';
 import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react'; 
 import { useAuth, UserRole } from '@/context/AuthContext';
+import { dashboardPathFor } from '@/lib/roles';
 import { toast } from 'sonner';
 import {
   Select, SelectContent, SelectItem,
@@ -19,8 +20,9 @@ import {
 } from '@/components/ui/select';
 
 export const LoginScreen = () => {
-  const { login } = useAuth();
+  const { login, isLoggedIn, userRole } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
   const [ID, setID] = useState('');
@@ -53,26 +55,17 @@ export const LoginScreen = () => {
       return;
     }
 
-    login(selectedRole);
+    login(selectedRole, { id: ID, specialty: selectedRole === 'doctor' ? specialty : undefined });
     toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
 
-    switch (selectedRole) {
-      case 'admin':
-        navigate('/admin/dashboard');
-        break;
-      case 'doctor':
-        navigate('/medecin/dashboard');
-        break;
-      case 'social':
-        navigate('/social/dashboard');
-        break;
-      case 'dentist':
-        navigate('/dentist/dashboard');
-        break;
-      default:
-        navigate('/');
-    }
+    // Go back to the page that was requested before login, otherwise to the role's dashboard.
+    const from = (location.state as { from?: string } | null)?.from;
+    navigate(from && from !== '/' ? from : dashboardPathFor(selectedRole), { replace: true });
   };
+
+  if (isLoggedIn) {
+    return <Navigate to={dashboardPathFor(userRole)} replace />;
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-medsuite-light to-white p-4">

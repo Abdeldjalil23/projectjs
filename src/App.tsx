@@ -2,9 +2,8 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import SettingsPage from "./pages/SettingsPage";
 import LoginPage from "./components/LoginScreen";
@@ -38,34 +37,55 @@ import PatientManagement from "./pages/dentist/PatientManagement";
 
 import PrivateRoute from "./pages/PrivateRoute";
 import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
+import { useAuth, UserRole } from "./context/AuthContext";
+import { dashboardPathFor } from "./lib/roles";
 import { ChroniqueProvider } from "./context/ChroniqueContext";
 
 const queryClient = new QueryClient();
 
-const protectedRoutes = [
-  { path: "/", element: <Index /> },
-  { path: "/prescriptions", element: <PrescriptionsPage /> },
-  { path: "/medecin/reports", element: <MedReportsPage /> },
-  { path: "/dashboard", element: <DoctorDashboard /> },
-  { path: "/medecin/dashboard", element: <DoctorDashboard /> },
-  { path: "/admin/dashboard", element: <AdminDashboard /> },
-  { path: "/social/dashboard", element: <SocialDashboard /> },
-  { path: "/social/patients", element: <PatientSupportPage /> },
-  { path: "/social/services", element: <SocialServicesPage /> },
-  { path: "/social/reports", element: <SocialReportsPage /> },
-  { path: "/social/resources", element: <SocialResourcesPage /> },
-  { path: "/visite-perdue", element: <VisitePerdPage /> },
+const DOCTOR: UserRole[] = ["doctor"];
+const ADMIN: UserRole[] = ["admin"];
+const SOCIAL: UserRole[] = ["social"];
+const DENTIST: UserRole[] = ["dentist"];
+
+// Sends "/" to the dashboard of the logged-in role.
+const HomeRedirect = () => {
+  const { userRole } = useAuth();
+  return <Navigate to={dashboardPathFor(userRole)} replace />;
+};
+
+const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[] }[] = [
+  { path: "/", element: <HomeRedirect /> },
   { path: "/settings", element: <SettingsPage /> },
-  { path: "/admin/reports", element: <ReportsPage /> },
-  { path: "/dossiers-medicaux", element: <DossiersMedicauxPage /> },
-  { path: "/dossier/:id", element: <DossierDetailsPage /> },
-  { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation /> },
-  { path: "/nouvelle-consultation", element: <NouvelleConsultation /> },
-  { path: "/admin/visite-perdue", element: <AdminViPerdPage /> },
-  { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage /> },
-  { path: "/visite-periodique", element: <MedViPerPage /> },
-  { path: "/dentist/dashboard", element: <DentistDashboard /> },
-  { path: "/dentist/patient-management", element: <PatientManagement /> },
+
+  // Doctor
+  { path: "/dashboard", element: <DoctorDashboard />, roles: DOCTOR },
+  { path: "/medecin/dashboard", element: <DoctorDashboard />, roles: DOCTOR },
+  { path: "/prescriptions", element: <PrescriptionsPage />, roles: DOCTOR },
+  { path: "/medecin/reports", element: <MedReportsPage />, roles: DOCTOR },
+  { path: "/dossiers-medicaux", element: <DossiersMedicauxPage />, roles: DOCTOR },
+  { path: "/dossier/:id", element: <DossierDetailsPage />, roles: DOCTOR },
+  { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation />, roles: DOCTOR },
+  { path: "/nouvelle-consultation", element: <NouvelleConsultation />, roles: DOCTOR },
+  { path: "/visite-periodique", element: <MedViPerPage />, roles: DOCTOR },
+
+  // Admin
+  { path: "/admin/dashboard", element: <AdminDashboard />, roles: ADMIN },
+  { path: "/admin/reports", element: <ReportsPage />, roles: ADMIN },
+  { path: "/admin/visite-perdue", element: <AdminViPerdPage />, roles: ADMIN },
+  { path: "/visite-perdue", element: <VisitePerdPage />, roles: ADMIN },
+  { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage />, roles: ADMIN },
+
+  // Social
+  { path: "/social/dashboard", element: <SocialDashboard />, roles: SOCIAL },
+  { path: "/social/patients", element: <PatientSupportPage />, roles: SOCIAL },
+  { path: "/social/services", element: <SocialServicesPage />, roles: SOCIAL },
+  { path: "/social/reports", element: <SocialReportsPage />, roles: SOCIAL },
+  { path: "/social/resources", element: <SocialResourcesPage />, roles: SOCIAL },
+
+  // Dentist
+  { path: "/dentist/dashboard", element: <DentistDashboard />, roles: DENTIST },
+  { path: "/dentist/patient-management", element: <PatientManagement />, roles: DENTIST },
 ];
 
 function App() {
@@ -82,11 +102,11 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
 
                 {/* Routes protégées */}
-                {protectedRoutes.map(({ path, element }) => (
+                {protectedRoutes.map(({ path, element, roles }) => (
                   <Route
                     key={path}
                     path={path}
-                    element={<PrivateRoute>{element}</PrivateRoute>}
+                    element={<PrivateRoute roles={roles}>{element}</PrivateRoute>}
                   />
                 ))}
 
