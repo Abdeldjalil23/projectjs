@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { toast } from 'sonner';
 import { useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -184,8 +185,7 @@ const VisitePerdPage = () => {
         emp.id === employeeId ? { ...emp, reminderDate: newReminderDate } : emp
       ),
     }));
-    console.log(`Nouveau rappel envoyé pour employé ${employeeId} à ${newReminderDate}`);
-    alert(`Nouveau rappel planifié pour ${visiteData.selectedEmployees.find(emp => emp.id === employeeId)?.name}`);
+    toast.success(`Nouveau rappel planifié pour ${visiteData.selectedEmployees.find(emp => emp.id === employeeId)?.name}`);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -223,13 +223,7 @@ const VisitePerdPage = () => {
     setScheduledEmployeeIds(newScheduledIds);
     localStorage.setItem('scheduledEmployeeIds', JSON.stringify(newScheduledIds));
     localStorage.setItem('selectedEmployees', JSON.stringify([]));
-    console.log("Données visite périodique:", visiteData);
-    console.log("Rappels planifiés:", visiteData.selectedEmployees.map(emp => ({
-      name: emp.name,
-      reminderDate: emp.reminderDate || visiteData.reminderDate,
-      attended: emp.attended,
-    })));
-    alert("Visite enregistrée avec succès !");
+    toast.success("Visite enregistrée avec succès !");
     navigate(-1);
   };
 

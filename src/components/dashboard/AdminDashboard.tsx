@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { toast } from 'sonner';
 import AppLayout from '@/components/layout/AppLayout';
 import {
   Card,
@@ -77,10 +78,12 @@ import {
 } from "lucide-react";
 
 // --- Type Definitions ---
+type EmployeeRole = 'admin' | 'doctor' | 'dentist' | 'social' | 'patient';
+
 type Employee = {
   id: number;
   name: string;
-  role: 'admin' | 'doctor' | 'patient';
+  role: EmployeeRole;
   department: string;
   phone: string;
 };
@@ -210,9 +213,7 @@ const formatCurrency = (amount: number) => {
 };
 
 // --- Dashboard Widgets ---
-const StatsWidgets = () => {
-  const totalMedicines = medicinesData.length;
-  const totalEmployees = employeesData.length;
+const StatsWidgets = ({ totalEmployees, totalMedicines }: { totalEmployees: number; totalMedicines: number }) => {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
@@ -245,12 +246,16 @@ const StatsWidgets = () => {
 };
 
 // --- User Management Section ---
-const UserManagementSection = () => {
-  const [employees, setEmployees] = useState<Employee[]>(employeesData);
+type UserManagementProps = {
+  employees: Employee[];
+  setEmployees: React.Dispatch<React.SetStateAction<Employee[]>>;
+};
+
+const UserManagementSection = ({ employees, setEmployees }: UserManagementProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [newEmployee, setNewEmployee] = useState({
     name: '',
-    role: 'patient' as 'admin' | 'doctor' | 'patient',
+    role: 'patient' as EmployeeRole,
     department: '',
     phone: '',
   });
@@ -275,7 +280,7 @@ const UserManagementSection = () => {
       setNewEmployee({ name: '', role: 'patient', department: '', phone: '' });
       setIsAdding(false);
     } else {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
     }
   };
 
@@ -290,7 +295,7 @@ const UserManagementSection = () => {
       setEditingEmployee(null);
       setIsAdding(false);
     } else {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
     }
   };
 
@@ -301,7 +306,9 @@ const UserManagementSection = () => {
   };
 
   const handleViewDetails = (employee: Employee) => {
-    alert(`Details for ${employee.name}:\nRole: ${employee.role}\nDepartment: ${employee.department}\nPhone: ${employee.phone}`);
+    toast(employee.name, {
+      description: `Role: ${employee.role} · Department: ${employee.department} · Phone: ${employee.phone}`,
+    });
   };
 
   const handleEditEmployee = (employee: Employee) => {
@@ -315,14 +322,14 @@ const UserManagementSection = () => {
     setIsAdding(true);
   };
 
-  const handleRoleChange = (value: 'admin' | 'doctor' | 'patient') => {
+  const handleRoleChange = (value: EmployeeRole) => {
     setNewEmployee({ ...newEmployee, role: value });
   };
 
   return (
     <Card className="shadow-md border-0">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle className="text-lg font-bold text-gray-900">User Management</CardTitle>
             <CardDescription>Manage employee accounts and roles</CardDescription>
@@ -360,6 +367,8 @@ const UserManagementSection = () => {
                     <SelectContent>
                       <SelectItem value="admin">Admin</SelectItem>
                       <SelectItem value="doctor">Doctor</SelectItem>
+                      <SelectItem value="dentist">Dentist</SelectItem>
+                      <SelectItem value="social">Social</SelectItem>
                       <SelectItem value="patient">Patient</SelectItem>
                     </SelectContent>
                   </Select>
@@ -486,7 +495,12 @@ const UserManagementSection = () => {
 };
 
 // --- Medicine Inventory Section ---
-const PharmacyManagement = () => {
+type PharmacyManagementProps = {
+  medicines: Medicine[];
+  setMedicines: React.Dispatch<React.SetStateAction<Medicine[]>>;
+};
+
+const PharmacyManagement = ({ medicines, setMedicines }: PharmacyManagementProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -501,47 +515,62 @@ const PharmacyManagement = () => {
   });
 
   const filteredMedicines = useMemo(() => {
-    return medicinesData.filter(medicine => {
+    return medicines.filter(medicine => {
       const matchesSearch = medicine.name.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = categoryFilter === 'all' || medicine.category === categoryFilter;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, categoryFilter]);
+  }, [medicines, searchQuery, categoryFilter]);
 
-  const categories = [...new Set(medicinesData.map(m => m.category))];
+  const categories = [...new Set(medicines.map(m => m.category))];
 
   const handleAddMedicine = () => {
     if (newMedicine.name && newMedicine.category && newMedicine.quantity && newMedicine.unit) {
-      // This is a simplified example; in a real app, you'd update medicinesData or make an API call
-      console.log('Adding medicine:', newMedicine);
+      const nextId = medicines.reduce((max, m) => Math.max(max, m.id), 0) + 1;
+      setMedicines([
+        ...medicines,
+        {
+          id: nextId,
+          price: 0,
+          supplier: '',
+          expiryDate: '',
+          threshold: 0,
+          location: '',
+          prescriptionRequired: false,
+          ...newMedicine,
+        },
+      ]);
+      toast.success(`${newMedicine.name} added`);
       setNewMedicine({ name: '', category: '', quantity: 0, unit: '' });
       setShowAddDialog(false);
     } else {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
     }
   };
 
   const handleEditMedicine = () => {
     if (editingMedicine && newMedicine.name && newMedicine.category && newMedicine.quantity && newMedicine.unit) {
-      // This is a simplified example; in a real app, you'd update medicinesData or make an API call
-      console.log('Editing medicine:', newMedicine);
+      setMedicines(
+        medicines.map((m) => (m.id === editingMedicine.id ? { ...m, ...newMedicine } : m))
+      );
+      toast.success(`${newMedicine.name} updated`);
       setNewMedicine({ name: '', category: '', quantity: 0, unit: '' });
       setEditingMedicine(null);
       setShowAddDialog(false);
     } else {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
     }
   };
 
   const handleDeleteMedicine = (id: number) => {
-    // This is a simplified example; in a real app, you'd update medicinesData or make an API call
-    console.log(`Deleting medicine with id: ${id}`);
+    setMedicines(medicines.filter((m) => m.id !== id));
+    toast.success('Medicine deleted');
   };
 
   return (
     <Card className="shadow-md border-0">
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <CardTitle className="text-lg font-bold text-gray-900">Medicine Inventory</CardTitle>
             <CardDescription>Manage medicine stock</CardDescription>
@@ -776,6 +805,8 @@ const PharmacyManagement = () => {
 // --- Main Dashboard Component ---
 export const UsersManagementPage = () => {
   const [isLoading, setIsLoading] = useState(true);
+  const [employees, setEmployees] = useState<Employee[]>(employeesData);
+  const [medicines, setMedicines] = useState<Medicine[]>(medicinesData);
 
   useEffect(() => {
     setTimeout(() => setIsLoading(false), 1000); 
@@ -785,15 +816,15 @@ export const UsersManagementPage = () => {
     <AppLayout title="Admin Dashboard">
       <div className="min-h-screen w-full bg-gray-50">
         <main className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
-          <StatsWidgets />
+          <StatsWidgets totalEmployees={employees.length} totalMedicines={medicines.length} />
           <div className="grid gap-6 md:grid-cols-2">
-            <UserManagementSection />
+            <UserManagementSection employees={employees} setEmployees={setEmployees} />
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
               </div>
             ) : (
-              <PharmacyManagement />
+              <PharmacyManagement medicines={medicines} setMedicines={setMedicines} />
             )}
           </div>
         </main>

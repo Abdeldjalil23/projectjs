@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import AppLayout from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
@@ -1000,12 +1001,12 @@ const RapportPage = () => {
 
   const handleSave = () => {
     // TODO: Implement save functionality
-    alert('Rapport médical sauvegardé avec succès!');
+    toast.success('Rapport médical sauvegardé avec succès!');
   };
 
   const handleExport = () => {
     // TODO: Implement export functionality
-    alert('Exportation du rapport médical!');
+    toast.info('Exportation du rapport médical!');
   };
 
   return (

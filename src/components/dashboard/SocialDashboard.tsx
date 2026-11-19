@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import {
@@ -187,10 +188,10 @@ export const SocialDashboard = () => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem onClick={() => alert(`Viewing profile for ${user.name}`)}>
+                          <DropdownMenuItem onClick={() => toast.info(`Viewing profile for ${user.name}`)}>
                             View Profile
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => alert(`Editing user ${user.name}`)}>
+                          <DropdownMenuItem onClick={() => toast.info(`Editing user ${user.name}`)}>
                             Edit User
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />

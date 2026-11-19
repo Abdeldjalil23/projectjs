@@ -83,7 +83,6 @@ const AntecedentsP = () => {
   // Simulates saving the data
   const handleSave = () => {
     // In a real application, you would send this data to your backend API
-    console.log('Données à enregistrer:', antecedents);
     toast.success('Les antécédents ont été enregistrés !');
     // Optionally, you could navigate away after saving
     // navigate('/dossiers');

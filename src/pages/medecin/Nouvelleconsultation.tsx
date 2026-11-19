@@ -1,5 +1,6 @@
 // src/pages/NouvelleConsultation.tsx
 import AppLayout from '@/components/layout/AppLayout';
+import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -484,11 +485,9 @@ const NouvelleConsultation: React.FC = () => {
 
 const handleSave = () => {
   if (!consultationData.date || !consultationData.doctor) {
-    alert("يرجى ملء التاريخ واسم الطبيب على الأقل");
+    toast.error("يرجى ملء التاريخ واسم الطبيب على الأقل");
     return;
   }
-
-  console.log("البيانات المحفوظة:", consultationData);
 
   setConsultationOpen(false);
 };

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 import {
   Card,
   CardContent,
@@ -75,7 +76,7 @@ const PatientManagement: React.FC = () => {
 
   const handleAddNewPatient = () => {
     if (!newPatientName || !newPatientDob || !newPatientContact) {
-      alert('Please fill in all patient details.');
+      toast.error('Please fill in all patient details.');
       return;
     }
     const newPatientId = `P${(patients.length + 1).toString().padStart(3, '0')}`;
