@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import AppLayout from '@/components/layout/AppLayout';
 import {
@@ -245,7 +246,7 @@ export const DoctorDashboard = () => {
       setNewService({ patient: '', date: new Date().toISOString().split('T')[0], status: '' });
       setShowAddDialog(false);
     } else {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
     }
   };
 
@@ -261,7 +262,7 @@ export const DoctorDashboard = () => {
       setEditingService(null);
       setShowAddDialog(false);
     } else {
-      alert('Please fill in all required fields');
+      toast.error('Please fill in all required fields');
     }
   };
 

@@ -1,4 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
+import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import AppLayout from '@/components/layout/AppLayout';
 import {
@@ -133,7 +134,7 @@ const RequestsPriseEnChargePage = () => {
 
   const downloadReport = () => {
     // Mock report download
-    alert('Downloading report...');
+    toast.info('Downloading report...');
   };
 
   return (
