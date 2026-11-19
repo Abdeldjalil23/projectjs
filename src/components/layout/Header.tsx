@@ -6,31 +6,21 @@ import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { SidebarTrigger } from '@/components/ui/sidebar';
-import { useAuth, UserRole } from '@/context/AuthContext';
+import { useAuth } from '@/context/AuthContext';
+import { ROLE_INITIALS, ROLE_LABELS } from '@/lib/roles';
 
 interface HeaderProps {
   title: string;
 }
 
 export const Header = ({ title }: HeaderProps) => {
-  const { userRole, logout } = useAuth();
+  const { userRole, userId, specialty, logout } = useAuth();
   const [notifications] = useState(3);
-  
-  const getUserInitials = () => {
-    switch(userRole) {
-      case 'doctor': return 'DR';
-      case 'admin': return 'AD';
-      default: return 'US';
-    }
-  };
-  
-  const getUserName = () => {
-    switch(userRole) {
-      case 'doctor': return 'Dr. Sarah Johnson';
-      case 'admin': return 'Admin Ali Hassan';
-      default: return 'User';
-    }
-  };
+
+  const initials = userRole ? ROLE_INITIALS[userRole] : 'US';
+  const roleLabel = userRole ? ROLE_LABELS[userRole] : 'User';
+  const displayName = userId ? `ID ${userId}` : roleLabel;
+  const subtitle = specialty ? `${roleLabel} · ${specialty}` : roleLabel;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 backdrop-blur px-4">
@@ -56,7 +46,7 @@ export const Header = ({ title }: HeaderProps) => {
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
                 <AvatarFallback className="bg-medsuite-primary text-white">
-                  {getUserInitials()}
+                  {initials}
                 </AvatarFallback>
               </Avatar>
             </Button>
@@ -64,11 +54,9 @@ export const Header = ({ title }: HeaderProps) => {
           <DropdownMenuContent align="end" className="w-56">
             <div className="flex items-center justify-start gap-2 p-2">
               <div className="flex flex-col space-y-0.5">
-                <p className="text-sm font-medium leading-none">{getUserName()}</p>
+                <p className="text-sm font-medium leading-none">{displayName}</p>
                 <p className="text-xs leading-none text-muted-foreground">
-                  {userRole === 'doctor' ? 'Cardiology Department' : 
-                   userRole === 'admin' ? 'System Administrator' : 
-                   'Production Department'}
+                  {subtitle}
                 </p>
               </div>
             </div>

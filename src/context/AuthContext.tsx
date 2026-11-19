@@ -4,17 +4,59 @@ import { NavigateFunction } from 'react-router-dom';
 
 export type UserRole = 'admin' | 'doctor' | 'dentist' | 'social' | 'patient' | null;
 
+interface SessionUser {
+  id: string;
+  role: Exclude<UserRole, null>;
+  specialty?: string;
+}
+
+interface LoginDetails {
+  id?: string;
+  specialty?: string;
+}
+
 interface AuthContextType {
   userRole: UserRole;
-  setUserRole: (role: UserRole) => void;
+  userId: string | null;
+  specialty: string | null;
   isLoggedIn: boolean;
-  login: (role: UserRole) => void;
+  login: (role: UserRole, details?: LoginDetails) => void;
   logout: () => void;
 }
 
+// The session lives in sessionStorage: it survives a page reload
+// and is cleared when the browser tab is closed.
+const SESSION_KEY = 'medsuite.session';
+const VALID_ROLES = ['admin', 'doctor', 'dentist', 'social', 'patient'];
+
+const readSession = (): SessionUser | null => {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !VALID_ROLES.includes(parsed.role)) return null;
+    return { id: String(parsed.id ?? ''), role: parsed.role, specialty: parsed.specialty || undefined };
+  } catch {
+    return null;
+  }
+};
+
+const writeSession = (user: SessionUser | null) => {
+  try {
+    if (user) {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+    } else {
+      sessionStorage.removeItem(SESSION_KEY);
+    }
+  } catch {
+    // Storage can be unavailable (private mode, blocked cookies): keep the in-memory session only.
+  }
+};
+
 const AuthContext = createContext<AuthContextType>({
   userRole: null,
-  setUserRole: () => {},
+  userId: null,
+  specialty: null,
   isLoggedIn: false,
   login: () => {},
   logout: () => {},
@@ -23,22 +65,32 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children, navigate }: { children: ReactNode; navigate: NavigateFunction }) => {
-  const [userRole, setUserRole] = useState<UserRole>(null);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<SessionUser | null>(readSession);
 
-  const login = (role: UserRole) => {
-    setUserRole(role);
-    setIsLoggedIn(true);
+  const login = (role: UserRole, details: LoginDetails = {}) => {
+    if (!role) return;
+    const next: SessionUser = { id: details.id ?? '', role, specialty: details.specialty || undefined };
+    setUser(next);
+    writeSession(next);
   };
 
   const logout = () => {
-    setUserRole(null);
-    setIsLoggedIn(false);
+    setUser(null);
+    writeSession(null);
     navigate('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ userRole, setUserRole, isLoggedIn, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        userRole: user?.role ?? null,
+        userId: user?.id || null,
+        specialty: user?.specialty ?? null,
+        isLoggedIn: user !== null,
+        login,
+        logout,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
