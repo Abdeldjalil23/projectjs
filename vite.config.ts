@@ -12,6 +12,9 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+    // Radix components carry their own copies of this package; one copy is needed so that
+    // the right-to-left setting reaches all of them.
+    dedupe: ["@radix-ui/react-direction"],
   },
   build: {
     rollupOptions: {

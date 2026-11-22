@@ -1,6 +1,7 @@
 // LoginScreen component for Sonatrach MedSuite
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
@@ -10,17 +11,29 @@ import { Label } from '@/components/ui/label';
 import {
   Tabs, TabsContent, TabsList, TabsTrigger
 } from '@/components/ui/tabs';
-import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react'; 
+import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react';
 import { useAuth, UserRole } from '@/context/AuthContext';
-import { dashboardPathFor } from '@/lib/roles';
+import { dashboardPathFor, DEMO_STAFF_ROLE } from '@/lib/roles';
 import PageLoader from '@/components/shared/PageLoader';
+import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { toast } from 'sonner';
 import {
   Select, SelectContent, SelectItem,
   SelectTrigger, SelectValue
 } from '@/components/ui/select';
 
+// Demo login tabs: one per workspace.
+const DEMO_TABS = [
+  { value: 'doctor', icon: Stethoscope },
+  { value: 'admin', icon: Briefcase },
+  { value: 'social', icon: Users },
+  { value: 'dentist', icon: Smile },
+] as const;
+
+const SPECIALTIES = ['MEDECINE', 'INFERMIER'] as const;
+
 export const LoginScreen = () => {
+  const { t } = useTranslation();
   const { login, signIn, isLoggedIn, userRole, loading, isDemo } = useAuth();
   const location = useLocation();
 
@@ -30,17 +43,15 @@ export const LoginScreen = () => {
   const [specialty, setSpecialty] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const specialties = ['MEDECINE', 'INFERMIER']; // Removed DENTISTE as it’s a separate role
-
   // Real login: the role and permissions come from the account in the database.
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ID.trim()) {
-      toast.error('Please enter your ID');
+      toast.error(t('login.errors.enterId'));
       return;
     }
     if (!password) {
-      toast.error('Please enter your password');
+      toast.error(t('login.errors.enterPassword'));
       return;
     }
 
@@ -60,26 +71,28 @@ export const LoginScreen = () => {
     const idPattern = /^\d{4}[A-Z]$/;
 
     if (!ID.trim()) {
-      toast.error('Please enter your ID');
+      toast.error(t('login.errors.enterId'));
       return;
     }
     if (!password) {
-      toast.error('Please enter your password');
+      toast.error(t('login.errors.enterPassword'));
       return;
     }
 
     if (selectedRole === 'doctor' && !specialty) {
-      toast.error('Please select your specialty');
+      toast.error(t('login.errors.selectSpecialty'));
       return;
     }
 
     if (!idPattern.test(ID)) {
-      toast.error('ID must be exactly four digits followed by one uppercase letter');
+      toast.error(t('login.errors.idFormat'));
       return;
     }
 
     login(selectedRole, { id: ID, specialty: selectedRole === 'doctor' ? specialty : undefined });
-    toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
+    const roleName = selectedRole ? t(`roles.${DEMO_STAFF_ROLE[selectedRole]}`) : '';
+    const specialtyName = selectedRole === 'doctor' ? ` (${t(`login.specialties.${specialty}`)})` : '';
+    toast.success(t('login.loggedInAs', { role: roleName + specialtyName }));
   };
 
   if (loading) {
@@ -93,7 +106,11 @@ export const LoginScreen = () => {
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-medsuite-light to-white p-4">
+    <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-medsuite-light to-white p-4">
+      <div className="absolute end-4 top-4">
+        <LanguageSwitcher showName />
+      </div>
+
       <div className="w-full max-w-md animate-fade-in">
         <div className="text-center mb-8">
           <img src="/logo.png" alt="Sonatrach MedSuite Logo" className="mx-auto mb-4 h-32 w-auto" />
@@ -102,10 +119,8 @@ export const LoginScreen = () => {
 
         <Card className="border-medsuite-primary/20">
           <CardHeader>
-            <CardTitle>Welcome back</CardTitle>
-            <CardDescription>
-              {isDemo ? 'Demo mode: no server is connected yet' : 'Sign in with your staff ID'}
-            </CardDescription>
+            <CardTitle>{t('login.welcome')}</CardTitle>
+            <CardDescription>{isDemo ? t('login.demoHint') : t('login.staffHint')}</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -116,44 +131,19 @@ export const LoginScreen = () => {
                 onValueChange={(value) => setSelectedRole(value as UserRole)}
               >
                 <TabsList className="grid w-full grid-cols-4">
-                  <TabsTrigger value="doctor" className="flex items-center gap-1">
-                    <Stethoscope className="h-4 w-4" />
-                    <span className="hidden sm:inline">Doctor</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="admin" className="flex items-center gap-1">
-                    <Briefcase className="h-4 w-4" />
-                    <span className="hidden sm:inline">Admin</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="social" className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    <span className="hidden sm:inline">Social</span>
-                  </TabsTrigger>
-                  <TabsTrigger value="dentist" className="flex items-center gap-1">
-                    <Smile className="h-4 w-4" /> 
-                    <span className="hidden sm:inline">Dentist</span>
-                  </TabsTrigger>
+                  {DEMO_TABS.map(({ value, icon: Icon }) => (
+                    <TabsTrigger key={value} value={value} className="flex items-center gap-1">
+                      <Icon className="h-4 w-4" />
+                      <span className="hidden sm:inline">{t(`login.tabs.${value}`)}</span>
+                    </TabsTrigger>
+                  ))}
                 </TabsList>
 
-                <TabsContent value="doctor">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Manage patient appointments and medical records
-                  </p>
-                </TabsContent>
-                <TabsContent value="admin">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Oversee healthcare system operations
-                  </p>
-                </TabsContent>
-                <TabsContent value="social">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Provide social services and patient support
-                  </p>
-                </TabsContent>
-                <TabsContent value="dentist">
-                  <p className="text-sm text-muted-foreground mb-4">
-                    Manage dental appointments and patient records
-                  </p>
-                </TabsContent>
+                {DEMO_TABS.map(({ value }) => (
+                  <TabsContent key={value} value={value}>
+                    <p className="text-sm text-muted-foreground mb-4">{t(`login.tabHints.${value}`)}</p>
+                  </TabsContent>
+                ))}
               </Tabs>
             )}
 
@@ -161,15 +151,15 @@ export const LoginScreen = () => {
               <div className="grid gap-4">
                 {isDemo && selectedRole === 'doctor' && (
                   <div className="grid gap-2">
-                    <Label htmlFor="specialty">Specialty</Label>
+                    <Label htmlFor="specialty">{t('login.specialty')}</Label>
                     <Select value={specialty} onValueChange={setSpecialty}>
                       <SelectTrigger id="specialty">
-                        <SelectValue placeholder="Select your specialty" />
+                        <SelectValue placeholder={t('login.specialtyPlaceholder')} />
                       </SelectTrigger>
                       <SelectContent>
-                        {specialties.map((spec) => (
+                        {SPECIALTIES.map((spec) => (
                           <SelectItem key={spec} value={spec}>
-                            {spec}
+                            {t(`login.specialties.${spec}`)}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -178,10 +168,10 @@ export const LoginScreen = () => {
                 )}
 
                 <div className="grid gap-2">
-                  <Label htmlFor="ID">ID</Label>
+                  <Label htmlFor="ID">{t('login.id')}</Label>
                   <Input
                     id="ID"
-                    placeholder="Enter your ID"
+                    placeholder={t('login.idPlaceholder')}
                     autoComplete="username"
                     value={ID}
                     onChange={(e) => setID(e.target.value)}
@@ -190,17 +180,17 @@ export const LoginScreen = () => {
 
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{t('login.password')}</Label>
                     {isDemo && (
                       <a href="#" className="text-sm text-medsuite-primary hover:underline">
-                        Forgot password?
+                        {t('login.forgotLink')}
                       </a>
                     )}
                   </div>
                   <Input
                     id="password"
                     type="password"
-                    placeholder="Enter your password"
+                    placeholder={t('login.passwordPlaceholder')}
                     autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -212,12 +202,10 @@ export const LoginScreen = () => {
                   disabled={submitting}
                   className="bg-medsuite-primary hover:bg-medsuite-accent"
                 >
-                  {submitting ? 'Signing in…' : 'Sign In'}
+                  {submitting ? t('login.signingIn') : t('login.signIn')}
                 </Button>
                 {!isDemo && (
-                  <p className="text-center text-xs text-muted-foreground">
-                    Forgot your password? Ask the administrator to reset it.
-                  </p>
+                  <p className="text-center text-xs text-muted-foreground">{t('login.forgotHint')}</p>
                 )}
               </div>
             </form>

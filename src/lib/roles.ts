@@ -36,10 +36,19 @@ export const dashboardPathFor = (role: UserRole): string =>
  * Nurses share the doctors' workspace, as in the demo login. Roles that are not listed
  * here (psychologist, contracted doctor) have no workspace yet and cannot sign in.
  */
-export const WORKSPACE_BY_STAFF_ROLE: Record<string, { role: Role; specialty?: string }> = {
+export const WORKSPACE_BY_STAFF_ROLE: Record<string, { role: Role }> = {
   admin: { role: 'admin' },
   doctor: { role: 'doctor' },
-  nurse: { role: 'doctor', specialty: 'Nurse' },
+  nurse: { role: 'doctor' },
   dentist: { role: 'dentist' },
   social_worker: { role: 'social' },
+};
+
+/** Account role shown for each demo workspace (demo mode has no database roles). */
+export const DEMO_STAFF_ROLE: Record<Role, string> = {
+  admin: 'admin',
+  doctor: 'doctor',
+  dentist: 'dentist',
+  social: 'social_worker',
+  patient: 'patient',
 };

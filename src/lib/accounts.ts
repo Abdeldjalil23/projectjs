@@ -1,5 +1,6 @@
 // Data access for staff accounts, roles and permissions (Supabase).
 import { FunctionsHttpError } from '@supabase/supabase-js';
+import i18n from '@/i18n';
 import { supabase } from '@/lib/supabase';
 
 export interface StaffRole {
@@ -37,13 +38,13 @@ export interface RolePermission {
 const ROLE_ORDER = ['admin', 'doctor', 'nurse', 'dentist', 'psychologist', 'social_worker', 'contracted_doctor'];
 
 const client = () => {
-  if (!supabase) throw new Error('The server is not configured.');
+  if (!supabase) throw new Error(i18n.t('common.serverNotConfigured'));
   return supabase;
 };
 
 /** Turns a database or network error into a message for the screen. */
 const fail = (error: { message?: string } | null): never => {
-  throw new Error(error?.message || 'The request failed. Please try again.');
+  throw new Error(error?.message || i18n.t('common.requestFailed'));
 };
 
 export const fetchAccounts = async (): Promise<StaffAccount[]> => {
@@ -110,16 +111,14 @@ const callAdminUsers = async (body: Record<string, unknown>) => {
   if (error instanceof FunctionsHttpError) {
     const response = error.context as Response;
     if (response.status === 404) {
-      throw new Error('The account service is not deployed yet (docs/SETUP-SUPABASE.md, step 4).');
+      throw new Error(i18n.t('accounts.service.notDeployed'));
     }
     const details = await response.json().catch(() => null);
-    throw new Error(details?.error || `The account service refused the request (${response.status}).`);
+    throw new Error(details?.error || i18n.t('accounts.service.refused', { status: response.status }));
   }
   // No answer at all: usually the function is not deployed, or still checks tokens itself
   // (deploy it with --no-verify-jwt, see docs/SETUP-SUPABASE.md, step 4).
-  throw new Error(
-    'Could not reach the account service. Check that admin-users is deployed with --no-verify-jwt (docs/SETUP-SUPABASE.md, step 4).',
-  );
+  throw new Error(i18n.t('accounts.service.unreachable'));
 };
 
 export const createAccount = (input: {
@@ -139,4 +138,13 @@ export const generatePassword = (length = 12) => {
   const values = new Uint32Array(length);
   crypto.getRandomValues(values);
   return Array.from(values, (v) => alphabet[v % alphabet.length]).join('');
+};
+
+/** Saves the signed-in user's language in their account, so it follows them to other computers. */
+export const saveMyLanguage = async (language: string) => {
+  const { data } = await client().auth.getSession();
+  const userId = data.session?.user.id;
+  if (!userId) return;
+  const { error } = await client().from('profiles').update({ preferred_language: language }).eq('id', userId);
+  if (error) fail(error);
 };
