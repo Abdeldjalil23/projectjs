@@ -27,5 +27,6 @@ dist-ssr
 !.env.example
 .eslintcache
 
-# Supabase CLI cache
+# Supabase CLI and Vite caches
 supabase/.temp/
+.vite/
