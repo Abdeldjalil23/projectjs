@@ -16,6 +16,7 @@
 | --- | --- |
 | `20261122000001_core_access.sql` | الأدوار، الصلاحيات، ملفات المستخدمين، الإعدادات، وسجل التدقيق، مع الصلاحيات الافتراضية لكل دور |
 | `20261122000002_api_grants.sql` | يحدد بدقة ما يصل إليه المستخدم المسجَّل عبر الواجهة، ولا شيء لغير المسجَّل |
+| `20261123000001_account_safeguards.sql` | يمنع أي مستخدم من تغيير دوره أو تعطيل حسابه بنفسه، ويُبقي لدور الإدارة صلاحيتَي إدارة الحسابات والصلاحيات |
 
 إذا ظهر تحذير عن «destructive operations» فوافق عليه: سببه عبارات مثل `on delete cascade` و`revoke`، ولا يُحذف شيء.
 
@@ -47,14 +48,18 @@ select staff_id, full_name, active from public.profiles;
 
 ## 4. وظيفة إدارة الحسابات (Edge Function)
 
+شاشة **Staff accounts** تحتاجها لإنشاء الحسابات وإعادة تعيين كلمات المرور. أما تعديل الدور والتعطيل وشاشة الصلاحيات فتعمل بدونها.
+
 من مجلد المشروع:
 
 ```bash
 npx supabase login
-npx supabase functions deploy admin-users --project-ref <project-ref> --no-verify-jwt
+npx supabase functions deploy admin-users --remote=<project-ref> --no-verify-jwt
 ```
 
-- `project-ref` هو الجزء الأول من رابط المشروع: `https://<project-ref>.supabase.co`.
+- `project-ref` هو الجزء الأول من رابط المشروع: `https://<project-ref>.supabase.co`. (النسخ القديمة من أداة Supabase تستعمل `--project-ref <project-ref>` بدل `--remote`.)
+- التحذير `Docker is not running` عادي: الرفع يتم بدون Docker.
+- كل تعديل على ملف الوظيفة يحتاج إعادة نفس الأمر.
 - `--no-verify-jwt` ضروري: الوظيفة تتحقق بنفسها من هوية المستخدم ومن صلاحية `users.manage`.
 - لا تحتاج إلى نسخ أي مفتاح: Supabase يعطي الوظيفة مفاتيحها تلقائياً.
 

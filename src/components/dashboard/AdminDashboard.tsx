@@ -1,6 +1,10 @@
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useQuery } from '@tanstack/react-query';
 import AppLayout from '@/components/layout/AppLayout';
+import AccountsOverview from '@/components/dashboard/AccountsOverview';
+import { useAuth } from '@/context/AuthContext';
+import { fetchAccounts } from '@/lib/accounts';
 import {
   Card,
   CardContent,
@@ -213,13 +217,21 @@ const formatCurrency = (amount: number) => {
 };
 
 // --- Dashboard Widgets ---
-const StatsWidgets = ({ totalEmployees, totalMedicines }: { totalEmployees: number; totalMedicines: number }) => {
+const StatsWidgets = ({
+  totalEmployees,
+  totalMedicines,
+  employeesTitle = "Total Employees",
+}: {
+  totalEmployees: number;
+  totalMedicines: number;
+  employeesTitle?: string;
+}) => {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-2">
       {[
         { 
-          title: "Total Employees", 
+          title: employeesTitle, 
           value: totalEmployees, 
           icon: UserIcon,
           description: "Total employees in system"
@@ -804,6 +816,9 @@ const PharmacyManagement = ({ medicines, setMedicines }: PharmacyManagementProps
 
 // --- Main Dashboard Component ---
 export const UsersManagementPage = () => {
+  const { isDemo } = useAuth();
+  // With the server, the user list comes from the real staff accounts.
+  const accounts = useQuery({ queryKey: ['accounts'], queryFn: fetchAccounts, enabled: !isDemo });
   const [isLoading, setIsLoading] = useState(true);
   const [employees, setEmployees] = useState<Employee[]>(employeesData);
   const [medicines, setMedicines] = useState<Medicine[]>(medicinesData);
@@ -816,9 +831,17 @@ export const UsersManagementPage = () => {
     <AppLayout title="Admin Dashboard">
       <div className="min-h-screen w-full bg-gray-50">
         <main className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
-          <StatsWidgets totalEmployees={employees.length} totalMedicines={medicines.length} />
+          <StatsWidgets
+            totalEmployees={isDemo ? employees.length : accounts.data?.length ?? 0}
+            employeesTitle={isDemo ? "Total Employees" : "Staff accounts"}
+            totalMedicines={medicines.length}
+          />
           <div className="grid gap-6 md:grid-cols-2">
-            <UserManagementSection employees={employees} setEmployees={setEmployees} />
+            {isDemo ? (
+              <UserManagementSection employees={employees} setEmployees={setEmployees} />
+            ) : (
+              <AccountsOverview accounts={accounts} />
+            )}
             {isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
