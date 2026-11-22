@@ -54,10 +54,12 @@ select staff_id, full_name, active from public.profiles;
 
 ```bash
 npx supabase login
-npx supabase functions deploy admin-users --project-ref <project-ref> --no-verify-jwt
+npx supabase functions deploy admin-users --remote=<project-ref> --no-verify-jwt
 ```
 
-- `project-ref` هو الجزء الأول من رابط المشروع: `https://<project-ref>.supabase.co`.
+- `project-ref` هو الجزء الأول من رابط المشروع: `https://<project-ref>.supabase.co`. (النسخ القديمة من أداة Supabase تستعمل `--project-ref <project-ref>` بدل `--remote`.)
+- التحذير `Docker is not running` عادي: الرفع يتم بدون Docker.
+- كل تعديل على ملف الوظيفة يحتاج إعادة نفس الأمر.
 - `--no-verify-jwt` ضروري: الوظيفة تتحقق بنفسها من هوية المستخدم ومن صلاحية `users.manage`.
 - لا تحتاج إلى نسخ أي مفتاح: Supabase يعطي الوظيفة مفاتيحها تلقائياً.
 
