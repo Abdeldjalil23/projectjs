@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useNavigate } from 'react-router-dom';
 import AppLayout from '@/components/layout/AppLayout';
 import {
   Table,
@@ -45,7 +44,6 @@ const allUsersData = [
 type UserRole = 'all' | 'doctor' | 'admin';
 
 export const SocialDashboard = () => {
-  const navigate = useNavigate();
   // State to keep track of the current filter
   const [activeFilter, setActiveFilter] = useState<UserRole>('all');
 
@@ -116,9 +114,6 @@ export const SocialDashboard = () => {
               View, manage, and filter all system users.
             </CardDescription>
           </div>
-          <Button onClick={() => navigate('/admin/users')}>
-            Manage Users
-          </Button>
       </CardHeader>
 
           <CardContent className="space-y-4">
