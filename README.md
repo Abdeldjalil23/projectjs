@@ -29,6 +29,10 @@ npm run dev
 | `npm run preview` | تجربة نسخة النشر محلياً |
 | `npm run lint` | فحص الكود |
 
+## الخادم
+
+خطوات إعداد Supabase (الجداول، أول حساب إدارة، المفاتيح) في [docs/SETUP-SUPABASE.md](docs/SETUP-SUPABASE.md).
+
 ## الأدوار ولوحاتها
 
 | الدور | اللوحة |
