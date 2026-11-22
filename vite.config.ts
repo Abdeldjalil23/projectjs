@@ -13,4 +13,12 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        // The Supabase library changes rarely: a separate file stays cached between deployments.
+        manualChunks: { supabase: ["@supabase/supabase-js"] },
+      },
+    },
+  },
 });

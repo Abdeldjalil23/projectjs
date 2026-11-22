@@ -1,6 +1,6 @@
 // LoginScreen component for Sonatrach MedSuite
 import { useState } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import {
   Card, CardContent, CardDescription, CardHeader, CardTitle
@@ -13,6 +13,7 @@ import {
 import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react'; 
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { dashboardPathFor } from '@/lib/roles';
+import PageLoader from '@/components/shared/PageLoader';
 import { toast } from 'sonner';
 import {
   Select, SelectContent, SelectItem,
@@ -20,18 +21,40 @@ import {
 } from '@/components/ui/select';
 
 export const LoginScreen = () => {
-  const { login, isLoggedIn, userRole } = useAuth();
-  const navigate = useNavigate();
+  const { login, signIn, isLoggedIn, userRole, loading, isDemo } = useAuth();
   const location = useLocation();
 
   const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
   const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
   const [specialty, setSpecialty] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const specialties = ['MEDECINE', 'INFERMIER']; // Removed DENTISTE as it’s a separate role
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Real login: the role and permissions come from the account in the database.
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!ID.trim()) {
+      toast.error('Please enter your ID');
+      return;
+    }
+    if (!password) {
+      toast.error('Please enter your password');
+      return;
+    }
+
+    setSubmitting(true);
+    const error = await signIn(ID, password);
+    setSubmitting(false);
+    if (error) {
+      toast.error(error);
+      setPassword('');
+    }
+  };
+
+  // Demo login, used while no server is configured: the role is picked on this screen.
+  const handleDemoLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
     const idPattern = /^\d{4}[A-Z]$/;
@@ -57,14 +80,16 @@ export const LoginScreen = () => {
 
     login(selectedRole, { id: ID, specialty: selectedRole === 'doctor' ? specialty : undefined });
     toast.success(`Logged in as ${selectedRole}${selectedRole === 'doctor' ? ` (${specialty})` : ''}`);
-
-    // Go back to the page that was requested before login, otherwise to the role's dashboard.
-    const from = (location.state as { from?: string } | null)?.from;
-    navigate(from && from !== '/' ? from : dashboardPathFor(selectedRole), { replace: true });
   };
 
+  if (loading) {
+    return <PageLoader />;
+  }
+
+  // Once logged in, go back to the page that was requested before login, otherwise to the dashboard.
   if (isLoggedIn) {
-    return <Navigate to={dashboardPathFor(userRole)} replace />;
+    const from = (location.state as { from?: string } | null)?.from;
+    return <Navigate to={from && from !== '/' ? from : dashboardPathFor(userRole)} replace />;
   }
 
   return (
@@ -78,59 +103,63 @@ export const LoginScreen = () => {
         <Card className="border-medsuite-primary/20">
           <CardHeader>
             <CardTitle>Welcome back</CardTitle>
-            <CardDescription>Sign in to your account</CardDescription>
+            <CardDescription>
+              {isDemo ? 'Demo mode: no server is connected yet' : 'Sign in with your staff ID'}
+            </CardDescription>
           </CardHeader>
 
           <CardContent>
-            <Tabs
-              defaultValue="doctor"
-              className="mb-6"
-              onValueChange={(value) => setSelectedRole(value as UserRole)}
-            >
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="doctor" className="flex items-center gap-1">
-                  <Stethoscope className="h-4 w-4" />
-                  <span className="hidden sm:inline">Doctor</span>
-                </TabsTrigger>
-                <TabsTrigger value="admin" className="flex items-center gap-1">
-                  <Briefcase className="h-4 w-4" />
-                  <span className="hidden sm:inline">Admin</span>
-                </TabsTrigger>
-                <TabsTrigger value="social" className="flex items-center gap-1">
-                  <Users className="h-4 w-4" />
-                  <span className="hidden sm:inline">Social</span>
-                </TabsTrigger>
-                <TabsTrigger value="dentist" className="flex items-center gap-1">
-                  <Smile className="h-4 w-4" /> 
-                  <span className="hidden sm:inline">Dentist</span>
-                </TabsTrigger>
-              </TabsList>
+            {isDemo && (
+              <Tabs
+                defaultValue="doctor"
+                className="mb-6"
+                onValueChange={(value) => setSelectedRole(value as UserRole)}
+              >
+                <TabsList className="grid w-full grid-cols-4">
+                  <TabsTrigger value="doctor" className="flex items-center gap-1">
+                    <Stethoscope className="h-4 w-4" />
+                    <span className="hidden sm:inline">Doctor</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="admin" className="flex items-center gap-1">
+                    <Briefcase className="h-4 w-4" />
+                    <span className="hidden sm:inline">Admin</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="social" className="flex items-center gap-1">
+                    <Users className="h-4 w-4" />
+                    <span className="hidden sm:inline">Social</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="dentist" className="flex items-center gap-1">
+                    <Smile className="h-4 w-4" /> 
+                    <span className="hidden sm:inline">Dentist</span>
+                  </TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="doctor">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Manage patient appointments and medical records
-                </p>
-              </TabsContent>
-              <TabsContent value="admin">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Oversee healthcare system operations
-                </p>
-              </TabsContent>
-              <TabsContent value="social">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Provide social services and patient support
-                </p>
-              </TabsContent>
-              <TabsContent value="dentist">
-                <p className="text-sm text-muted-foreground mb-4">
-                  Manage dental appointments and patient records
-                </p>
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="doctor">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Manage patient appointments and medical records
+                  </p>
+                </TabsContent>
+                <TabsContent value="admin">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Oversee healthcare system operations
+                  </p>
+                </TabsContent>
+                <TabsContent value="social">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Provide social services and patient support
+                  </p>
+                </TabsContent>
+                <TabsContent value="dentist">
+                  <p className="text-sm text-muted-foreground mb-4">
+                    Manage dental appointments and patient records
+                  </p>
+                </TabsContent>
+              </Tabs>
+            )}
 
-            <form onSubmit={handleLogin}>
+            <form onSubmit={isDemo ? handleDemoLogin : handleSignIn}>
               <div className="grid gap-4">
-                {selectedRole === 'doctor' && (
+                {isDemo && selectedRole === 'doctor' && (
                   <div className="grid gap-2">
                     <Label htmlFor="specialty">Specialty</Label>
                     <Select value={specialty} onValueChange={setSpecialty}>
@@ -153,6 +182,7 @@ export const LoginScreen = () => {
                   <Input
                     id="ID"
                     placeholder="Enter your ID"
+                    autoComplete="username"
                     value={ID}
                     onChange={(e) => setID(e.target.value)}
                   />
@@ -161,22 +191,34 @@ export const LoginScreen = () => {
                 <div className="grid gap-2">
                   <div className="flex items-center justify-between">
                     <Label htmlFor="password">Password</Label>
-                    <a href="#" className="text-sm text-medsuite-primary hover:underline">
-                      Forgot password?
-                    </a>
+                    {isDemo && (
+                      <a href="#" className="text-sm text-medsuite-primary hover:underline">
+                        Forgot password?
+                      </a>
+                    )}
                   </div>
                   <Input
                     id="password"
                     type="password"
                     placeholder="Enter your password"
+                    autoComplete="current-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                 </div>
 
-                <Button type="submit" className="bg-medsuite-primary hover:bg-medsuite-accent">
-                  Sign In
+                <Button
+                  type="submit"
+                  disabled={submitting}
+                  className="bg-medsuite-primary hover:bg-medsuite-accent"
+                >
+                  {submitting ? 'Signing in…' : 'Sign In'}
                 </Button>
+                {!isDemo && (
+                  <p className="text-center text-xs text-muted-foreground">
+                    Forgot your password? Ask the administrator to reset it.
+                  </p>
+                )}
               </div>
             </form>
           </CardContent>

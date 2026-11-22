@@ -14,13 +14,14 @@ interface HeaderProps {
 }
 
 export const Header = ({ title }: HeaderProps) => {
-  const { userRole, userId, specialty, logout } = useAuth();
+  const { userRole, userId, specialty, fullName, roleLabel: accountRole, logout } = useAuth();
   const [notifications] = useState(3);
 
   const initials = userRole ? ROLE_INITIALS[userRole] : 'US';
-  const roleLabel = userRole ? ROLE_LABELS[userRole] : 'User';
-  const displayName = userId ? `ID ${userId}` : roleLabel;
-  const subtitle = specialty ? `${roleLabel} · ${specialty}` : roleLabel;
+  const roleLabel = accountRole ?? (userRole ? ROLE_LABELS[userRole] : 'User');
+  const displayName = fullName || (userId ? `ID ${userId}` : roleLabel);
+  const details = [roleLabel, specialty !== roleLabel ? specialty : null, fullName && userId ? `ID ${userId}` : null];
+  const subtitle = details.filter(Boolean).join(' · ');
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 backdrop-blur px-4">

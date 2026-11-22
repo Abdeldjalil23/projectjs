@@ -30,3 +30,16 @@ export const ROLE_INITIALS: Record<Role, string> = {
 
 export const dashboardPathFor = (role: UserRole): string =>
   role ? DASHBOARD_BY_ROLE[role] : '/login';
+
+/**
+ * Which workspace of the app each account role (roles.code in the database) opens.
+ * Nurses share the doctors' workspace, as in the demo login. Roles that are not listed
+ * here (psychologist, contracted doctor) have no workspace yet and cannot sign in.
+ */
+export const WORKSPACE_BY_STAFF_ROLE: Record<string, { role: Role; specialty?: string }> = {
+  admin: { role: 'admin' },
+  doctor: { role: 'doctor' },
+  nurse: { role: 'doctor', specialty: 'Nurse' },
+  dentist: { role: 'dentist' },
+  social_worker: { role: 'social' },
+};
