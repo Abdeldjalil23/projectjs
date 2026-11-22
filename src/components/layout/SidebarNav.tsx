@@ -24,6 +24,8 @@ import {
   HeartPulse,
   ClipboardCheck,
   Stethoscope,
+  UserCog,
+  ShieldCheck,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -33,7 +35,7 @@ type MenuItem = {
 };
 
 export const SidebarNav = () => {
-  const { userRole, logout } = useAuth();
+  const { userRole, logout, isDemo, can } = useAuth();
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const location = useLocation();
 
@@ -52,6 +54,9 @@ export const SidebarNav = () => {
         { title: 'Reports', icon: FileText, url: '/admin/reports' },
         { title: 'Visite Périodique', icon: FileText, url: '/admin/visite-perdue' },
         { title: 'Requests prise en charge', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
+        // Account and permission management works only with the real server.
+        ...(!isDemo && can('users.manage') ? [{ title: 'Staff accounts', icon: UserCog, url: '/admin/accounts' }] : []),
+        ...(!isDemo && can('roles.manage') ? [{ title: 'Roles & permissions', icon: ShieldCheck, url: '/admin/roles' }] : []),
       ]);
     } else if (userRole === 'social') {
       setMenuItems([
@@ -67,7 +72,7 @@ export const SidebarNav = () => {
         { title: 'Patient Management', icon: HeartPulse, url: '/dentist/patient-management' },
       ]);
     }
-  }, [userRole]);
+  }, [userRole, isDemo, can]);
 
   const userRoleLabel = () => {
     switch (userRole) {

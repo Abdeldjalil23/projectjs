@@ -31,6 +31,8 @@ const AdminDashboard = lazy(() => import("./components/dashboard/AdminDashboard"
 const ReportsPage = lazy(() => import("./pages/admin/ReportsPage"));
 const AdminViPerdPage = lazy(() => import("./pages/admin/AdminViPerdPage"));
 const RequestsPriseEnChargePage = lazy(() => import("./pages/admin/RequestsPriseEnCharge"));
+const AccountsPage = lazy(() => import("./pages/admin/AccountsPage"));
+const RolesPermissionsPage = lazy(() => import("./pages/admin/RolesPermissionsPage"));
 
 // Pages social
 const SocialDashboard = lazy(() => import("./components/dashboard/SocialDashboard"));
@@ -55,7 +57,7 @@ const HomeRedirect = () => {
   return <Navigate to={dashboardPathFor(userRole)} replace />;
 };
 
-const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[] }[] = [
+const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[]; permission?: string }[] = [
   { path: "/", element: <HomeRedirect /> },
   { path: "/settings", element: <SettingsPage /> },
 
@@ -76,6 +78,8 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[] 
   { path: "/admin/visite-perdue", element: <AdminViPerdPage />, roles: ADMIN },
   { path: "/visite-perdue", element: <Navigate to="/admin/visite-perdue" replace />, roles: ADMIN },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage />, roles: ADMIN },
+  { path: "/admin/accounts", element: <AccountsPage />, roles: ADMIN, permission: "users.manage" },
+  { path: "/admin/roles", element: <RolesPermissionsPage />, roles: ADMIN, permission: "roles.manage" },
 
   // Social
   { path: "/social/dashboard", element: <SocialDashboard />, roles: SOCIAL },
@@ -104,11 +108,15 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
 
                 {/* Routes protégées */}
-                {protectedRoutes.map(({ path, element, roles }) => (
+                {protectedRoutes.map(({ path, element, roles, permission }) => (
                   <Route
                     key={path}
                     path={path}
-                    element={<PrivateRoute roles={roles}>{element}</PrivateRoute>}
+                    element={
+                      <PrivateRoute roles={roles} permission={permission}>
+                        {element}
+                      </PrivateRoute>
+                    }
                   />
                 ))}
 
