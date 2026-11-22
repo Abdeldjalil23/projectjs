@@ -115,7 +115,11 @@ const callAdminUsers = async (body: Record<string, unknown>) => {
     const details = await response.json().catch(() => null);
     throw new Error(details?.error || `The account service refused the request (${response.status}).`);
   }
-  throw new Error('Could not reach the account service. Please try again.');
+  // No answer at all: usually the function is not deployed, or still checks tokens itself
+  // (deploy it with --no-verify-jwt, see docs/SETUP-SUPABASE.md, step 4).
+  throw new Error(
+    'Could not reach the account service. Check that admin-users is deployed with --no-verify-jwt (docs/SETUP-SUPABASE.md, step 4).',
+  );
 };
 
 export const createAccount = (input: {

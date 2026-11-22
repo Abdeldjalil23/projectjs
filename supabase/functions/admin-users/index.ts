@@ -7,9 +7,11 @@
 // POST { action: "reset_password", user_id, password }
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
+// Every header the Supabase library may send, so the browser's preflight check passes.
 const cors = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers':
+    'authorization, x-client-info, apikey, content-type, x-retry-count, traceparent, tracestate, baggage',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
