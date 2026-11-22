@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import {
   Sidebar,
   SidebarContent,
@@ -18,99 +19,87 @@ import {
   Home,
   FileText,
   Users,
-  Settings,
   LogOut,
-  Bell,
   HeartPulse,
   ClipboardCheck,
-  Stethoscope,
   UserCog,
   ShieldCheck,
 } from 'lucide-react';
 
 type MenuItem = {
-  title: string;
+  /** Text key under "nav". */
+  label: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   url: string;
 };
 
 export const SidebarNav = () => {
-  const { userRole, logout, isDemo, can } = useAuth();
-  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const { t, i18n } = useTranslation();
+  const { userRole, staffRole, roleLabel, logout, isDemo, can } = useAuth();
   const location = useLocation();
 
-  useEffect(() => {
-    if (userRole === 'doctor') {
-      setMenuItems([
-        { title: 'Dashboard', icon: Home, url: '/medecin/dashboard' },
-        // { title: 'Consultation', icon: Stethoscope, url: '/nouvelle-consultation' },
-        { title: 'Dossiers Médicaux', icon: FileText, url: '/dossiers-medicaux' },
-        { title: 'Visite Périodique', icon: FileText, url: '/visite-periodique' },
-        { title: 'Reports', icon: FileText, url: '/medecin/reports' },
-      ]);
-    } else if (userRole === 'admin') {
-      setMenuItems([
-        { title: 'Dashboard', icon: Home, url: '/admin/dashboard' },
-        { title: 'Reports', icon: FileText, url: '/admin/reports' },
-        { title: 'Visite Périodique', icon: FileText, url: '/admin/visite-perdue' },
-        { title: 'Requests prise en charge', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
-        // Account and permission management works only with the real server.
-        ...(!isDemo && can('users.manage') ? [{ title: 'Staff accounts', icon: UserCog, url: '/admin/accounts' }] : []),
-        ...(!isDemo && can('roles.manage') ? [{ title: 'Roles & permissions', icon: ShieldCheck, url: '/admin/roles' }] : []),
-      ]);
-    } else if (userRole === 'social') {
-      setMenuItems([
-        { title: 'Dashboard', icon: Home, url: '/social/dashboard' },
-        { title: 'Patient Support', icon: HeartPulse, url: '/social/patients' },
-        { title: 'Social Services', icon: Users, url: '/social/services' },
-        { title: 'Reports', icon: FileText, url: '/social/reports' },
-        { title: 'Resources', icon: FileText, url: '/social/resources' },
-      ]);
-    } else if (userRole === 'dentist') {
-      setMenuItems([
-        { title: 'Dashboard', icon: Home, url: '/dentist/dashboard' },
-        { title: 'Patient Management', icon: HeartPulse, url: '/dentist/patient-management' },
-      ]);
+  const menuItems = useMemo<MenuItem[]>(() => {
+    switch (userRole) {
+      case 'doctor':
+        return [
+          { label: 'dashboard', icon: Home, url: '/medecin/dashboard' },
+          { label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' },
+          { label: 'periodicVisit', icon: FileText, url: '/visite-periodique' },
+          { label: 'reports', icon: FileText, url: '/medecin/reports' },
+        ];
+      case 'admin':
+        return [
+          { label: 'dashboard', icon: Home, url: '/admin/dashboard' },
+          { label: 'reports', icon: FileText, url: '/admin/reports' },
+          { label: 'periodicVisit', icon: FileText, url: '/admin/visite-perdue' },
+          { label: 'careRequests', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
+          // Account and permission management works only with the real server.
+          ...(!isDemo && can('users.manage') ? [{ label: 'staffAccounts', icon: UserCog, url: '/admin/accounts' }] : []),
+          ...(!isDemo && can('roles.manage') ? [{ label: 'rolesPermissions', icon: ShieldCheck, url: '/admin/roles' }] : []),
+        ];
+      case 'social':
+        return [
+          { label: 'dashboard', icon: Home, url: '/social/dashboard' },
+          { label: 'patientSupport', icon: HeartPulse, url: '/social/patients' },
+          { label: 'socialServices', icon: Users, url: '/social/services' },
+          { label: 'reports', icon: FileText, url: '/social/reports' },
+          { label: 'resources', icon: FileText, url: '/social/resources' },
+        ];
+      case 'dentist':
+        return [
+          { label: 'dashboard', icon: Home, url: '/dentist/dashboard' },
+          { label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' },
+        ];
+      default:
+        return [];
     }
   }, [userRole, isDemo, can]);
 
-  const userRoleLabel = () => {
-    switch (userRole) {
-      case 'doctor':
-        return 'Doctor';
-      case 'admin':
-        return 'Administrator';
-      case 'social':
-        return 'Social Worker';
-      case 'dentist':
-        return 'Dentist';
-      default:
-        return '';
-    }
-  };
+  const roleName = staffRole ? t(`roles.${staffRole}`, { defaultValue: roleLabel ?? '' }) : '';
 
   return (
-    <Sidebar>
+    // In Arabic the menu sits on the right, where reading starts.
+    <Sidebar side={i18n.dir() === 'rtl' ? 'right' : 'left'}>
       <SidebarHeader>
         <div className="flex items-center gap-2 py-1">
           <HeartPulse className="h-6 w-6" />
           <div>
             <h1 className="text-lg font-semibold">MedSuite</h1>
-            <p className="text-xs opacity-80">{userRoleLabel()} Portal</p>
+            <p className="text-xs opacity-80">{t('nav.portal', { role: roleName })}</p>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
+          <SidebarGroupLabel>{t('nav.mainMenu')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={location.pathname === item.url}>
                     <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                      <span>{t(`nav.${item.label}`)}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -120,13 +109,13 @@ export const SidebarNav = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <Button 
+        <Button
           variant="outline"
           className="w-full justify-start border-orange-500 text-orange-500"
           onClick={logout}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Sign Out
+          <LogOut className="me-2 h-4 w-4 rtl:-scale-x-100" />
+          {t('nav.signOut')}
         </Button>
       </SidebarFooter>
     </Sidebar>

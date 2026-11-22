@@ -2,6 +2,8 @@
 import { Fragment, useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { useTranslation } from 'react-i18next';
+import { permissionKey } from '@/i18n';
 import { Lock } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -30,15 +32,16 @@ import {
   setRolePermission,
 } from '@/lib/accounts';
 
-const MODULES: { code: string; label: string }[] = [
-  { code: 'administration', label: 'Administration' },
-  { code: 'beneficiaries', label: 'Beneficiaries' },
-  { code: 'clinical', label: 'Clinical data (medical secrecy)' },
-  { code: 'care_requests', label: 'Care coverage requests' },
-  { code: 'appointments', label: 'Appointments' },
-  { code: 'pharmacy', label: 'Pharmacy' },
-  { code: 'social', label: 'Social support' },
-  { code: 'reports', label: 'Reports' },
+// Order of the permission groups; their names are in the "rolesPage.modules" texts.
+const MODULES = [
+  'administration',
+  'beneficiaries',
+  'clinical',
+  'care_requests',
+  'appointments',
+  'pharmacy',
+  'social',
+  'reports',
 ];
 
 /** The administration role always keeps these, so nobody is locked out (also enforced by the database). */
@@ -55,6 +58,7 @@ interface Change {
 }
 
 export const RolesPermissionsPage = () => {
+  const { t } = useTranslation();
   const { isDemo } = useAuth();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<Change | null>(null);
@@ -70,10 +74,14 @@ export const RolesPermissionsPage = () => {
 
   const groups = useMemo(() => {
     const list = permissions.data ?? [];
-    const known = MODULES.map((m) => ({ ...m, items: list.filter((p) => p.module === m.code) }));
-    const others = list.filter((p) => !MODULES.some((m) => m.code === p.module));
-    return [...known, { code: 'other', label: 'Other', items: others }].filter((g) => g.items.length > 0);
+    const known = MODULES.map((code) => ({ code, items: list.filter((p) => p.module === code) }));
+    const others = list.filter((p) => !MODULES.includes(p.module));
+    return [...known, { code: 'other', items: others }].filter((g) => g.items.length > 0);
   }, [permissions.data]);
+
+  const roleName = (role: StaffRole) => t(`roles.${role.code}`, { defaultValue: role.name_en });
+  const permissionText = (permission: Permission) =>
+    t(permissionKey(permission.code), { defaultValue: permission.description });
 
   const change = useMutation({
     mutationFn: ({ role, permission, granted: on }: Change) => setRolePermission(role.id, permission.id, on),
@@ -91,10 +99,12 @@ export const RolesPermissionsPage = () => {
     },
     onError: (e, _change, context) => {
       if (context) queryClient.setQueryData(['role_permissions'], context.previous);
-      toast.error(e instanceof Error ? e.message : 'The change was not saved.');
+      toast.error(e instanceof Error ? e.message : t('rolesPage.notSaved'));
     },
     onSuccess: (_, { role, permission, granted: on }) => {
-      toast.success(`${role.name_en}: ${permission.code} ${on ? 'granted' : 'removed'}`);
+      toast.success(
+        t(on ? 'rolesPage.granted' : 'rolesPage.removed', { role: roleName(role), permission: permissionText(permission) }),
+      );
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['role_permissions'] }),
   });
@@ -109,7 +119,7 @@ export const RolesPermissionsPage = () => {
 
   if (isDemo) {
     return (
-      <AppLayout title="Roles & permissions">
+      <AppLayout title={t('rolesPage.title')}>
         <ServerRequiredNotice />
       </AppLayout>
     );
@@ -119,31 +129,28 @@ export const RolesPermissionsPage = () => {
   const failed = roles.error || permissions.error || matrix.error;
 
   return (
-    <AppLayout title="Roles & permissions">
+    <AppLayout title={t('rolesPage.title')}>
       <Card>
         <CardHeader>
-          <CardTitle>Roles & permissions</CardTitle>
-          <CardDescription>
-            Tick what each role may do. Each change is saved at once and written to the audit log. Data access
-            changes immediately; menus follow at the person's next sign-in.
-          </CardDescription>
+          <CardTitle>{t('rolesPage.title')}</CardTitle>
+          <CardDescription>{t('rolesPage.description')}</CardDescription>
         </CardHeader>
         <CardContent>
           {loading ? (
-            <p className="py-8 text-center text-sm text-muted-foreground">Loading…</p>
+            <p className="py-8 text-center text-sm text-muted-foreground">{t('common.loading')}</p>
           ) : failed ? (
             <p className="py-8 text-center text-sm text-destructive">
-              {failed instanceof Error ? failed.message : 'Could not load the permissions.'}
+              {failed instanceof Error ? failed.message : t('rolesPage.loadFailed')}
             </p>
           ) : (
             <div className="overflow-x-auto rounded-md border">
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[260px]">Permission</TableHead>
+                    <TableHead className="min-w-[260px]">{t('rolesPage.permission')}</TableHead>
                     {(roles.data ?? []).map((role) => (
                       <TableHead key={role.id} className="text-center text-xs">
-                        {role.name_en}
+                        {roleName(role)}
                       </TableHead>
                     ))}
                   </TableRow>
@@ -153,21 +160,23 @@ export const RolesPermissionsPage = () => {
                     <Fragment key={group.code}>
                       <TableRow className="bg-muted/50 hover:bg-muted/50">
                         <TableCell colSpan={(roles.data?.length ?? 0) + 1} className="py-2 text-sm font-semibold">
-                          {group.label}
+                          {t(`rolesPage.modules.${group.code}`)}
                         </TableCell>
                       </TableRow>
                       {group.items.map((permission) => (
                         <TableRow key={permission.id} data-permission={permission.code}>
                           <TableCell>
                             <div className="flex flex-wrap items-center gap-2">
-                              <span className="text-sm">{permission.description}</span>
+                              <span className="text-sm">{permissionText(permission)}</span>
                               {permission.is_medical && (
                                 <Badge variant="outline" className="border-red-300 text-red-700">
-                                  medical
+                                  {t('rolesPage.medical')}
                                 </Badge>
                               )}
                             </div>
-                            <span className="font-mono text-xs text-muted-foreground">{permission.code}</span>
+                            <span className="font-mono text-xs text-muted-foreground" dir="ltr">
+                              {permission.code}
+                            </span>
                           </TableCell>
                           {(roles.data ?? []).map((role) => {
                             const on = granted.has(key(role.id, permission.id));
@@ -178,13 +187,13 @@ export const RolesPermissionsPage = () => {
                                   <Checkbox
                                     checked={on}
                                     disabled={locked}
-                                    aria-label={`${role.name_en}: ${permission.code}`}
+                                    aria-label={`${roleName(role)}: ${permission.code}`}
                                     onCheckedChange={(value) => request(role, permission, value === true)}
                                   />
                                   {locked && (
                                     <Lock
                                       className="h-3 w-3 text-muted-foreground"
-                                      aria-label="Always kept by the administration role"
+                                      aria-label={t('rolesPage.alwaysKept')}
                                     />
                                   )}
                                 </div>
@@ -205,15 +214,18 @@ export const RolesPermissionsPage = () => {
       <AlertDialog open={confirming !== null} onOpenChange={(open) => !open && setConfirming(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Give medical access to {confirming?.role.name_en}?</AlertDialogTitle>
+            <AlertDialogTitle>
+              {confirming && t('rolesPage.confirmTitle', { role: roleName(confirming.role) })}
+            </AlertDialogTitle>
             <AlertDialogDescription>
-              “{confirming?.permission.description}” gives access to data covered by medical secrecy. This role is
-              not part of the care team.
+              {confirming && t('rolesPage.confirmBody', { permission: permissionText(confirming.permission) })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => confirming && change.mutate(confirming)}>Give access</AlertDialogAction>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => confirming && change.mutate(confirming)}>
+              {t('rolesPage.confirmAction')}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -123,8 +123,9 @@ export default {
 				'pulse-soft': 'pulse-soft 3s infinite ease-in-out'
 			},
 			fontFamily: {
-				sans: ['Inter', 'sans-serif'],
-				heading: ['Montserrat', 'sans-serif']
+				// Latin letters use Inter / Montserrat; Arabic letters fall back to Noto Sans Arabic (bundled).
+				sans: ['Inter', 'Noto Sans Arabic', 'sans-serif'],
+				heading: ['Montserrat', 'Noto Sans Arabic', 'sans-serif']
 			}
 		}
 	},

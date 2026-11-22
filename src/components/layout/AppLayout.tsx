@@ -1,9 +1,9 @@
 
 import { SidebarProvider } from '@/components/ui/sidebar';
-import { useAuth } from '@/context/AuthContext';
 import SidebarNav from './SidebarNav';
 import Header from './Header';
 import { ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface AppLayoutProps {
   children: ReactNode;
@@ -11,7 +11,7 @@ interface AppLayoutProps {
 }
 
 export const AppLayout = ({ children, title }: AppLayoutProps) => {
-  const { userRole } = useAuth();
+  const { t } = useTranslation();
 
   return (
     <SidebarProvider>
@@ -24,7 +24,7 @@ export const AppLayout = ({ children, title }: AppLayoutProps) => {
           </main>
           <footer className="border-t py-3 px-6">
             <div className="text-xs text-muted-foreground text-center">
-              &copy; {new Date().getFullYear()} Sonatrach MedSuite | Employee Healthcare Platform
+              {t('footer', { year: new Date().getFullYear() })}
             </div>
           </footer>
         </div>

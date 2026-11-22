@@ -3,6 +3,8 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { lazy, Suspense } from "react";
+import { DirectionProvider } from "@radix-ui/react-direction";
+import { useTranslation } from "react-i18next";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import NotFound from "./pages/NotFound";
 import LoginPage from "./components/LoginScreen";
@@ -94,40 +96,46 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
 ];
 
 function App() {
+  // Arabic is written right to left: menus, dialogs and notifications follow the direction.
+  const { i18n } = useTranslation();
+  const dir = i18n.dir();
+
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner richColors />
-        <BrowserRouter>
-          <AuthProviderWithNavigate>
-            <ChroniqueProvider>
-              <Suspense fallback={<PageLoader />}>
-              <Routes>
-                {/* Route login public */}
-                <Route path="/login" element={<LoginPage />} />
+      <DirectionProvider dir={dir}>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner richColors dir={dir} position={dir === "rtl" ? "bottom-left" : "bottom-right"} />
+          <BrowserRouter>
+            <AuthProviderWithNavigate>
+              <ChroniqueProvider>
+                <Suspense fallback={<PageLoader />}>
+                <Routes>
+                  {/* Route login public */}
+                  <Route path="/login" element={<LoginPage />} />
 
-                {/* Routes protégées */}
-                {protectedRoutes.map(({ path, element, roles, permission }) => (
-                  <Route
-                    key={path}
-                    path={path}
-                    element={
-                      <PrivateRoute roles={roles} permission={permission}>
-                        {element}
-                      </PrivateRoute>
-                    }
-                  />
-                ))}
+                  {/* Routes protégées */}
+                  {protectedRoutes.map(({ path, element, roles, permission }) => (
+                    <Route
+                      key={path}
+                      path={path}
+                      element={
+                        <PrivateRoute roles={roles} permission={permission}>
+                          {element}
+                        </PrivateRoute>
+                      }
+                    />
+                  ))}
 
-                {/* Route 404 */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-              </Suspense>
-            </ChroniqueProvider>
-          </AuthProviderWithNavigate>
-        </BrowserRouter>
-      </TooltipProvider>
+                  {/* Route 404 */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+                </Suspense>
+              </ChroniqueProvider>
+            </AuthProviderWithNavigate>
+          </BrowserRouter>
+        </TooltipProvider>
+      </DirectionProvider>
     </QueryClientProvider>
   );
 }

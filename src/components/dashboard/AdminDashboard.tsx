@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useQuery } from '@tanstack/react-query';
+import { useTranslation } from 'react-i18next';
 import AppLayout from '@/components/layout/AppLayout';
 import AccountsOverview from '@/components/dashboard/AccountsOverview';
 import { useAuth } from '@/context/AuthContext';
@@ -816,6 +817,7 @@ const PharmacyManagement = ({ medicines, setMedicines }: PharmacyManagementProps
 
 // --- Main Dashboard Component ---
 export const UsersManagementPage = () => {
+  const { t } = useTranslation();
   const { isDemo } = useAuth();
   // With the server, the user list comes from the real staff accounts.
   const accounts = useQuery({ queryKey: ['accounts'], queryFn: fetchAccounts, enabled: !isDemo });
@@ -833,7 +835,7 @@ export const UsersManagementPage = () => {
         <main className="flex flex-col gap-6 p-4 md:p-6 lg:p-8">
           <StatsWidgets
             totalEmployees={isDemo ? employees.length : accounts.data?.length ?? 0}
-            employeesTitle={isDemo ? "Total Employees" : "Staff accounts"}
+            employeesTitle={isDemo ? "Total Employees" : t('overview.title')}
             totalMedicines={medicines.length}
           />
           <div className="grid gap-6 md:grid-cols-2">
