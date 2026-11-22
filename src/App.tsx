@@ -11,6 +11,7 @@ import { AuthProviderWithNavigate } from "./context/AuthProviderWithNavigate";
 import { useAuth, UserRole } from "./context/AuthContext";
 import { dashboardPathFor } from "./lib/roles";
 import { ChroniqueProvider } from "./context/ChroniqueContext";
+import PageLoader from "./components/shared/PageLoader";
 
 // Pages are loaded on demand so the first visit downloads less code.
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
@@ -42,13 +43,6 @@ const SocialResourcesPage = lazy(() => import("./pages/social/SocialResourcesPag
 const PatientManagement = lazy(() => import("./pages/dentist/PatientManagement"));
 
 const queryClient = new QueryClient();
-
-// Shown while the code of a page is being downloaded (pages are loaded on demand).
-const PageLoader = () => (
-  <div className="flex min-h-screen items-center justify-center">
-    <div className="h-10 w-10 animate-spin rounded-full border-4 border-medsuite-primary border-t-transparent" />
-  </div>
-);
 
 const DOCTOR: UserRole[] = ["doctor"];
 const ADMIN: UserRole[] = ["admin"];
