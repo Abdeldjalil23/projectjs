@@ -33,6 +33,8 @@ npm run dev
 
 خطوات إعداد Supabase (الجداول، أول حساب إدارة، المفاتيح) في [docs/SETUP-SUPABASE.md](docs/SETUP-SUPABASE.md).
 
+لتجربة استيراد المستفيدين يوجد ملف بأسماء مختلقة: [docs/samples/beneficiaires-exemple.csv](docs/samples/beneficiaires-exemple.csv). لا تُدخل بيانات عمال حقيقية قبل الموافقة الرسمية.
+
 ## الأدوار ولوحاتها
 
 | الدور | اللوحة |

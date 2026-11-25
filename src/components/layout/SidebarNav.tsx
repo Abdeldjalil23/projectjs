@@ -24,6 +24,7 @@ import {
   ClipboardCheck,
   UserCog,
   ShieldCheck,
+  Contact,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -39,10 +40,14 @@ export const SidebarNav = () => {
   const location = useLocation();
 
   const menuItems = useMemo<MenuItem[]>(() => {
+    // Real data pages, shown to every workspace whose role has the permission.
+    const beneficiaries: MenuItem[] =
+      !isDemo && can('beneficiaries.read') ? [{ label: 'beneficiaries', icon: Contact, url: '/beneficiaries' }] : [];
     switch (userRole) {
       case 'doctor':
         return [
           { label: 'dashboard', icon: Home, url: '/medecin/dashboard' },
+          ...beneficiaries,
           { label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' },
           { label: 'periodicVisit', icon: FileText, url: '/visite-periodique' },
           { label: 'reports', icon: FileText, url: '/medecin/reports' },
@@ -50,6 +55,7 @@ export const SidebarNav = () => {
       case 'admin':
         return [
           { label: 'dashboard', icon: Home, url: '/admin/dashboard' },
+          ...beneficiaries,
           { label: 'reports', icon: FileText, url: '/admin/reports' },
           { label: 'periodicVisit', icon: FileText, url: '/admin/visite-perdue' },
           { label: 'careRequests', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
@@ -60,6 +66,7 @@ export const SidebarNav = () => {
       case 'social':
         return [
           { label: 'dashboard', icon: Home, url: '/social/dashboard' },
+          ...beneficiaries,
           { label: 'patientSupport', icon: HeartPulse, url: '/social/patients' },
           { label: 'socialServices', icon: Users, url: '/social/services' },
           { label: 'reports', icon: FileText, url: '/social/reports' },
@@ -68,6 +75,7 @@ export const SidebarNav = () => {
       case 'dentist':
         return [
           { label: 'dashboard', icon: Home, url: '/dentist/dashboard' },
+          ...beneficiaries,
           { label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' },
         ];
       default:

@@ -1,0 +1,15 @@
+﻿Matricule;Nom;Prénom;Date de naissance;Sexe;Catégorie;Matricule agent;Lien de parenté;Entreprise;Structure;Téléphone
+100101;BENALI;Karim;12/03/1978;M;Agent SH;;;Sonatrach;DP Hassi Messaoud;0661000001
+;BENALI;Amina;05/07/1982;F;Ayant droit;100101;Conjointe;;;
+;BENALI;Yacine;20/01/2010;M;Ayant droit;100101;Enfant;;;
+;BENALI;Lina;14/09/2015;F;Ayant droit;100101;Enfant;;;
+100102;HAMDI;Sofiane;02/11/1985;M;Agent SH;;;Sonatrach;DP Ouargla;0661000002
+;HAMDI;Nadia;30/04/1988;F;Ayant droit;100102;Conjointe;;;
+;HAMDI;Rayan;08/06/2019;M;Ayant droit;100102;Enfant;;;
+100103;KHELIFI;Samira;19/02/1990;F;Agent SH;;;Sonatrach;Direction régionale Ouargla;0661000003
+100104;SAIDI;Omar;15/08/1992;H;Agent;;;Sonatrach;DP Hassi Messaoud;
+100105;BOUZID;Leila;27/03/1986;F;Agent SH;;;Sonatrach;DP Ouargla;
+900201;MEBARKI;Ahmed;10/10/1955;M;Retraité;;;Sonatrach;;0661000004
+;MEBARKI;Fatma;01/01/1958;F;AD retraité;900201;Epouse;;;
+500301;ZITOUNI;Mourad;23/05/1987;M;Entreprise contractante;;;Entreprise Exemple;Chantier Nord;0661000005
+;ZITOUNI;Ines;11/12/2016;F;Ayant droit contractant;500301;Fille;;;
