@@ -25,6 +25,7 @@ import {
   UserCog,
   ShieldCheck,
   Contact,
+  CalendarCheck,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -43,6 +44,13 @@ export const SidebarNav = () => {
     // Real data pages, shown to every workspace whose role has the permission.
     const beneficiaries: MenuItem[] =
       !isDemo && can('beneficiaries.read') ? [{ label: 'beneficiaries', icon: Contact, url: '/beneficiaries' }] : [];
+    // Visit schedule: the real page once the server is connected, the sample page in the demo.
+    const visits = (demoUrl: string): MenuItem[] =>
+      isDemo
+        ? [{ label: 'periodicVisit', icon: FileText, url: demoUrl }]
+        : can('appointments.read')
+          ? [{ label: 'visits', icon: CalendarCheck, url: '/visits' }]
+          : [];
     switch (userRole) {
       case 'doctor':
         return [
@@ -50,7 +58,7 @@ export const SidebarNav = () => {
           ...beneficiaries,
           // Sample pages, replaced by the patient files once the server is connected.
           ...(isDemo ? [{ label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' }] : []),
-          { label: 'periodicVisit', icon: FileText, url: '/visite-periodique' },
+          ...visits('/visite-periodique'),
           { label: 'reports', icon: FileText, url: '/medecin/reports' },
         ];
       case 'admin':
@@ -58,7 +66,7 @@ export const SidebarNav = () => {
           { label: 'dashboard', icon: Home, url: '/admin/dashboard' },
           ...beneficiaries,
           { label: 'reports', icon: FileText, url: '/admin/reports' },
-          { label: 'periodicVisit', icon: FileText, url: '/admin/visite-perdue' },
+          ...visits('/admin/visite-perdue'),
           { label: 'careRequests', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
           // Account and permission management works only with the real server.
           ...(!isDemo && can('users.manage') ? [{ label: 'staffAccounts', icon: UserCog, url: '/admin/accounts' }] : []),

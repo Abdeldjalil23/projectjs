@@ -38,6 +38,8 @@ const BeneficiariesPage = lazy(() => import("./pages/beneficiaries/Beneficiaries
 const ImportBeneficiariesPage = lazy(() => import("./pages/beneficiaries/ImportBeneficiariesPage"));
 const PatientFilePage = lazy(() => import("./pages/patient/PatientFilePage"));
 const RolesPermissionsPage = lazy(() => import("./pages/admin/RolesPermissionsPage"));
+const VisitSchedulePage = lazy(() => import("./pages/visits/VisitSchedulePage"));
+const VisitCertificatePage = lazy(() => import("./pages/visits/VisitCertificatePage"));
 
 // Pages social
 const SocialDashboard = lazy(() => import("./components/dashboard/SocialDashboard"));
@@ -84,12 +86,12 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/dossier/:id", element: <DemoOnly to="/beneficiaries"><DossierDetailsPage /></DemoOnly>, roles: DOCTOR },
   { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation />, roles: DOCTOR },
   { path: "/nouvelle-consultation", element: <NouvelleConsultation />, roles: DOCTOR },
-  { path: "/visite-periodique", element: <MedViPerPage />, roles: DOCTOR },
+  { path: "/visite-periodique", element: <DemoOnly to="/visits"><MedViPerPage /></DemoOnly>, roles: DOCTOR },
 
   // Admin
   { path: "/admin/dashboard", element: <AdminDashboard />, roles: ADMIN },
   { path: "/admin/reports", element: <ReportsPage />, roles: ADMIN },
-  { path: "/admin/visite-perdue", element: <AdminViPerdPage />, roles: ADMIN },
+  { path: "/admin/visite-perdue", element: <DemoOnly to="/visits?tab=appointments&status=missed"><AdminViPerdPage /></DemoOnly>, roles: ADMIN },
   { path: "/visite-perdue", element: <Navigate to="/admin/visite-perdue" replace />, roles: ADMIN },
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage />, roles: ADMIN },
   { path: "/admin/accounts", element: <AccountsPage />, roles: ADMIN, permission: "users.manage" },
@@ -97,6 +99,8 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/beneficiaries", element: <BeneficiariesPage />, roles: STAFF, permission: "beneficiaries.read" },
   { path: "/beneficiaries/import", element: <ImportBeneficiariesPage />, roles: STAFF, permission: "beneficiaries.import" },
   { path: "/beneficiaries/:id", element: <PatientFilePage />, roles: STAFF, permission: "beneficiaries.read" },
+  { path: "/visits", element: <VisitSchedulePage />, roles: STAFF, permission: "appointments.read" },
+  { path: "/visits/:id/certificate", element: <VisitCertificatePage />, roles: STAFF, permission: "visits.read" },
 
   // Social
   { path: "/social/dashboard", element: <SocialDashboard />, roles: SOCIAL },
