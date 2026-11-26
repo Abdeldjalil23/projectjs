@@ -6,6 +6,8 @@ import AppLayout from '@/components/layout/AppLayout';
 import AccountsOverview from '@/components/dashboard/AccountsOverview';
 import { useAuth } from '@/context/AuthContext';
 import { fetchAccounts } from '@/lib/accounts';
+import { fetchMedicines } from '@/lib/medicines';
+import MedicinesOverview from '@/pages/medicines/MedicinesOverview';
 import {
   Card,
   CardContent,
@@ -222,10 +224,12 @@ const StatsWidgets = ({
   totalEmployees,
   totalMedicines,
   employeesTitle = "Total Employees",
+  medicinesTitle = "Total Medicines",
 }: {
   totalEmployees: number;
   totalMedicines: number;
   employeesTitle?: string;
+  medicinesTitle?: string;
 }) => {
 
   return (
@@ -238,7 +242,7 @@ const StatsWidgets = ({
           description: "Total employees in system"
         },
         { 
-          title: "Total Medicines", 
+          title: medicinesTitle, 
           value: totalMedicines, 
           icon: PillIcon,
           description: "Total medicines in inventory"
@@ -818,9 +822,10 @@ const PharmacyManagement = ({ medicines, setMedicines }: PharmacyManagementProps
 // --- Main Dashboard Component ---
 export const UsersManagementPage = () => {
   const { t } = useTranslation();
-  const { isDemo } = useAuth();
-  // With the server, the user list comes from the real staff accounts.
+  const { isDemo, can } = useAuth();
+  // With the server, the user list comes from the real staff accounts and the medicines from the stock.
   const accounts = useQuery({ queryKey: ['accounts'], queryFn: fetchAccounts, enabled: !isDemo });
+  const realMedicines = useQuery({ queryKey: ['medicines'], queryFn: fetchMedicines, enabled: !isDemo && can('medicines.read') });
   const [isLoading, setIsLoading] = useState(true);
   const [employees, setEmployees] = useState<Employee[]>(employeesData);
   const [medicines, setMedicines] = useState<Medicine[]>(medicinesData);
@@ -836,7 +841,8 @@ export const UsersManagementPage = () => {
           <StatsWidgets
             totalEmployees={isDemo ? employees.length : accounts.data?.length ?? 0}
             employeesTitle={isDemo ? "Total Employees" : t('overview.title')}
-            totalMedicines={medicines.length}
+            totalMedicines={isDemo ? medicines.length : realMedicines.data?.filter((m) => m.active).length ?? 0}
+            medicinesTitle={isDemo ? "Total Medicines" : t('medicines.counts.active')}
           />
           <div className="grid gap-6 md:grid-cols-2">
             {isDemo ? (
@@ -844,7 +850,9 @@ export const UsersManagementPage = () => {
             ) : (
               <AccountsOverview accounts={accounts} />
             )}
-            {isLoading ? (
+            {!isDemo ? (
+              can('medicines.read') && <MedicinesOverview />
+            ) : isLoading ? (
               <div className="flex justify-center items-center h-64">
                 <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
               </div>

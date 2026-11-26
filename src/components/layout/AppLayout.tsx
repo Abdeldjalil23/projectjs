@@ -24,7 +24,7 @@ export const AppLayout = ({ children, title }: AppLayoutProps) => {
           </main>
           <footer className="border-t py-3 px-6">
             <div className="text-xs text-muted-foreground text-center">
-              {t('footer', { year: new Date().getFullYear() })}
+              {t('footer', { year: String(new Date().getFullYear()) })}
             </div>
           </footer>
         </div>

@@ -25,6 +25,9 @@ import {
   UserCog,
   ShieldCheck,
   Contact,
+  CalendarCheck,
+  FileStack,
+  Pill,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -43,13 +46,29 @@ export const SidebarNav = () => {
     // Real data pages, shown to every workspace whose role has the permission.
     const beneficiaries: MenuItem[] =
       !isDemo && can('beneficiaries.read') ? [{ label: 'beneficiaries', icon: Contact, url: '/beneficiaries' }] : [];
+    // Visit schedule: the real page once the server is connected, the sample page in the demo.
+    const visits = (demoUrl: string): MenuItem[] =>
+      isDemo
+        ? [{ label: 'periodicVisit', icon: FileText, url: demoUrl }]
+        : can('appointments.read')
+          ? [{ label: 'visits', icon: CalendarCheck, url: '/visits' }]
+          : [];
+    // Register of the documents issued.
+    const documents: MenuItem[] =
+      !isDemo && can('documents.read') ? [{ label: 'documents', icon: FileStack, url: '/documents' }] : [];
+    // Medicine stock.
+    const medicines: MenuItem[] =
+      !isDemo && can('medicines.read') ? [{ label: 'medicines', icon: Pill, url: '/medicines' }] : [];
     switch (userRole) {
       case 'doctor':
         return [
           { label: 'dashboard', icon: Home, url: '/medecin/dashboard' },
           ...beneficiaries,
-          { label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' },
-          { label: 'periodicVisit', icon: FileText, url: '/visite-periodique' },
+          // Sample pages, replaced by the patient files once the server is connected.
+          ...(isDemo ? [{ label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' }] : []),
+          ...visits('/visite-periodique'),
+          ...documents,
+          ...medicines,
           { label: 'reports', icon: FileText, url: '/medecin/reports' },
         ];
       case 'admin':
@@ -57,7 +76,8 @@ export const SidebarNav = () => {
           { label: 'dashboard', icon: Home, url: '/admin/dashboard' },
           ...beneficiaries,
           { label: 'reports', icon: FileText, url: '/admin/reports' },
-          { label: 'periodicVisit', icon: FileText, url: '/admin/visite-perdue' },
+          ...visits('/admin/visite-perdue'),
+          ...medicines,
           { label: 'careRequests', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
           // Account and permission management works only with the real server.
           ...(!isDemo && can('users.manage') ? [{ label: 'staffAccounts', icon: UserCog, url: '/admin/accounts' }] : []),
@@ -76,7 +96,10 @@ export const SidebarNav = () => {
         return [
           { label: 'dashboard', icon: Home, url: '/dentist/dashboard' },
           ...beneficiaries,
-          { label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' },
+          ...documents,
+          ...medicines,
+          // Sample page, replaced by the patient files once the server is connected.
+          ...(isDemo ? [{ label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' }] : []),
         ];
       default:
         return [];
