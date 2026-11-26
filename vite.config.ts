@@ -20,7 +20,11 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // The Supabase library changes rarely: a separate file stays cached between deployments.
-        manualChunks: { supabase: ["@supabase/supabase-js"] },
+        manualChunks(id) {
+          if (id.includes("/node_modules/@supabase/")) return "supabase";
+          // Texts of the three languages, in their own file.
+          if (id.includes("/src/i18n/locales/")) return "locales";
+        },
       },
     },
   },

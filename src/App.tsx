@@ -34,6 +34,8 @@ const ReportsPage = lazy(() => import("./pages/admin/ReportsPage"));
 const AdminViPerdPage = lazy(() => import("./pages/admin/AdminViPerdPage"));
 const RequestsPriseEnChargePage = lazy(() => import("./pages/admin/RequestsPriseEnCharge"));
 const AccountsPage = lazy(() => import("./pages/admin/AccountsPage"));
+const BeneficiariesPage = lazy(() => import("./pages/beneficiaries/BeneficiariesPage"));
+const ImportBeneficiariesPage = lazy(() => import("./pages/beneficiaries/ImportBeneficiariesPage"));
 const RolesPermissionsPage = lazy(() => import("./pages/admin/RolesPermissionsPage"));
 
 // Pages social
@@ -52,6 +54,8 @@ const DOCTOR: UserRole[] = ["doctor"];
 const ADMIN: UserRole[] = ["admin"];
 const SOCIAL: UserRole[] = ["social"];
 const DENTIST: UserRole[] = ["dentist"];
+// Pages shared by every staff workspace; the permission decides who may open them.
+const STAFF: UserRole[] = ["admin", "doctor", "dentist", "social"];
 
 // Sends "/" to the dashboard of the logged-in role.
 const HomeRedirect = () => {
@@ -82,6 +86,8 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/admin/requests-prise-en-charge", element: <RequestsPriseEnChargePage />, roles: ADMIN },
   { path: "/admin/accounts", element: <AccountsPage />, roles: ADMIN, permission: "users.manage" },
   { path: "/admin/roles", element: <RolesPermissionsPage />, roles: ADMIN, permission: "roles.manage" },
+  { path: "/beneficiaries", element: <BeneficiariesPage />, roles: STAFF, permission: "beneficiaries.read" },
+  { path: "/beneficiaries/import", element: <ImportBeneficiariesPage />, roles: STAFF, permission: "beneficiaries.import" },
 
   // Social
   { path: "/social/dashboard", element: <SocialDashboard />, roles: SOCIAL },
