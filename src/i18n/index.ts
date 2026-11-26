@@ -4,6 +4,7 @@ import { initReactI18next } from 'react-i18next';
 import { en } from './locales/en';
 import { fr } from './locales/fr';
 import { ar } from './locales/ar';
+import { formatNumber } from '@/lib/format';
 
 export const LANGUAGES = ['fr', 'ar', 'en'] as const;
 export type Language = (typeof LANGUAGES)[number];
@@ -35,7 +36,17 @@ const applyToDocument = (language: string) => {
   document.documentElement.dir = i18n.dir(language);
 };
 
-void i18n.use(initReactI18next).init({
+// Numbers put into texts ("Total: {{count}}") are written the local way, like the dates.
+const numberFormatter = {
+  type: 'formatter' as const,
+  init: () => {},
+  add: () => {},
+  addCached: () => {},
+  format: (value: unknown, _format: string | undefined, lng: string | undefined) =>
+    typeof value === 'number' && Number.isFinite(value) ? formatNumber(value, lng) : value,
+};
+
+void i18n.use(initReactI18next).use(numberFormatter).init({
   resources: {
     fr: { translation: fr },
     ar: { translation: ar },
@@ -44,7 +55,7 @@ void i18n.use(initReactI18next).init({
   lng: savedLanguage() ?? 'fr',
   fallbackLng: 'fr',
   supportedLngs: [...LANGUAGES],
-  interpolation: { escapeValue: false }, // React already escapes text
+  interpolation: { escapeValue: false, alwaysFormat: true }, // React already escapes text
   initAsync: false,
 });
 

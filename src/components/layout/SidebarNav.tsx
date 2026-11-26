@@ -27,6 +27,7 @@ import {
   Contact,
   CalendarCheck,
   FileStack,
+  Pill,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -55,6 +56,9 @@ export const SidebarNav = () => {
     // Register of the documents issued.
     const documents: MenuItem[] =
       !isDemo && can('documents.read') ? [{ label: 'documents', icon: FileStack, url: '/documents' }] : [];
+    // Medicine stock.
+    const medicines: MenuItem[] =
+      !isDemo && can('medicines.read') ? [{ label: 'medicines', icon: Pill, url: '/medicines' }] : [];
     switch (userRole) {
       case 'doctor':
         return [
@@ -64,6 +68,7 @@ export const SidebarNav = () => {
           ...(isDemo ? [{ label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' }] : []),
           ...visits('/visite-periodique'),
           ...documents,
+          ...medicines,
           { label: 'reports', icon: FileText, url: '/medecin/reports' },
         ];
       case 'admin':
@@ -72,6 +77,7 @@ export const SidebarNav = () => {
           ...beneficiaries,
           { label: 'reports', icon: FileText, url: '/admin/reports' },
           ...visits('/admin/visite-perdue'),
+          ...medicines,
           { label: 'careRequests', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
           // Account and permission management works only with the real server.
           ...(!isDemo && can('users.manage') ? [{ label: 'staffAccounts', icon: UserCog, url: '/admin/accounts' }] : []),
@@ -91,6 +97,7 @@ export const SidebarNav = () => {
           { label: 'dashboard', icon: Home, url: '/dentist/dashboard' },
           ...beneficiaries,
           ...documents,
+          ...medicines,
           // Sample page, replaced by the patient files once the server is connected.
           ...(isDemo ? [{ label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' }] : []),
         ];

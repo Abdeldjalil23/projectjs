@@ -3,7 +3,7 @@
 // number and the date; the document opens ready to print.
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { Plus, Trash2 } from 'lucide-react';
@@ -29,6 +29,8 @@ import {
   issueDocument,
 } from '@/lib/consultations';
 import { addDays, today } from '@/lib/visits';
+import { fetchMedicineNames } from '@/lib/medicines';
+import { useAuth } from '@/context/AuthContext';
 
 const NONE = '__none__';
 
@@ -94,6 +96,14 @@ export const DocumentDialog = ({ beneficiaryId, workplace, consultation, initial
   const queryClient = useQueryClient();
   const [type, setType] = useState<DocType | null>(initialType ?? null);
   const [content, setContent] = useState<DocumentContent>(() => (initialType ? initialContent(initialType, consultation, workplace) : {}));
+  const { can } = useAuth();
+  // Medicines of the stock, offered while writing a prescription.
+  const medicineNames = useQuery({
+    queryKey: ['medicine-names'],
+    queryFn: fetchMedicineNames,
+    enabled: type === 'prescription' && can('medicines.read'),
+    staleTime: 300_000,
+  });
 
   const issue = useMutation({
     mutationFn: () => issueDocument(beneficiaryId, type!, clean(type!, content), consultation?.id ?? null),
@@ -261,7 +271,7 @@ export const DocumentDialog = ({ beneficiaryId, workplace, consultation, initial
                       <Label htmlFor={`doc-item-${i}-medicine`} className="text-xs">
                         {t('documents.fields.medicine')}
                       </Label>
-                      <Input id={`doc-item-${i}-medicine`} maxLength={200} value={it.medicine} onChange={(e) => setItem(i, 'medicine', e.target.value)} />
+                      <Input id={`doc-item-${i}-medicine`} list="stock-medicines" maxLength={200} value={it.medicine} onChange={(e) => setItem(i, 'medicine', e.target.value)} />
                     </div>
                     <div className="grid gap-1">
                       <Label htmlFor={`doc-item-${i}-dosage`} className="text-xs">
@@ -280,6 +290,11 @@ export const DocumentDialog = ({ beneficiaryId, workplace, consultation, initial
                     </Button>
                   </div>
                 ))}
+                <datalist id="stock-medicines">
+                  {(medicineNames.data ?? []).map((name) => (
+                    <option key={name} value={name} />
+                  ))}
+                </datalist>
                 <Button type="button" variant="outline" size="sm" disabled={items.length >= 15} onClick={() => set('items', [...items, { medicine: '', dosage: '', duration: '' }])}>
                   <Plus className="me-2 h-4 w-4" />
                   {t('documents.addLine')}

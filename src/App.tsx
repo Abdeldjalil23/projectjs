@@ -42,6 +42,7 @@ const VisitSchedulePage = lazy(() => import("./pages/visits/VisitSchedulePage"))
 const VisitCertificatePage = lazy(() => import("./pages/visits/VisitCertificatePage"));
 const DocumentsPage = lazy(() => import("./pages/documents/DocumentsPage"));
 const DocumentPrintPage = lazy(() => import("./pages/documents/DocumentPrintPage"));
+const MedicinesPage = lazy(() => import("./pages/medicines/MedicinesPage"));
 
 // Pages social
 const SocialDashboard = lazy(() => import("./components/dashboard/SocialDashboard"));
@@ -105,6 +106,7 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/visits/:id/certificate", element: <VisitCertificatePage />, roles: STAFF, permission: "visits.read" },
   { path: "/documents", element: <DocumentsPage />, roles: STAFF, permission: "documents.read" },
   { path: "/documents/:id/print", element: <DocumentPrintPage />, roles: STAFF, permission: "documents.read" },
+  { path: "/medicines", element: <MedicinesPage />, roles: STAFF, permission: "medicines.read" },
 
   // Social
   { path: "/social/dashboard", element: <SocialDashboard />, roles: SOCIAL },
