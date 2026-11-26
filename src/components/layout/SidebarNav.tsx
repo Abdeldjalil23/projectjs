@@ -26,6 +26,7 @@ import {
   ShieldCheck,
   Contact,
   CalendarCheck,
+  FileStack,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -51,6 +52,9 @@ export const SidebarNav = () => {
         : can('appointments.read')
           ? [{ label: 'visits', icon: CalendarCheck, url: '/visits' }]
           : [];
+    // Register of the documents issued.
+    const documents: MenuItem[] =
+      !isDemo && can('documents.read') ? [{ label: 'documents', icon: FileStack, url: '/documents' }] : [];
     switch (userRole) {
       case 'doctor':
         return [
@@ -59,6 +63,7 @@ export const SidebarNav = () => {
           // Sample pages, replaced by the patient files once the server is connected.
           ...(isDemo ? [{ label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' }] : []),
           ...visits('/visite-periodique'),
+          ...documents,
           { label: 'reports', icon: FileText, url: '/medecin/reports' },
         ];
       case 'admin':
@@ -85,7 +90,9 @@ export const SidebarNav = () => {
         return [
           { label: 'dashboard', icon: Home, url: '/dentist/dashboard' },
           ...beneficiaries,
-          { label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' },
+          ...documents,
+          // Sample page, replaced by the patient files once the server is connected.
+          ...(isDemo ? [{ label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' }] : []),
         ];
       default:
         return [];

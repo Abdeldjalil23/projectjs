@@ -40,6 +40,8 @@ const PatientFilePage = lazy(() => import("./pages/patient/PatientFilePage"));
 const RolesPermissionsPage = lazy(() => import("./pages/admin/RolesPermissionsPage"));
 const VisitSchedulePage = lazy(() => import("./pages/visits/VisitSchedulePage"));
 const VisitCertificatePage = lazy(() => import("./pages/visits/VisitCertificatePage"));
+const DocumentsPage = lazy(() => import("./pages/documents/DocumentsPage"));
+const DocumentPrintPage = lazy(() => import("./pages/documents/DocumentPrintPage"));
 
 // Pages social
 const SocialDashboard = lazy(() => import("./components/dashboard/SocialDashboard"));
@@ -80,12 +82,12 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   // Doctor
   { path: "/dashboard", element: <DoctorDashboard />, roles: DOCTOR },
   { path: "/medecin/dashboard", element: <DoctorDashboard />, roles: DOCTOR },
-  { path: "/prescriptions", element: <PrescriptionsPage />, roles: DOCTOR },
+  { path: "/prescriptions", element: <DemoOnly to="/documents"><PrescriptionsPage /></DemoOnly>, roles: DOCTOR },
   { path: "/medecin/reports", element: <MedReportsPage />, roles: DOCTOR },
   { path: "/dossiers-medicaux", element: <DemoOnly to="/beneficiaries"><DossiersMedicauxPage /></DemoOnly>, roles: DOCTOR },
   { path: "/dossier/:id", element: <DemoOnly to="/beneficiaries"><DossierDetailsPage /></DemoOnly>, roles: DOCTOR },
-  { path: "/dossier/:id/nouvelle-consultation", element: <NouvelleConsultation />, roles: DOCTOR },
-  { path: "/nouvelle-consultation", element: <NouvelleConsultation />, roles: DOCTOR },
+  { path: "/dossier/:id/nouvelle-consultation", element: <DemoOnly to="/beneficiaries"><NouvelleConsultation /></DemoOnly>, roles: DOCTOR },
+  { path: "/nouvelle-consultation", element: <DemoOnly to="/beneficiaries"><NouvelleConsultation /></DemoOnly>, roles: DOCTOR },
   { path: "/visite-periodique", element: <DemoOnly to="/visits"><MedViPerPage /></DemoOnly>, roles: DOCTOR },
 
   // Admin
@@ -101,6 +103,8 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/beneficiaries/:id", element: <PatientFilePage />, roles: STAFF, permission: "beneficiaries.read" },
   { path: "/visits", element: <VisitSchedulePage />, roles: STAFF, permission: "appointments.read" },
   { path: "/visits/:id/certificate", element: <VisitCertificatePage />, roles: STAFF, permission: "visits.read" },
+  { path: "/documents", element: <DocumentsPage />, roles: STAFF, permission: "documents.read" },
+  { path: "/documents/:id/print", element: <DocumentPrintPage />, roles: STAFF, permission: "documents.read" },
 
   // Social
   { path: "/social/dashboard", element: <SocialDashboard />, roles: SOCIAL },
@@ -111,7 +115,7 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
 
   // Dentist
   { path: "/dentist/dashboard", element: <DentistDashboard />, roles: DENTIST },
-  { path: "/dentist/patient-management", element: <PatientManagement />, roles: DENTIST },
+  { path: "/dentist/patient-management", element: <DemoOnly to="/beneficiaries"><PatientManagement /></DemoOnly>, roles: DENTIST },
 ];
 
 function App() {
