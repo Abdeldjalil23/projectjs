@@ -48,7 +48,8 @@ export const SidebarNav = () => {
         return [
           { label: 'dashboard', icon: Home, url: '/medecin/dashboard' },
           ...beneficiaries,
-          { label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' },
+          // Sample pages, replaced by the patient files once the server is connected.
+          ...(isDemo ? [{ label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' }] : []),
           { label: 'periodicVisit', icon: FileText, url: '/visite-periodique' },
           { label: 'reports', icon: FileText, url: '/medecin/reports' },
         ];

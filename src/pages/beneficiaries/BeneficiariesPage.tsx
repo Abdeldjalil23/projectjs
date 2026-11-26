@@ -26,6 +26,7 @@ import {
 } from '@/lib/beneficiaries';
 import BeneficiaryDialog from './BeneficiaryDialog';
 import BeneficiaryDetailsSheet from './BeneficiaryDetailsSheet';
+import BeneficiaryNumber from './BeneficiaryNumber';
 
 type DialogState =
   | { mode: 'create'; preset?: { category: Category; holder: PersonRef; company?: string | null } }
@@ -171,8 +172,7 @@ export const BeneficiariesPage = () => {
                             onClick={() => setOpenId(b.id)}
                           >
                             <TableCell className="font-mono text-xs">
-                              {/* Numbers keep their left-to-right order in Arabic. */}
-                              <span dir="ltr">{b.external_id ?? '—'}</span>
+                              <BeneficiaryNumber beneficiary={b} />
                             </TableCell>
                             <TableCell>
                               <button type="button" className="text-start font-medium hover:underline">
