@@ -24,6 +24,7 @@
 | `20261126000005_medicines.sql` | مخزون الأدوية: الدخول والصرف والتصحيح والإتلاف، والمخزون يحسبه الخادم ولا ينزل تحت الصفر، دون ذكر أي مريض |
 | `20261127000001_care_requests.sql` | الأطباء المتعاقدون وطلبات التكفل: الطلب، قبوله أو رفضه، رمز QR عشوائي، وصفحة تحقق عامة تعرض الصلاحية فقط وتسجّل الاستعمال (انظر [API-CARE-REQUESTS.md](API-CARE-REQUESTS.md)) |
 | `20261128000001_reports.sql` | التقارير: التقرير الشهري لـCMS والحصيلة الفصلية لطب العمل، أعداد فقط تُحسب مما سُجّل، لمن يملك `reports.read` |
+| `20261129000001_worker_app.sql` | تطبيق العامل: حسابات العمال ورموز التفعيل، وما يصل إليه العامل عبر وظائف `worker_*` فقط (عائلته، طلباته، الأطباء، المواعيد)، والإشعارات عند كل تغيّر في الطلب |
 
 إذا ظهر تحذير عن «destructive operations» فوافق عليه: سببه عبارات مثل `on delete cascade` و`revoke`، ولا يُحذف شيء.
 
@@ -79,6 +80,28 @@ npx supabase functions deploy admin-users --remote=<project-ref> --no-verify-jwt
 3. على Vercel: **Settings ← Environment Variables**، أضف نفس القيمتين ثم أعد النشر. هذه الخطوة يقوم بها صاحب مشروع Vercel، وبدونها لا يدخل أحد إلى الموقع المنشور.
 
 > المشاريع القديمة في Supabase تسمّي المفتاح العام `anon`. المتغير القديم `VITE_SUPABASE_ANON_KEY` ما زال مقبولاً.
+
+## 6. تطبيق العامل (Edge Function `worker-access`)
+
+يحتاجها العامل ليفعّل حسابه بالرمز الذي يسلّمه له المركز. تُضاف من المتصفح، حتى من الهاتف، دون أي أداة:
+
+1. في لوحة Supabase: **Edge Functions ← Deploy a new function ← Via Editor**.
+2. الاسم: `worker-access` (بالضبط).
+3. امسح المثال، والصق كل محتوى الملف `supabase/functions/worker-access/index.ts`، ثم **Deploy function**.
+4. افتح الوظيفة ← **Details** (أو Settings)، وأوقف **Enforce JWT verification** (Verify JWT)، ثم احفظ. هذا ضروري: العامل لا يملك حساباً بعد حين يفعّله، والوظيفة تتحقق بنفسها من الرقم والرمز.
+
+أو من الحاسوب: `npx supabase functions deploy worker-access --remote=<project-ref> --no-verify-jwt`.
+
+**أرقام الاتصال في التطبيق** (صفحة Contacts): في **SQL Editor**، مع تغيير الأرقام:
+
+```sql
+update public.app_settings
+set value = '[
+  {"label": "Accueil du centre médical", "phone": "029 00 00 00", "hours": "Dimanche – jeudi, 8 h – 16 h"},
+  {"label": "Infirmerie (urgences)", "phone": "029 00 00 01", "hours": "24 h / 24"}
+]'
+where key = 'worker_contacts';
+```
 
 ## قواعد لا استثناء فيها
 

@@ -185,6 +185,11 @@ const RequestsTab = ({ state, onState }: { state: CareState | 'all'; onState: (s
                       <TableRow key={r.id} data-request={r.number}>
                         <TableCell className="whitespace-nowrap font-mono text-xs" dir="ltr">
                           {r.number}
+                          {r.source === 'app' && (
+                            <Badge variant="secondary" className="ms-2 font-sans" title={t('careRequests.fromApp')}>
+                              App
+                            </Badge>
+                          )}
                         </TableCell>
                         <TableCell>
                           {r.beneficiary ? (
