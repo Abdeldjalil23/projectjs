@@ -107,15 +107,24 @@ export const fetchBeneficiaries = async ({ search, category, status, page }: Lis
   return { rows: (data ?? []) as Beneficiary[], total: count ?? 0 };
 };
 
+// The worker a dependent depends on is read with a second query: the server (PostgREST) does not
+// embed a table in itself through its own foreign key ("Could not find a relationship between
+// 'beneficiaries' and 'beneficiaries'").
 export const fetchBeneficiary = async (id: string): Promise<BeneficiaryDetails> => {
-  const { data, error } = await client()
-    .from('beneficiaries')
-    .select(`${LIST_COLUMNS}, holder:beneficiaries!beneficiaries_holder_id_fkey(id, external_id, last_name, first_name)`)
-    .eq('id', id)
-    .single();
+  const { data, error } = await client().from('beneficiaries').select(LIST_COLUMNS).eq('id', id).single();
   if (error) fail(error);
-  const row = data as unknown as BeneficiaryDetails & { holder: PersonRef | PersonRef[] | null };
-  return { ...row, holder: Array.isArray(row.holder) ? row.holder[0] ?? null : row.holder };
+  const row = data as unknown as Beneficiary;
+  let holder: PersonRef | null = null;
+  if (row.holder_id) {
+    const { data: found, error: holderError } = await client()
+      .from('beneficiaries')
+      .select('id, external_id, last_name, first_name')
+      .eq('id', row.holder_id)
+      .maybeSingle();
+    if (holderError) fail(holderError);
+    holder = (found as PersonRef | null) ?? null;
+  }
+  return { ...row, holder };
 };
 
 export const fetchDependents = async (holderId: string): Promise<Beneficiary[]> => {
