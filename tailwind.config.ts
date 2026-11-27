@@ -124,9 +124,9 @@ export default {
 				'pulse-soft': 'pulse-soft 3s infinite ease-in-out'
 			},
 			fontFamily: {
-				// Latin letters use Inter / Montserrat; Arabic letters fall back to Noto Sans Arabic (bundled).
-				sans: ['Inter', 'Noto Sans Arabic', 'sans-serif'],
-				heading: ['Montserrat', 'Noto Sans Arabic', 'sans-serif']
+				// Latin letters use Montserrat, Arabic letters Tajawal, as on sonatrach.com (both bundled).
+				sans: ['Montserrat', 'Tajawal', 'sans-serif'],
+				heading: ['Montserrat', 'Tajawal', 'sans-serif']
 			}
 		}
 	},

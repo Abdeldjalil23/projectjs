@@ -26,8 +26,8 @@ export const MedicinesOverview = () => {
   return (
     <Card data-testid="medicines-overview">
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Pill className="h-4 w-4" />
+        <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+          <Pill className="h-4 w-4 text-primary" />
           {t('medicines.overviewTitle')}
         </CardTitle>
         <Button variant="outline" size="sm" asChild>

@@ -22,15 +22,17 @@ export const AccountsOverview = ({ accounts }: { accounts: UseQueryResult<StaffA
   }
 
   return (
-    <Card className="shadow-md">
+    <Card>
       <CardHeader className="flex flex-row items-start justify-between gap-3">
         <div className="space-y-1.5">
-          <CardTitle>{t('overview.title')}</CardTitle>
+          <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+            <UserCog className="h-4 w-4 text-primary" />
+            {t('overview.title')}
+          </CardTitle>
           <CardDescription>{t('overview.subtitle')}</CardDescription>
         </div>
-        <Button asChild>
+        <Button variant="outline" size="sm" asChild>
           <Link to="/admin/accounts">
-            <UserCog className="me-2 h-4 w-4" />
             {t('overview.manage')}
           </Link>
         </Button>

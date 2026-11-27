@@ -28,6 +28,9 @@ export const ar: Translation = {
     contracted_doctor: 'طبيب متعاقد',
   },
   login: {
+    heroLead: 'طاقتنا في خدمة',
+    heroStrong: 'صحة العمال',
+    heroText: 'الملفات الطبية، زيارات طب العمل، الاستشارات وطلبات التكفل، في فضاء واحد لطاقم المركز الطبي.',
     welcome: 'مرحباً بك',
     staffHint: 'سجّل الدخول بمعرّفك',
     serverMissing: "انسخ .env.example إلى .env.local واملأ مفاتيح Supabase (انظر docs/SETUP-SUPABASE.md)، ثم أعد تشغيل التطبيق.",

@@ -28,6 +28,9 @@ export const en = {
     contracted_doctor: 'Contracted doctor',
   },
   login: {
+    heroLead: 'Energy in the service of',
+    heroStrong: "workers' health",
+    heroText: 'Medical records, occupational health visits, consultations and care coverage of the workers, in one place for the medical centre team.',
     welcome: 'Welcome back',
     staffHint: 'Sign in with your staff ID',
     serverMissing: "Copy .env.example to .env.local and fill in the Supabase keys (see docs/SETUP-SUPABASE.md), then restart the app.",

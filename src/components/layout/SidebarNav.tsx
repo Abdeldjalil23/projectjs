@@ -50,6 +50,17 @@ const ITEMS: MenuItem[] = [
   { label: 'rolesPermissions', icon: ShieldCheck, url: '/admin/roles', permission: 'roles.manage' },
 ];
 
+// Menu entries in capitals, as in the menu of sonatrach.com; the open page is marked by a bar and
+// its name in the brand colour.
+// Long names (« Demandes de prise en charge ») go on two lines instead of being cut.
+const ITEM_CLASS = [
+  'relative h-auto min-h-8 py-2 font-semibold uppercase tracking-wide text-[0.78rem] leading-tight text-sidebar-foreground',
+  '[&>span:last-child]:whitespace-normal',
+  'before:absolute before:inset-y-1.5 before:start-0 before:w-[3px] before:rounded-full before:bg-transparent',
+  'data-[active=true]:text-primary data-[active=true]:before:bg-primary',
+  '[&>svg]:data-[active=true]:text-primary',
+].join(' ');
+
 export const SidebarNav = () => {
   const { t, i18n } = useTranslation();
   const { userRole, staffRole, roleLabel, logout, can } = useAuth();
@@ -74,23 +85,31 @@ export const SidebarNav = () => {
   return (
     // In Arabic the menu sits on the right, where reading starts. Folded, it keeps its icons.
     <Sidebar side={rtl ? 'right' : 'left'} collapsible="icon">
-      <SidebarHeader>
-        <div className="flex items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:px-0">
-          <HeartPulse className="h-6 w-6 shrink-0" />
+      <SidebarHeader className="border-b border-sidebar-border">
+        <div className="flex items-center gap-3 px-1 py-1.5 group-data-[collapsible=icon]:px-0">
+          {/* Square brand mark, after the square logo of sonatrach.com. */}
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-sm bg-primary text-primary-foreground">
+            <HeartPulse className="h-5 w-5" />
+          </span>
           <div className="min-w-0 group-data-[collapsible=icon]:hidden">
-            <h1 className="text-lg font-semibold">MedSuite</h1>
-            <p className="truncate text-xs opacity-80">{t('nav.portal', { role: roleName })}</p>
+            <p className="font-heading text-base font-bold uppercase leading-tight tracking-wider text-white">MedSuite</p>
+            <p className="truncate text-[11px] text-sidebar-foreground/70">{t('nav.portal', { role: roleName })}</p>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>{t('nav.mainMenu')}</SidebarGroupLabel>
+          <SidebarGroupLabel className="uppercase tracking-wider text-sidebar-foreground/50">{t('nav.mainMenu')}</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.url} tooltip={tooltip(t(`nav.${item.label}`))}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={location.pathname === item.url}
+                    tooltip={tooltip(t(`nav.${item.label}`))}
+                    className={ITEM_CLASS}
+                  >
                     <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{t(`nav.${item.label}`)}</span>
@@ -108,7 +127,7 @@ export const SidebarNav = () => {
             <SidebarMenuButton
               onClick={logout}
               tooltip={tooltip(t('nav.signOut'))}
-              className="bg-background text-medsuite-primary hover:bg-background/90 hover:text-medsuite-accent"
+              className="border border-sidebar-border font-semibold hover:border-primary hover:bg-transparent hover:text-primary"
             >
               <LogOut className="h-4 w-4 rtl:-scale-x-100" />
               <span>{t('nav.signOut')}</span>

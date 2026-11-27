@@ -3,9 +3,8 @@ import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { ServerOff } from 'lucide-react';
+import { HeartPulse, ServerOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
@@ -55,24 +54,48 @@ export const LoginScreen = () => {
   }
 
   return (
-    <div className="relative flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-medsuite-light to-white p-4">
-      <div className="absolute end-4 top-4">
-        <LanguageSwitcher showName />
-      </div>
+    <div className="grid min-h-screen lg:grid-cols-[1.15fr_1fr]">
+      {/* Brand panel: dark like the header of sonatrach.com, with its tiled band and a headline
+          whose strong part is underlined in the brand colour. */}
+      <section className="relative flex flex-col justify-between gap-8 overflow-hidden bg-[#141414] px-6 py-7 text-white sm:gap-10 sm:px-10 lg:px-16 lg:py-12">
+        <div className="brand-pattern absolute inset-0 [--pattern-color:rgb(255_255_255/0.045)]" aria-hidden />
+        <div className="absolute inset-x-0 bottom-0 h-1 bg-primary lg:inset-x-auto lg:end-0 lg:top-0 lg:h-auto lg:w-1" aria-hidden />
 
-      <div className="w-full max-w-md animate-fade-in">
-        <div className="text-center mb-8">
-          <img src="/logo.png" alt="Sonatrach MedSuite Logo" className="mx-auto mb-4 h-32 w-auto" />
-          <h4 className="text-3xl font-bold text-medsuite-dark mb-3">Sonatrach MedSuite</h4>
+        <div className="relative flex items-center gap-3">
+          <span className="flex h-11 w-11 items-center justify-center rounded-sm bg-primary">
+            <HeartPulse className="h-6 w-6" />
+          </span>
+          <div>
+            <p className="text-lg font-bold uppercase leading-tight tracking-wider">MedSuite</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-white/60">Sonatrach</p>
+          </div>
         </div>
 
-        <Card className="border-medsuite-primary/20">
-          <CardHeader>
-            <CardTitle>{t('login.welcome')}</CardTitle>
-            <CardDescription>{t('login.staffHint')}</CardDescription>
-          </CardHeader>
+        <div className="relative max-w-xl">
+          <h1 className="text-2xl font-normal leading-tight sm:text-4xl">
+            {t('login.heroLead')}{' '}
+            <span className="inline-block font-bold">
+              {t('login.heroStrong')}
+              <span className="mt-2 block h-1 w-full bg-primary" aria-hidden />
+            </span>
+          </h1>
+          <p className="mt-6 hidden max-w-md leading-relaxed text-white/75 sm:block">{t('login.heroText')}</p>
+        </div>
 
-          <CardContent>
+        <p className="relative hidden text-xs text-white/50 lg:block">{t('footer', { year: String(new Date().getFullYear()) })}</p>
+      </section>
+
+      <section className="relative flex flex-col items-center justify-center bg-background px-6 py-10 sm:px-10">
+        <div className="absolute end-4 top-4">
+          <LanguageSwitcher showName />
+        </div>
+
+        <div className="w-full max-w-sm animate-fade-in">
+          <h2 className="text-2xl font-bold uppercase tracking-wide">{t('login.welcome')}</h2>
+          <span className="title-bar mt-2" aria-hidden />
+          <p className="mt-3 text-sm text-muted-foreground">{t('login.staffHint')}</p>
+
+          <div className="mt-8">
             {!isSupabaseConfigured ? (
               // Without the server keys nobody can sign in: say what is missing instead of a form that cannot work.
               <div className="flex items-start gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-4" role="alert">
@@ -84,11 +107,12 @@ export const LoginScreen = () => {
               </div>
             ) : (
               <form onSubmit={handleSignIn}>
-                <div className="grid gap-4">
+                <div className="grid gap-5">
                   <div className="grid gap-2">
                     <Label htmlFor="ID">{t('login.id')}</Label>
                     <Input
                       id="ID"
+                      className="h-11"
                       placeholder={t('login.idPlaceholder')}
                       autoComplete="username"
                       value={ID}
@@ -101,6 +125,7 @@ export const LoginScreen = () => {
                     <Input
                       id="password"
                       type="password"
+                      className="h-11"
                       placeholder={t('login.passwordPlaceholder')}
                       autoComplete="current-password"
                       value={password}
@@ -108,20 +133,16 @@ export const LoginScreen = () => {
                     />
                   </div>
 
-                  <Button
-                    type="submit"
-                    disabled={submitting}
-                    className="bg-medsuite-primary hover:bg-medsuite-accent"
-                  >
+                  <Button type="submit" size="lg" disabled={submitting} className="mt-1 uppercase tracking-wide">
                     {submitting ? t('login.signingIn') : t('login.signIn')}
                   </Button>
-                  <p className="text-center text-xs text-muted-foreground">{t('login.forgotHint')}</p>
+                  <p className="text-xs text-muted-foreground">{t('login.forgotHint')}</p>
                 </div>
               </form>
             )}
-          </CardContent>
-        </Card>
-      </div>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

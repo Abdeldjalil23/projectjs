@@ -1,6 +1,3 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -8,13 +5,14 @@
 @layer base {
   /*
    * Colour theme. Every coloured part of the interface (buttons, menu, highlights) is computed
-   * from one brand colour: hue, saturation and lightness. The default is Sonatrach orange; the
-   * other themes, chosen in Settings, only change these three values (see src/lib/theme.ts).
+   * from one brand colour: hue, saturation and lightness. The default is Sonatrach orange
+   * (#FF8500, as on sonatrach.com); the other themes, chosen in Settings, only change these three
+   * values (see src/lib/theme.ts).
    */
   :root {
     --brand-h: 31;
-    --brand-s: 87%;
-    --brand-l: 54%;
+    --brand-s: 100%;
+    --brand-l: 50%;
   }
   :root[data-theme='ubuntu'] { --brand-h: 15.5; --brand-s: 82%; --brand-l: 52%; } /* #E95420 */
   :root[data-theme='blue']   { --brand-h: 210; --brand-s: 79%; --brand-l: 46%; } /* #1976D2 */
@@ -26,16 +24,17 @@
     --brand: var(--brand-h) var(--brand-s) var(--brand-l);
     --brand-dark: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 10%);
     --brand-deep: var(--brand-h) var(--brand-s) 30%;
-    --brand-soft: var(--brand-h) 80% 94%;
+    --brand-soft: var(--brand-h) 80% 95%;
 
-    --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    /* Neutrals of sonatrach.com: near-black text, light grey bands, white cards. */
+    --background: 0 0% 97.5%;
+    --foreground: 0 0% 12%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 0 0% 12%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 0 0% 12%;
 
     --primary: var(--brand);
     --primary-foreground: 0 0% 100%;
@@ -44,37 +43,40 @@
     --medsuite-primary: var(--brand);
     --medsuite-accent: var(--brand-dark);
     --medsuite-secondary: var(--brand-soft);
-    --medsuite-dark: 0 0% 20%;
+    --medsuite-dark: 0 0% 12%;
     --medsuite-light: 0 0% 98%;
 
     --secondary: var(--brand-soft);
     --secondary-foreground: var(--brand-deep);
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 95%;
+    --muted-foreground: 0 0% 40%;
 
-    --accent: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 14%);
-    --accent-foreground: 0 0% 100%;
+    /* Hover and focus in menus and lists: a light tint of the brand colour. */
+    --accent: var(--brand-soft);
+    --accent-foreground: var(--brand-deep);
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --border: 0 0% 88%;
+    --input: 0 0% 85%;
     --ring: var(--brand);
 
-    --radius: 0.5rem;
+    /* Square-cut corners, as on sonatrach.com. */
+    --radius: 0.375rem;
 
-    --sidebar-background: var(--brand);
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: var(--brand-deep);
+    /* Dark side menu, like the site's header over its photos; the active item is in the brand colour. */
+    --sidebar-background: 0 0% 11%;
+    --sidebar-foreground: 0 0% 80%;
+    --sidebar-primary: var(--brand);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: var(--brand-soft);
-    --sidebar-accent-foreground: var(--brand-deep);
-    --sidebar-border: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 9%);
-    --sidebar-ring: var(--brand-soft);
+    --sidebar-accent: 0 0% 17%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 0 0% 20%;
+    --sidebar-ring: var(--brand);
   }
-  
+
   .dark {
     --background: 0 0% 10%;
     --foreground: 0 0% 98%;
@@ -94,7 +96,7 @@
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 14%);
+    --accent: var(--brand-h) 30% 20%;
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -104,13 +106,13 @@
     --input: 0 0% 20%;
     --ring: var(--brand);
 
-    --sidebar-background: 0 0% 15%;
-    --sidebar-foreground: 0 0% 98%;
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 85%;
     --sidebar-primary: var(--brand);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 20%;
+    --sidebar-accent: 0 0% 16%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 25%;
+    --sidebar-border: 0 0% 22%;
     --sidebar-ring: var(--brand);
   }
 }
@@ -121,11 +123,23 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply bg-background text-foreground font-sans antialiased;
   }
-  
+
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+  }
+
+  /* Tajawal draws Arabic letters smaller than Montserrat draws Latin ones: a slightly larger base
+     size keeps Arabic pages as readable as French ones. */
+  html[lang='ar'] {
+    font-size: 106.25%;
+  }
+
+  /* Spacing letters apart breaks the joined Arabic script: Arabic pages keep normal spacing even
+     where a title or menu is spaced out in French and English. */
+  html[lang='ar'] * {
+    letter-spacing: normal;
   }
 }
 
@@ -133,16 +147,35 @@
   .medsuite-card {
     @apply bg-white rounded-lg border border-border shadow-sm p-5 transition-all;
   }
-  
+
   .medsuite-card-hover {
     @apply hover:shadow-md hover:border-medsuite-primary/30 transition-all;
   }
-  
+
   .stats-card {
     @apply medsuite-card space-y-2;
   }
-  
+
   .dashboard-section {
     @apply space-y-6;
+  }
+
+  /* Short brand-coloured bar under a title, the signature of sonatrach.com headings. */
+  .title-bar {
+    @apply block h-[3px] w-10 rounded-full bg-primary;
+  }
+
+  /*
+   * Band of square tiles above the footer and on the sign-in page, echoing the tiled band of
+   * sonatrach.com. Each tile is a rounded square with three bars; the colour comes from
+   * --pattern-color so the same band works on light and dark backgrounds.
+   */
+  .brand-pattern {
+    --pattern-color: hsl(0 0% 0% / 0.06);
+    background-color: var(--pattern-color);
+    -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='3' y='3' width='30' height='30' rx='4'/%3E%3Cpath d='M10 12h16M10 18h10M16 24h10'/%3E%3C/g%3E%3C/svg%3E");
+    mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='36' height='36' viewBox='0 0 36 36'%3E%3Cg fill='none' stroke='%23000' stroke-width='2.2' stroke-linecap='round'%3E%3Crect x='3' y='3' width='30' height='30' rx='4'/%3E%3Cpath d='M10 12h16M10 18h10M16 24h10'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-mask-size: 36px 36px;
+    mask-size: 36px 36px;
   }
 }
