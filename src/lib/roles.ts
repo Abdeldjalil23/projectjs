@@ -22,8 +22,8 @@ export const dashboardPathFor = (role: UserRole): string =>
 /**
  * Which workspace of the app each account role (roles.code in the database) opens. Nurses and
  * psychologists share the doctors' workspace: the pages they see there follow their permissions.
- * The contracted doctor has no workspace yet (the QR check page comes with phase 3) and cannot
- * sign in.
+ * The contracted doctor needs no account: scanning the QR code of a care coverage opens the
+ * public page /verify/<token>, which shows the coverage and records its use.
  */
 export const WORKSPACE_BY_STAFF_ROLE: Record<string, { role: Role }> = {
   admin: { role: 'admin' },

@@ -28,6 +28,9 @@ const VisitCertificatePage = lazy(() => import("./pages/visits/VisitCertificateP
 const DocumentsPage = lazy(() => import("./pages/documents/DocumentsPage"));
 const DocumentPrintPage = lazy(() => import("./pages/documents/DocumentPrintPage"));
 const MedicinesPage = lazy(() => import("./pages/medicines/MedicinesPage"));
+const CareRequestsPage = lazy(() => import("./pages/careRequests/CareRequestsPage"));
+const CareRequestPrintPage = lazy(() => import("./pages/careRequests/CareRequestPrintPage"));
+const VerifyCareRequestPage = lazy(() => import("./pages/careRequests/VerifyCareRequestPage"));
 
 const queryClient = new QueryClient();
 
@@ -65,8 +68,11 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/documents/:id/print", element: <DocumentPrintPage />, roles: STAFF, permission: "documents.read" },
   { path: "/medicines", element: <MedicinesPage />, roles: STAFF, permission: "medicines.read" },
 
-  // Built in later phases of the plan: care coverage requests (phase 3) and reports (phase 4).
-  { path: "/care-requests", element: <PlannedPage feature="careRequests" />, roles: STAFF, permission: "care_requests.read" },
+  // Care coverage requests (phase 3). Accounts that may only make requests see the page too.
+  { path: "/care-requests", element: <CareRequestsPage />, roles: STAFF, permission: "care_requests.read" },
+  { path: "/care-requests/:id/print", element: <CareRequestPrintPage />, roles: STAFF, permission: "care_requests.read" },
+
+  // Built in a later phase of the plan: reports (phase 4).
   { path: "/reports", element: <PlannedPage feature="reports" />, roles: STAFF, permission: "reports.read" },
 ];
 
@@ -87,6 +93,8 @@ function App() {
                 <Routes>
                   {/* Route login public */}
                   <Route path="/login" element={<LoginPage />} />
+                  {/* Opened by scanning the QR code of a care coverage: no account needed. */}
+                  <Route path="/verify/:token" element={<VerifyCareRequestPage />} />
 
                   {/* Routes protégées */}
                   {protectedRoutes.map(({ path, element, roles, permission }) => (

@@ -5,9 +5,9 @@ import { Hourglass } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import { Card, CardContent } from '@/components/ui/card';
 
-export type PlannedFeature = 'careRequests' | 'reports';
+export type PlannedFeature = 'reports';
 
-const PHASE: Record<PlannedFeature, number> = { careRequests: 3, reports: 4 };
+const PHASE: Record<PlannedFeature, number> = { reports: 4 };
 
 const PlannedPage = ({ feature }: { feature: PlannedFeature }) => {
   const { t } = useTranslation();
