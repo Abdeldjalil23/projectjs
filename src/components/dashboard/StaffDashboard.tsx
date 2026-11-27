@@ -5,7 +5,7 @@ import type { ComponentType, ReactNode, SVGProps } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
-import { CalendarCheck, CalendarClock, CalendarX, Contact, FileStack, Stethoscope } from 'lucide-react';
+import { CalendarCheck, CalendarClock, CalendarX, ClipboardCheck, Contact, FileStack, Stethoscope } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import AccountsOverview from '@/components/dashboard/AccountsOverview';
 import MedicinesOverview from '@/pages/medicines/MedicinesOverview';
@@ -17,6 +17,7 @@ import { useDateFormat } from '@/hooks/useDateFormat';
 import { useNumberFormat } from '@/hooks/useNumberFormat';
 import { fetchAccounts } from '@/lib/accounts';
 import { personLabel } from '@/lib/beneficiaries';
+import { countPendingCareRequests } from '@/lib/careRequests';
 import { SERVICES, SERVICE_PERMISSION } from '@/lib/consultations';
 import {
   DAY_LIST_LIMIT,
@@ -136,6 +137,9 @@ export const StaffDashboard = () => {
   const due = useQuery({ queryKey: ['dashboard', 'due', day], queryFn: () => countDueVisits(day), enabled: seesDueVisits });
   const beneficiaries = useQuery({ queryKey: ['dashboard', 'beneficiaries'], queryFn: countActiveBeneficiaries, enabled: seesBeneficiaries });
   const accounts = useQuery({ queryKey: ['accounts'], queryFn: fetchAccounts, enabled: can('users.manage') });
+  // Care coverage requests waiting for the administration.
+  const reviewsCare = can('care_requests.review');
+  const pendingCare = useQuery({ queryKey: ['dashboard', 'care-requests'], queryFn: countPendingCareRequests, enabled: reviewsCare });
 
   /** A figure, "…" while it loads and "—" when it could not be read. */
   const figure = (q: { isLoading: boolean; isError: boolean; data?: number }) =>
@@ -181,6 +185,9 @@ export const StaffDashboard = () => {
           )}
           {seesBeneficiaries && (
             <StatTile icon={Contact} label={t('dashboard.tiles.beneficiaries')} value={figure(beneficiaries)} to="/beneficiaries" />
+          )}
+          {reviewsCare && (
+            <StatTile icon={ClipboardCheck} label={t('dashboard.tiles.careRequests')} value={figure(pendingCare)} to="/care-requests?state=pending" />
           )}
         </div>
 

@@ -15,7 +15,7 @@ import { LANGUAGES, LANGUAGE_NAMES, Language } from '@/i18n';
 import { saveMyLanguage } from '@/lib/accounts';
 
 /** Language menu. Once signed in, the choice is also saved in the account. */
-export const LanguageSwitcher = ({ showName = false }: { showName?: boolean }) => {
+export const LanguageSwitcher = ({ showName = false, className }: { showName?: boolean; className?: string }) => {
   const { t, i18n } = useTranslation();
   const { isLoggedIn } = useAuth();
   const current = i18n.resolvedLanguage as Language;
@@ -35,7 +35,7 @@ export const LanguageSwitcher = ({ showName = false }: { showName?: boolean }) =
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size={showName ? 'sm' : 'icon'} aria-label={t('language.label')} title={t('language.label')}>
+        <Button variant="ghost" size={showName ? 'sm' : 'icon'} className={className} aria-label={t('language.label')} title={t('language.label')}>
           <Globe className="h-5 w-5" />
           {showName && <span>{LANGUAGE_NAMES[current]}</span>}
         </Button>
