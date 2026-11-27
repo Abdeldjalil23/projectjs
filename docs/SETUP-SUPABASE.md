@@ -73,9 +73,8 @@ npx supabase functions deploy admin-users --remote=<project-ref> --no-verify-jwt
 1. انسخ `.env.example` إلى `.env.local` واملأ القيمتين من **Project Settings ← API Keys**:
    - `VITE_SUPABASE_URL`: رابط المشروع.
    - `VITE_SUPABASE_PUBLISHABLE_KEY`: المفتاح العام الذي يبدأ بـ`sb_publishable_`.
-2. أعد تشغيل `npm run dev`. تختفي اختيارات الأدوار من شاشة الدخول، لأن الدور يُقرأ من حساب المستخدم.
-3. على Vercel: **Settings ← Environment Variables**، أضف نفس القيمتين. هذه الخطوة يقوم بها صاحب مشروع Vercel.
-   بعدها يتوقف الدخول التجريبي على الموقع المنشور، ولا يدخل إلا أصحاب الحسابات.
+2. أعد تشغيل `npm run dev`. بدون القيمتين تعرض شاشة الدخول رسالة «الخادم غير مُعدّ» ولا يمكن الدخول، فلا يوجد دخول تجريبي.
+3. على Vercel: **Settings ← Environment Variables**، أضف نفس القيمتين ثم أعد النشر. هذه الخطوة يقوم بها صاحب مشروع Vercel، وبدونها لا يدخل أحد إلى الموقع المنشور.
 
 > المشاريع القديمة في Supabase تسمّي المفتاح العام `anon`. المتغير القديم `VITE_SUPABASE_ANON_KEY` ما زال مقبولاً.
 

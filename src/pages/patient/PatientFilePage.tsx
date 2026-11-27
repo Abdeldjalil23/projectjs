@@ -6,7 +6,6 @@ import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -28,19 +27,12 @@ export const PatientFilePage = () => {
   const { id = '' } = useParams();
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
-  const { isDemo, can } = useAuth();
+  const { can } = useAuth();
   const [dialog, setDialog] = useState<DialogState>(null);
 
-  const details = useQuery({ queryKey: ['beneficiary', id], queryFn: () => fetchBeneficiary(id), enabled: !isDemo && Boolean(id) });
+  const details = useQuery({ queryKey: ['beneficiary', id], queryFn: () => fetchBeneficiary(id), enabled: Boolean(id) });
   const b = details.data;
 
-  if (isDemo) {
-    return (
-      <AppLayout title={t('patient.title')}>
-        <ServerRequiredNotice />
-      </AppLayout>
-    );
-  }
 
   const tabs = PATIENT_TABS.filter((tab) => tab.visible(can));
   const current = tabs.some((tab) => tab.value === params.get('tab')) ? params.get('tab')! : 'info';

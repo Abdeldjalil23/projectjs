@@ -14,7 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { imagerieOptions, testOptions } from '@/pages/medecin/consultation/constants';
+import { imagerieOptions, testOptions } from '@/lib/exams';
 import {
   CERTIFICATE_KINDS,
   Consultation,

@@ -2,48 +2,28 @@
 import { useState } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
+import { ServerOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  Card, CardContent, CardDescription, CardHeader, CardTitle
-} from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Tabs, TabsContent, TabsList, TabsTrigger
-} from '@/components/ui/tabs';
-import { Briefcase, Stethoscope, Users, Smile } from 'lucide-react';
-import { useAuth, UserRole } from '@/context/AuthContext';
-import { dashboardPathFor, DEMO_STAFF_ROLE } from '@/lib/roles';
+import { useAuth } from '@/context/AuthContext';
+import { dashboardPathFor } from '@/lib/roles';
+import { isSupabaseConfigured } from '@/lib/supabase';
 import PageLoader from '@/components/shared/PageLoader';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
-import { toast } from 'sonner';
-import {
-  Select, SelectContent, SelectItem,
-  SelectTrigger, SelectValue
-} from '@/components/ui/select';
-
-// Demo login tabs: one per workspace.
-const DEMO_TABS = [
-  { value: 'doctor', icon: Stethoscope },
-  { value: 'admin', icon: Briefcase },
-  { value: 'social', icon: Users },
-  { value: 'dentist', icon: Smile },
-] as const;
-
-const SPECIALTIES = ['MEDECINE', 'INFERMIER'] as const;
 
 export const LoginScreen = () => {
   const { t } = useTranslation();
-  const { login, signIn, isLoggedIn, userRole, loading, isDemo } = useAuth();
+  const { signIn, isLoggedIn, userRole, loading } = useAuth();
   const location = useLocation();
 
-  const [selectedRole, setSelectedRole] = useState<UserRole>('doctor');
   const [ID, setID] = useState('');
   const [password, setPassword] = useState('');
-  const [specialty, setSpecialty] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Real login: the role and permissions come from the account in the database.
+  // The role and permissions come from the account in the database.
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!ID.trim()) {
@@ -62,37 +42,6 @@ export const LoginScreen = () => {
       toast.error(error);
       setPassword('');
     }
-  };
-
-  // Demo login, used while no server is configured: the role is picked on this screen.
-  const handleDemoLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    const idPattern = /^\d{4}[A-Z]$/;
-
-    if (!ID.trim()) {
-      toast.error(t('login.errors.enterId'));
-      return;
-    }
-    if (!password) {
-      toast.error(t('login.errors.enterPassword'));
-      return;
-    }
-
-    if (selectedRole === 'doctor' && !specialty) {
-      toast.error(t('login.errors.selectSpecialty'));
-      return;
-    }
-
-    if (!idPattern.test(ID)) {
-      toast.error(t('login.errors.idFormat'));
-      return;
-    }
-
-    login(selectedRole, { id: ID, specialty: selectedRole === 'doctor' ? specialty : undefined });
-    const roleName = selectedRole ? t(`roles.${DEMO_STAFF_ROLE[selectedRole]}`) : '';
-    const specialtyName = selectedRole === 'doctor' ? ` (${t(`login.specialties.${specialty}`)})` : '';
-    toast.success(t('login.loggedInAs', { role: roleName + specialtyName }));
   };
 
   if (loading) {
@@ -120,95 +69,56 @@ export const LoginScreen = () => {
         <Card className="border-medsuite-primary/20">
           <CardHeader>
             <CardTitle>{t('login.welcome')}</CardTitle>
-            <CardDescription>{isDemo ? t('login.demoHint') : t('login.staffHint')}</CardDescription>
+            <CardDescription>{t('login.staffHint')}</CardDescription>
           </CardHeader>
 
           <CardContent>
-            {isDemo && (
-              <Tabs
-                defaultValue="doctor"
-                className="mb-6"
-                onValueChange={(value) => setSelectedRole(value as UserRole)}
-              >
-                <TabsList className="grid w-full grid-cols-4">
-                  {DEMO_TABS.map(({ value, icon: Icon }) => (
-                    <TabsTrigger key={value} value={value} className="flex items-center gap-1">
-                      <Icon className="h-4 w-4" />
-                      <span className="hidden sm:inline">{t(`login.tabs.${value}`)}</span>
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-
-                {DEMO_TABS.map(({ value }) => (
-                  <TabsContent key={value} value={value}>
-                    <p className="text-sm text-muted-foreground mb-4">{t(`login.tabHints.${value}`)}</p>
-                  </TabsContent>
-                ))}
-              </Tabs>
-            )}
-
-            <form onSubmit={isDemo ? handleDemoLogin : handleSignIn}>
-              <div className="grid gap-4">
-                {isDemo && selectedRole === 'doctor' && (
-                  <div className="grid gap-2">
-                    <Label htmlFor="specialty">{t('login.specialty')}</Label>
-                    <Select value={specialty} onValueChange={setSpecialty}>
-                      <SelectTrigger id="specialty">
-                        <SelectValue placeholder={t('login.specialtyPlaceholder')} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {SPECIALTIES.map((spec) => (
-                          <SelectItem key={spec} value={spec}>
-                            {t(`login.specialties.${spec}`)}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                <div className="grid gap-2">
-                  <Label htmlFor="ID">{t('login.id')}</Label>
-                  <Input
-                    id="ID"
-                    placeholder={t('login.idPlaceholder')}
-                    autoComplete="username"
-                    value={ID}
-                    onChange={(e) => setID(e.target.value)}
-                  />
+            {!isSupabaseConfigured ? (
+              // Without the server keys nobody can sign in: say what is missing instead of a form that cannot work.
+              <div className="flex items-start gap-3 rounded-md border border-destructive/30 bg-destructive/5 p-4" role="alert">
+                <ServerOff className="mt-0.5 h-5 w-5 shrink-0 text-destructive" />
+                <div className="space-y-1">
+                  <p className="font-medium">{t('common.serverNotConfigured')}</p>
+                  <p className="text-sm text-muted-foreground">{t('login.serverMissing')}</p>
                 </div>
-
-                <div className="grid gap-2">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="password">{t('login.password')}</Label>
-                    {isDemo && (
-                      <a href="#" className="text-sm text-medsuite-primary hover:underline">
-                        {t('login.forgotLink')}
-                      </a>
-                    )}
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder={t('login.passwordPlaceholder')}
-                    autoComplete="current-password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
-                </div>
-
-                <Button
-                  type="submit"
-                  disabled={submitting}
-                  className="bg-medsuite-primary hover:bg-medsuite-accent"
-                >
-                  {submitting ? t('login.signingIn') : t('login.signIn')}
-                </Button>
-                {!isDemo && (
-                  <p className="text-center text-xs text-muted-foreground">{t('login.forgotHint')}</p>
-                )}
               </div>
-            </form>
+            ) : (
+              <form onSubmit={handleSignIn}>
+                <div className="grid gap-4">
+                  <div className="grid gap-2">
+                    <Label htmlFor="ID">{t('login.id')}</Label>
+                    <Input
+                      id="ID"
+                      placeholder={t('login.idPlaceholder')}
+                      autoComplete="username"
+                      value={ID}
+                      onChange={(e) => setID(e.target.value)}
+                    />
+                  </div>
+
+                  <div className="grid gap-2">
+                    <Label htmlFor="password">{t('login.password')}</Label>
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder={t('login.passwordPlaceholder')}
+                      autoComplete="current-password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    disabled={submitting}
+                    className="bg-medsuite-primary hover:bg-medsuite-accent"
+                  >
+                    {submitting ? t('login.signingIn') : t('login.signIn')}
+                  </Button>
+                  <p className="text-center text-xs text-muted-foreground">{t('login.forgotHint')}</p>
+                </div>
+              </form>
+            )}
           </CardContent>
         </Card>
       </div>

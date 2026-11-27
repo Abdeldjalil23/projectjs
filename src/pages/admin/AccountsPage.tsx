@@ -38,7 +38,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
 import PasswordField from '@/components/shared/PasswordField';
 import { useAuth } from '@/context/AuthContext';
 import { WORKSPACE_BY_STAFF_ROLE } from '@/lib/roles';
@@ -283,7 +282,7 @@ const ResetPasswordDialog = ({ account, onClose }: { account: StaffAccount; onCl
 
 export const AccountsPage = () => {
   const { t } = useTranslation();
-  const { isDemo, userId } = useAuth();
+  const { userId } = useAuth();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState('');
   const [roleFilter, setRoleFilter] = useState(ALL);
@@ -292,8 +291,8 @@ export const AccountsPage = () => {
   const [resetting, setResetting] = useState<StaffAccount | null>(null);
   const [toggling, setToggling] = useState<StaffAccount | null>(null);
 
-  const accounts = useQuery({ queryKey: ['accounts'], queryFn: fetchAccounts, enabled: !isDemo });
-  const roles = useQuery({ queryKey: ['roles'], queryFn: fetchRoles, enabled: !isDemo });
+  const accounts = useQuery({ queryKey: ['accounts'], queryFn: fetchAccounts });
+  const roles = useQuery({ queryKey: ['roles'], queryFn: fetchRoles });
 
   const toggleActive = useMutation({
     mutationFn: (account: StaffAccount) => updateAccount(account.id, { active: !account.active }),
@@ -321,13 +320,6 @@ export const AccountsPage = () => {
   const activeCount = (accounts.data ?? []).filter((a) => a.active).length;
   const isSelf = (account: StaffAccount) => Boolean(userId) && account.staff_id === userId;
 
-  if (isDemo) {
-    return (
-      <AppLayout title={t('accounts.title')}>
-        <ServerRequiredNotice />
-      </AppLayout>
-    );
-  }
 
   return (
     <AppLayout title={t('accounts.title')}>

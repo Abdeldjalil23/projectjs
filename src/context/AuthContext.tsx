@@ -3,9 +3,9 @@ import { createContext, useCallback, useContext, useEffect, useState, ReactNode 
 import { NavigateFunction } from 'react-router-dom';
 import i18n, { isLanguage } from '@/i18n';
 import { isSupabaseConfigured, staffEmail, supabase } from '@/lib/supabase';
-import { DEMO_STAFF_ROLE, ROLE_LABELS, WORKSPACE_BY_STAFF_ROLE } from '@/lib/roles';
+import { WORKSPACE_BY_STAFF_ROLE } from '@/lib/roles';
 
-export type UserRole = 'admin' | 'doctor' | 'dentist' | 'social' | 'patient' | null;
+export type UserRole = 'admin' | 'doctor' | 'dentist' | 'social' | null;
 
 interface SessionUser {
   /** Staff identifier, shown in the header. */
@@ -19,13 +19,8 @@ interface SessionUser {
   roleLabel?: string;
   /** Language saved in the account. */
   language?: string;
-  /** Permission codes from the database. Undefined in demo mode. */
-  permissions?: string[];
-}
-
-interface LoginDetails {
-  id?: string;
-  specialty?: string;
+  /** Permission codes from the database. */
+  permissions: string[];
 }
 
 interface AuthContextType {
@@ -33,53 +28,19 @@ interface AuthContextType {
   userId: string | null;
   specialty: string | null;
   fullName: string | null;
-  /** Account role code (admin, doctor, nurse…), also set in demo mode. */
+  /** Account role code in the database (admin, doctor, nurse…). */
   staffRole: string | null;
   /** Role name from the database, used when the role has no translation. */
   roleLabel: string | null;
   isLoggedIn: boolean;
   /** True while a saved session is being checked with the server. */
   loading: boolean;
-  /** True when no server is configured and the demo login is used. */
-  isDemo: boolean;
-  /** Whether the account has a permission (always true in demo mode). */
+  /** Whether the account has a permission. */
   can: (permission: string) => boolean;
-  /** Demo login: picks a role without checking any password. */
-  login: (role: UserRole, details?: LoginDetails) => void;
-  /** Real login. Resolves to an error message, or null on success. */
+  /** Resolves to an error message, or null on success. */
   signIn: (staffId: string, password: string) => Promise<string | null>;
   logout: () => void;
 }
-
-// Demo session: kept in sessionStorage so it survives a reload
-// and is cleared when the browser tab is closed.
-const SESSION_KEY = 'medsuite.session';
-const VALID_ROLES = ['admin', 'doctor', 'dentist', 'social', 'patient'];
-
-const readDemoSession = (): SessionUser | null => {
-  if (isSupabaseConfigured) return null;
-  try {
-    const raw = sessionStorage.getItem(SESSION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    if (!parsed || !VALID_ROLES.includes(parsed.role)) return null;
-    return { id: String(parsed.id ?? ''), role: parsed.role, specialty: parsed.specialty || undefined };
-  } catch {
-    return null;
-  }
-};
-
-const writeDemoSession = (user: SessionUser | null) => {
-  try {
-    if (user) {
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
-    } else {
-      sessionStorage.removeItem(SESSION_KEY);
-    }
-  } catch {
-    // Storage can be unavailable (private mode, blocked cookies): keep the in-memory session only.
-  }
-};
 
 /** Raised when the password is right but the account may not use the app. */
 class AccessError extends Error {}
@@ -143,9 +104,7 @@ const AuthContext = createContext<AuthContextType>({
   roleLabel: null,
   isLoggedIn: false,
   loading: false,
-  isDemo: !isSupabaseConfigured,
   can: () => false,
-  login: () => {},
   signIn: async () => 'Not available',
   logout: () => {},
 });
@@ -153,7 +112,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children, navigate }: { children: ReactNode; navigate: NavigateFunction }) => {
-  const [user, setUser] = useState<SessionUser | null>(readDemoSession);
+  const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(isSupabaseConfigured);
 
   // Restore a saved server session on load, and follow sign-outs (expired session, other tab).
@@ -186,13 +145,6 @@ export const AuthProvider = ({ children, navigate }: { children: ReactNode; navi
     };
   }, []);
 
-  const login = (role: UserRole, details: LoginDetails = {}) => {
-    if (!role || isSupabaseConfigured) return;
-    const next: SessionUser = { id: details.id ?? '', role, specialty: details.specialty || undefined };
-    setUser(next);
-    writeDemoSession(next);
-  };
-
   const signIn = async (staffId: string, password: string): Promise<string | null> => {
     if (!supabase) return i18n.t('common.serverNotConfigured');
 
@@ -217,18 +169,11 @@ export const AuthProvider = ({ children, navigate }: { children: ReactNode; navi
 
   const logout = () => {
     setUser(null);
-    if (supabase) {
-      void supabase.auth.signOut({ scope: 'local' });
-    } else {
-      writeDemoSession(null);
-    }
+    void supabase?.auth.signOut({ scope: 'local' });
     navigate('/login');
   };
 
-  const can = useCallback(
-    (permission: string) => (user ? !user.permissions || user.permissions.includes(permission) : false),
-    [user],
-  );
+  const can = useCallback((permission: string) => (user ? user.permissions.includes(permission) : false), [user]);
 
   return (
     <AuthContext.Provider
@@ -237,13 +182,11 @@ export const AuthProvider = ({ children, navigate }: { children: ReactNode; navi
         userId: user?.id || null,
         specialty: user?.specialty ?? null,
         fullName: user?.fullName ?? null,
-        staffRole: user ? user.staffRole ?? DEMO_STAFF_ROLE[user.role] : null,
-        roleLabel: user ? user.roleLabel ?? ROLE_LABELS[user.role] : null,
+        staffRole: user?.staffRole ?? null,
+        roleLabel: user?.roleLabel ?? null,
         isLoggedIn: user !== null,
         loading,
-        isDemo: !isSupabaseConfigured,
         can,
-        login,
         signIn,
         logout,
       }}

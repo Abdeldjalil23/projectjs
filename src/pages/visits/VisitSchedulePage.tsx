@@ -8,7 +8,6 @@ import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import { CalendarPlus, Pencil, Search, Stethoscope, UserX } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -498,7 +497,6 @@ const AppointmentList = ({ status, onStatus }: { status: AppointmentStatus | 'al
 
 export const VisitSchedulePage = () => {
   const { t } = useTranslation();
-  const { isDemo } = useAuth();
   const [params, setParams] = useSearchParams();
   const tab = params.get('tab') === 'appointments' ? 'appointments' : 'due';
   const raw = params.get('status');
@@ -506,22 +504,18 @@ export const VisitSchedulePage = () => {
 
   return (
     <AppLayout title={t('visits.schedule.title')}>
-      {isDemo ? (
-        <ServerRequiredNotice />
-      ) : (
-        <Tabs value={tab} onValueChange={(v) => setParams(v === 'appointments' ? { tab: v, status } : { tab: v }, { replace: true })}>
-          <TabsList>
-            <TabsTrigger value="due">{t('visits.due.tab')}</TabsTrigger>
-            <TabsTrigger value="appointments">{t('visits.schedule.tab')}</TabsTrigger>
-          </TabsList>
-          <TabsContent value="due" className="mt-4">
-            <DueList />
-          </TabsContent>
-          <TabsContent value="appointments" className="mt-4">
-            <AppointmentList status={status} onStatus={(s) => setParams({ tab: 'appointments', status: s }, { replace: true })} />
-          </TabsContent>
-        </Tabs>
-      )}
+      <Tabs value={tab} onValueChange={(v) => setParams(v === 'appointments' ? { tab: v, status } : { tab: v }, { replace: true })}>
+        <TabsList>
+          <TabsTrigger value="due">{t('visits.due.tab')}</TabsTrigger>
+          <TabsTrigger value="appointments">{t('visits.schedule.tab')}</TabsTrigger>
+        </TabsList>
+        <TabsContent value="due" className="mt-4">
+          <DueList />
+        </TabsContent>
+        <TabsContent value="appointments" className="mt-4">
+          <AppointmentList status={status} onStatus={(s) => setParams({ tab: 'appointments', status: s }, { replace: true })} />
+        </TabsContent>
+      </Tabs>
     </AppLayout>
   );
 };

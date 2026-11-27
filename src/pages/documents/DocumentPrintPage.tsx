@@ -8,8 +8,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
-import { useAuth } from '@/context/AuthContext';
 import { ageOn, fetchBeneficiary } from '@/lib/beneficiaries';
 import { MedicalDocument, PrescriptionLine, fetchDocument, fetchPrintHeader } from '@/lib/consultations';
 
@@ -29,19 +27,17 @@ export const DocumentPrintPage = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const { i18n, t: ui } = useTranslation();
-  const { isDemo } = useAuth();
   const lang = params.get('lang') === 'ar' ? 'ar' : 'fr';
   const t = i18n.getFixedT(lang);
 
-  const doc = useQuery({ queryKey: ['document', id], queryFn: () => fetchDocument(id), enabled: !isDemo && Boolean(id) });
+  const doc = useQuery({ queryKey: ['document', id], queryFn: () => fetchDocument(id), enabled: Boolean(id) });
   const person = useQuery({
     queryKey: ['beneficiary', doc.data?.beneficiary_id],
     queryFn: () => fetchBeneficiary(doc.data!.beneficiary_id),
     enabled: Boolean(doc.data?.beneficiary_id),
   });
-  const header = useQuery({ queryKey: ['print-header'], queryFn: fetchPrintHeader, enabled: !isDemo, staleTime: 3600_000 });
+  const header = useQuery({ queryKey: ['print-header'], queryFn: fetchPrintHeader, staleTime: 3600_000 });
 
-  if (isDemo) return <ServerRequiredNotice />;
 
   const d = doc.data;
   const b = person.data;

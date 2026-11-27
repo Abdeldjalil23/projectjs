@@ -7,7 +7,7 @@ const publicKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY || import.meta.e
 /** True once the project URL and public key are set (.env.local / Vercel settings). */
 export const isSupabaseConfigured = Boolean(url && publicKey);
 
-// The session is kept in sessionStorage, like the demo session: it survives a reload
+// The session is kept in sessionStorage: it survives a reload
 // and ends when the browser tab is closed, which suits shared computers.
 const sessionStore = (() => {
   try {

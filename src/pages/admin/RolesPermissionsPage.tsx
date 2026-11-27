@@ -20,8 +20,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
-import { useAuth } from '@/context/AuthContext';
 import {
   Permission,
   RolePermission,
@@ -59,13 +57,12 @@ interface Change {
 
 export const RolesPermissionsPage = () => {
   const { t } = useTranslation();
-  const { isDemo } = useAuth();
   const queryClient = useQueryClient();
   const [confirming, setConfirming] = useState<Change | null>(null);
 
-  const roles = useQuery({ queryKey: ['roles'], queryFn: fetchRoles, enabled: !isDemo });
-  const permissions = useQuery({ queryKey: ['permissions'], queryFn: fetchPermissions, enabled: !isDemo });
-  const matrix = useQuery({ queryKey: ['role_permissions'], queryFn: fetchRolePermissions, enabled: !isDemo });
+  const roles = useQuery({ queryKey: ['roles'], queryFn: fetchRoles });
+  const permissions = useQuery({ queryKey: ['permissions'], queryFn: fetchPermissions });
+  const matrix = useQuery({ queryKey: ['role_permissions'], queryFn: fetchRolePermissions });
 
   const granted = useMemo(
     () => new Set((matrix.data ?? []).map((rp) => key(rp.role_id, rp.permission_id))),
@@ -117,13 +114,6 @@ export const RolesPermissionsPage = () => {
     change.mutate({ role, permission, granted: on });
   };
 
-  if (isDemo) {
-    return (
-      <AppLayout title={t('rolesPage.title')}>
-        <ServerRequiredNotice />
-      </AppLayout>
-    );
-  }
 
   const loading = roles.isLoading || permissions.isLoading || matrix.isLoading;
   const failed = roles.error || permissions.error || matrix.error;
