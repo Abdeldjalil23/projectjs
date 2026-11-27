@@ -17,7 +17,6 @@ import PageLoader from "./components/shared/PageLoader";
 // Pages are loaded on demand so the first visit downloads less code.
 const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const StaffDashboard = lazy(() => import("./components/dashboard/StaffDashboard"));
-const PlannedPage = lazy(() => import("./pages/PlannedPage"));
 const AccountsPage = lazy(() => import("./pages/admin/AccountsPage"));
 const RolesPermissionsPage = lazy(() => import("./pages/admin/RolesPermissionsPage"));
 const BeneficiariesPage = lazy(() => import("./pages/beneficiaries/BeneficiariesPage"));
@@ -31,6 +30,8 @@ const MedicinesPage = lazy(() => import("./pages/medicines/MedicinesPage"));
 const CareRequestsPage = lazy(() => import("./pages/careRequests/CareRequestsPage"));
 const CareRequestPrintPage = lazy(() => import("./pages/careRequests/CareRequestPrintPage"));
 const VerifyCareRequestPage = lazy(() => import("./pages/careRequests/VerifyCareRequestPage"));
+const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
+const ReportPrintPage = lazy(() => import("./pages/reports/ReportPrintPage"));
 
 const queryClient = new QueryClient();
 
@@ -72,8 +73,9 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/care-requests", element: <CareRequestsPage />, roles: STAFF, permission: "care_requests.read" },
   { path: "/care-requests/:id/print", element: <CareRequestPrintPage />, roles: STAFF, permission: "care_requests.read" },
 
-  // Built in a later phase of the plan: reports (phase 4).
-  { path: "/reports", element: <PlannedPage feature="reports" />, roles: STAFF, permission: "reports.read" },
+  // Activity reports (phase 4): counts only, from what is recorded.
+  { path: "/reports", element: <ReportsPage />, roles: STAFF, permission: "reports.read" },
+  { path: "/reports/print", element: <ReportPrintPage />, roles: STAFF, permission: "reports.read" },
 ];
 
 function App() {
