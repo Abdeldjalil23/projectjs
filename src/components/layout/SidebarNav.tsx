@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
 import { dashboardPathFor } from '@/lib/roles';
-import { Button } from '@/components/ui/button';
 import {
   Home,
   FileText,
@@ -68,16 +67,19 @@ export const SidebarNav = () => {
   );
 
   const roleName = staffRole ? t(`roles.${staffRole}`, { defaultValue: roleLabel ?? '' }) : '';
+  const rtl = i18n.dir() === 'rtl';
+  // When the menu is folded to its icons, the name of each item shows beside it on hover.
+  const tooltip = (children: string) => ({ children, side: rtl ? ('left' as const) : ('right' as const) });
 
   return (
-    // In Arabic the menu sits on the right, where reading starts.
-    <Sidebar side={i18n.dir() === 'rtl' ? 'right' : 'left'}>
+    // In Arabic the menu sits on the right, where reading starts. Folded, it keeps its icons.
+    <Sidebar side={rtl ? 'right' : 'left'} collapsible="icon">
       <SidebarHeader>
-        <div className="flex items-center gap-2 py-1">
-          <HeartPulse className="h-6 w-6" />
-          <div>
+        <div className="flex items-center gap-2 px-1 py-1 group-data-[collapsible=icon]:px-0">
+          <HeartPulse className="h-6 w-6 shrink-0" />
+          <div className="min-w-0 group-data-[collapsible=icon]:hidden">
             <h1 className="text-lg font-semibold">MedSuite</h1>
-            <p className="text-xs opacity-80">{t('nav.portal', { role: roleName })}</p>
+            <p className="truncate text-xs opacity-80">{t('nav.portal', { role: roleName })}</p>
           </div>
         </div>
       </SidebarHeader>
@@ -88,7 +90,7 @@ export const SidebarNav = () => {
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={location.pathname === item.url}>
+                  <SidebarMenuButton asChild isActive={location.pathname === item.url} tooltip={tooltip(t(`nav.${item.label}`))}>
                     <Link to={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{t(`nav.${item.label}`)}</span>
@@ -101,14 +103,18 @@ export const SidebarNav = () => {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>
-        <Button
-          variant="outline"
-          className="w-full justify-start border-orange-500 text-orange-500"
-          onClick={logout}
-        >
-          <LogOut className="me-2 h-4 w-4 rtl:-scale-x-100" />
-          {t('nav.signOut')}
-        </Button>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              onClick={logout}
+              tooltip={tooltip(t('nav.signOut'))}
+              className="bg-background text-medsuite-primary hover:bg-background/90 hover:text-medsuite-accent"
+            >
+              <LogOut className="h-4 w-4 rtl:-scale-x-100" />
+              <span>{t('nav.signOut')}</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
   );

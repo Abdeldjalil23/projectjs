@@ -98,6 +98,18 @@ export const ar: Translation = {
   },
   settings: {
     title: "الإعدادات",
+    appearance: {
+      title: "الألوان",
+      hint: "لون القائمة والأزرار، ويُحفظ لك على هذا الحاسوب.",
+      themes: {
+        sonatrach: "سوناطراك",
+        ubuntu: "أوبونتو",
+        blue: "أزرق",
+        teal: "فيروزي",
+        green: "أخضر",
+        purple: "بنفسجي",
+      },
+    },
     account: {
       title: "حسابي",
       hint: "الاسم والمعرّف والدور تسيّرها الإدارة.",

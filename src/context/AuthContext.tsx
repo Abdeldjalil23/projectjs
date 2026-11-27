@@ -4,6 +4,7 @@ import { NavigateFunction } from 'react-router-dom';
 import i18n, { isLanguage } from '@/i18n';
 import { isSupabaseConfigured, staffEmail, supabase } from '@/lib/supabase';
 import { WORKSPACE_BY_STAFF_ROLE } from '@/lib/roles';
+import { applyTheme, savedTheme } from '@/lib/theme';
 
 export type UserRole = 'admin' | 'doctor' | 'dentist' | 'social' | null;
 
@@ -114,6 +115,11 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children, navigate }: { children: ReactNode; navigate: NavigateFunction }) => {
   const [user, setUser] = useState<SessionUser | null>(null);
   const [loading, setLoading] = useState(isSupabaseConfigured);
+
+  // Each user finds the colour theme they chose on this computer.
+  useEffect(() => {
+    applyTheme(savedTheme(user?.id));
+  }, [user?.id]);
 
   // Restore a saved server session on load, and follow sign-outs (expired session, other tab).
   useEffect(() => {

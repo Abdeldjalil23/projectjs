@@ -98,6 +98,18 @@ export const en = {
   },
   settings: {
     title: "Settings",
+    appearance: {
+      title: "Colours",
+      hint: "Colour of the menu and the buttons, kept for you on this computer.",
+      themes: {
+        sonatrach: "Sonatrach",
+        ubuntu: "Ubuntu",
+        blue: "Blue",
+        teal: "Teal",
+        green: "Green",
+        purple: "Purple",
+      },
+    },
     account: {
       title: "My account",
       hint: "Your name, identifier and role are managed by the administration.",

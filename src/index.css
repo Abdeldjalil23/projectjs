@@ -6,7 +6,28 @@
 @tailwind utilities;
 
 @layer base {
+  /*
+   * Colour theme. Every coloured part of the interface (buttons, menu, highlights) is computed
+   * from one brand colour: hue, saturation and lightness. The default is Sonatrach orange; the
+   * other themes, chosen in Settings, only change these three values (see src/lib/theme.ts).
+   */
   :root {
+    --brand-h: 31;
+    --brand-s: 87%;
+    --brand-l: 54%;
+  }
+  :root[data-theme='ubuntu'] { --brand-h: 15.5; --brand-s: 82%; --brand-l: 52%; } /* #E95420 */
+  :root[data-theme='blue']   { --brand-h: 210; --brand-s: 79%; --brand-l: 46%; } /* #1976D2 */
+  :root[data-theme='teal']   { --brand-h: 175; --brand-s: 84%; --brand-l: 32%; } /* #0D9488 */
+  :root[data-theme='green']  { --brand-h: 142; --brand-s: 71%; --brand-l: 36%; } /* #1B9E4B */
+  :root[data-theme='purple'] { --brand-h: 262; --brand-s: 60%; --brand-l: 52%; } /* #7D4ACF */
+
+  :root {
+    --brand: var(--brand-h) var(--brand-s) var(--brand-l);
+    --brand-dark: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 10%);
+    --brand-deep: var(--brand-h) var(--brand-s) 30%;
+    --brand-soft: var(--brand-h) 80% 94%;
+
     --background: 0 0% 100%;
     --foreground: 0 0% 0%;
 
@@ -16,22 +37,23 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    --primary: 32 87% 54%;
+    --primary: var(--brand);
     --primary-foreground: 0 0% 100%;
 
     /* MedSuite Colors */
-    --medsuite-primary: 32 87% 54%;
-    --medsuite-accent: 32 87% 44%;
+    --medsuite-primary: var(--brand);
+    --medsuite-accent: var(--brand-dark);
+    --medsuite-secondary: var(--brand-soft);
     --medsuite-dark: 0 0% 20%;
     --medsuite-light: 0 0% 98%;
 
-    --secondary: 32 80% 94%;
-    --secondary-foreground: 32 87% 30%;
+    --secondary: var(--brand-soft);
+    --secondary-foreground: var(--brand-deep);
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 32 87% 40%;
+    --accent: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 14%);
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -39,18 +61,18 @@
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 32 87% 54%;
+    --ring: var(--brand);
 
     --radius: 0.5rem;
 
-    --sidebar-background: 32 87% 54%;
+    --sidebar-background: var(--brand);
     --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 32 87% 30%;
+    --sidebar-primary: var(--brand-deep);
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 32 80% 94%;
-    --sidebar-accent-foreground: 32 87% 30%;
-    --sidebar-border: 32 87% 45%;
-    --sidebar-ring: 32 80% 94%;
+    --sidebar-accent: var(--brand-soft);
+    --sidebar-accent-foreground: var(--brand-deep);
+    --sidebar-border: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 9%);
+    --sidebar-ring: var(--brand-soft);
   }
   
   .dark {
@@ -63,16 +85,16 @@
     --popover: 0 0% 12%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 32 87% 54%;
+    --primary: var(--brand);
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 32 30% 20%;
+    --secondary: var(--brand-h) 30% 20%;
     --secondary-foreground: 0 0% 98%;
 
     --muted: 0 0% 20%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 32 87% 40%;
+    --accent: var(--brand-h) var(--brand-s) calc(var(--brand-l) - 14%);
     --accent-foreground: 0 0% 98%;
 
     --destructive: 0 62.8% 30.6%;
@@ -80,16 +102,16 @@
 
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    --ring: 32 87% 54%;
-    
+    --ring: var(--brand);
+
     --sidebar-background: 0 0% 15%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 32 87% 54%;
+    --sidebar-primary: var(--brand);
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 0 0% 20%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 25%;
-    --sidebar-ring: 32 87% 54%;
+    --sidebar-ring: var(--brand);
   }
 }
 
