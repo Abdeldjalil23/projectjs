@@ -32,6 +32,7 @@ const CareRequestPrintPage = lazy(() => import("./pages/careRequests/CareRequest
 const VerifyCareRequestPage = lazy(() => import("./pages/careRequests/VerifyCareRequestPage"));
 const ReportsPage = lazy(() => import("./pages/reports/ReportsPage"));
 const ReportPrintPage = lazy(() => import("./pages/reports/ReportPrintPage"));
+const WorkerApp = lazy(() => import("./worker/WorkerApp"));
 
 const queryClient = new QueryClient();
 
@@ -97,6 +98,8 @@ function App() {
                   <Route path="/login" element={<LoginPage />} />
                   {/* Opened by scanning the QR code of a care coverage: no account needed. */}
                   <Route path="/verify/:token" element={<VerifyCareRequestPage />} />
+                  {/* The workers' app (phase 5), with its own sign-in. */}
+                  <Route path="/app/*" element={<WorkerApp />} />
 
                   {/* Routes protégées */}
                   {protectedRoutes.map(({ path, element, roles, permission }) => (

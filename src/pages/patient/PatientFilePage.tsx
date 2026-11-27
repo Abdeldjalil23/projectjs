@@ -15,6 +15,8 @@ import { BeneficiaryDetails, Category, PersonRef, ageOn, fetchBeneficiary } from
 import BeneficiaryInfo from '@/pages/beneficiaries/BeneficiaryInfo';
 import BeneficiaryDialog from '@/pages/beneficiaries/BeneficiaryDialog';
 import BeneficiaryNumber from '@/pages/beneficiaries/BeneficiaryNumber';
+import { WORKER_CATEGORIES } from '@/lib/workerAccess';
+import WorkerAccessCard from './WorkerAccessCard';
 import { PATIENT_TABS } from './tabs';
 
 type DialogState =
@@ -82,7 +84,7 @@ export const PatientFilePage = () => {
                   </TabsTrigger>
                 ))}
               </TabsList>
-              <TabsContent value="info" className="mt-4">
+              <TabsContent value="info" className="mt-4 space-y-4">
                 <Card>
                   <CardContent className="p-6">
                     <BeneficiaryInfo
@@ -93,6 +95,8 @@ export const PatientFilePage = () => {
                     />
                   </CardContent>
                 </Card>
+                {/* Access to the workers' app, for workers and retirees (dependents use theirs). */}
+                {can('worker_access.manage') && b.active && WORKER_CATEGORIES.includes(b.category) && <WorkerAccessCard beneficiaryId={b.id} />}
               </TabsContent>
               {tabs
                 .filter((tab) => tab.value !== 'info')

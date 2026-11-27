@@ -98,8 +98,19 @@ const { data } = await supabase.rpc('verify_care_request', { p_token: token });
 | `This care coverage has already been used` | استُعمل من قبل (وضع الاستعمال الواحد) |
 | `This care coverage has expired` | تجاوز `valid_until` |
 
-## لتطبيق العامل (المرحلة 5)
+## تطبيق العامل (المرحلة 5)
 
-- يحتاج العامل حساباً مربوطاً بسجله في `beneficiaries`، وصلاحيات خاصة لا ترى إلا طلباته: سياسة RLS جديدة على `care_requests` بشرط `beneficiary_id` = سجل العامل.
-- الإنشاء من التطبيق يضع `source = 'app'`: يحتاج دالة أو سياسة خاصة، لأن هذا العمود غير متاح للإرسال اليوم.
-- الإشعارات عند تغيّر الحالة: جدول `notifications` في المرحلة 5، يملؤه trigger على `care_requests` عند تغيّر `status`.
+العامل لا يصل إلى أي جدول: كل ما يراه يمر عبر هذه الوظائف (`supabase/migrations/20261129000001_worker_app.sql`)، وكلها ترفض أي حساب ليس حساب عامل نشط.
+
+| الوظيفة | ما تعيده |
+| --- | --- |
+| `worker_me()` | العامل وذوو حقوقه النشطون (الأسماء، الرقم، الفئة) |
+| `worker_care_requests()` | طلبات العائلة، مع الحالة المحسوبة، و`qr_token` للطلبات المقبولة فقط |
+| `worker_create_care_request(p_beneficiary_id, p_doctor_id, p_prestation, p_notes)` | طلب جديد بمصدر `app`، للعامل أو لأحد ذوي حقوقه فقط |
+| `worker_doctors()` | الأطباء المتعاقدون النشطون |
+| `worker_appointments()` | مواعيد طب العمل للعائلة |
+| `worker_notifications()` / `worker_read_notifications()` | الإشعارات، وتعليمها مقروءة |
+
+- **الإشعارات:** trigger على `care_requests` يكتبها في جدول `notifications` عند: طلب قدّمه الطاقم باسمه (`care_request_created`)، والقبول، والرفض، والاستعمال. النص يُكتب في التطبيق بلغة القارئ من `kind` و`data`.
+- **التفعيل:** الطاقم (`worker_access.manage`) ينشئ الرمز بـ `create_worker_invitation`. لا يُحفظ إلا بصمة SHA-256 للرمز. وظيفة `worker-access` تتحقق منه بـ `redeem_worker_invitation`، الذي يعيد صفاً فارغاً لرقم أو رمز خاطئ ويغلق الرمز بعد 5 محاولات. بعدها تنشئ الحساب `<الرقم>@worker.medsuite.local` وتربطه بـ `complete_worker_invitation`. هاتان الوظيفتان لا يصل إليهما إلا المفتاح السري.
+- **لاحقاً:** إشعارات الهاتف خارج التطبيق (Web Push)، أو SMS إن قرّر المركز ذلك (الإعداد `notification_channels`).
