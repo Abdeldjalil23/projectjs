@@ -26,8 +26,9 @@ export const AppLayout = ({ children, title }: AppLayoutProps) => {
           <main className="flex-1 p-4 md:p-6 overflow-auto">
             {children}
           </main>
-          <footer className="border-t py-3 px-6">
-            <div className="text-xs text-muted-foreground text-center">
+          <footer>
+            <div className="brand-pattern h-9" aria-hidden />
+            <div className="border-t bg-card px-6 py-3 text-center text-xs text-muted-foreground">
               {t('footer', { year: String(new Date().getFullYear()) })}
             </div>
           </footer>

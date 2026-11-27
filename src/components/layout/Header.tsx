@@ -27,10 +27,14 @@ export const Header = ({ title }: HeaderProps) => {
   const pageTitle = title;
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 backdrop-blur px-4">
-      <div className="flex items-center gap-2">
+    <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-card/95 backdrop-blur px-4">
+      <div className="flex min-w-0 items-center gap-3">
         <SidebarTrigger aria-label={t('nav.toggleSidebar')} className="rtl:-scale-x-100" />
-        <h1 className="text-lg font-medium md:text-xl">{pageTitle}</h1>
+        {/* Page title in capitals with a short bar under it, as the headings of sonatrach.com. */}
+        <div className="min-w-0">
+          <h1 className="truncate text-base font-bold uppercase leading-tight tracking-wide md:text-lg">{pageTitle}</h1>
+          <span className="title-bar mt-1" aria-hidden />
+        </div>
       </div>
 
       <div className="flex items-center gap-2 md:gap-4">
@@ -40,7 +44,7 @@ export const Header = ({ title }: HeaderProps) => {
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="rounded-full">
               <Avatar className="h-8 w-8">
-                <AvatarFallback className="bg-medsuite-primary text-white">
+                <AvatarFallback className="bg-foreground text-xs font-bold text-white">
                   {initials}
                 </AvatarFallback>
               </Avatar>

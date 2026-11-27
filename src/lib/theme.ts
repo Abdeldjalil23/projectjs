@@ -8,7 +8,7 @@ export const DEFAULT_THEME: Theme = 'sonatrach';
 
 /** Colour of each theme, shown in the picker. Keep in line with src/index.css. */
 export const THEME_COLORS: Record<Theme, string> = {
-  sonatrach: '#EF8A23',
+  sonatrach: '#FF8500',
   ubuntu: '#E95420',
   blue: '#1976D2',
   teal: '#0D9488',

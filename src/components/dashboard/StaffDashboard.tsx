@@ -34,16 +34,20 @@ type Icon = ComponentType<SVGProps<SVGSVGElement>>;
 
 const errorText = (error: unknown, fallback: string) => (error instanceof Error ? error.message : fallback);
 
-/** One figure of the day, linking to the page where it can be worked on. */
+/**
+ * One figure of the day, linking to the page where it can be worked on. Drawn like the key
+ * figures of sonatrach.com: an outlined icon and a label underlined in the brand colour, then a
+ * large number.
+ */
 const StatTile = ({ icon: Icon, label, value, to }: { icon: Icon; label: string; value: string; to?: string }) => {
   const body = (
-    <Card className="h-full transition-shadow hover:shadow-md">
-      <CardContent className="flex items-center justify-between gap-3 p-4">
-        <div className="space-y-1">
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-2xl font-semibold tabular-nums">{value}</p>
+    <Card className="h-full transition-colors hover:border-primary/60">
+      <CardContent className="space-y-3 p-4 sm:p-5">
+        <div className="flex flex-col gap-2 border-b-2 border-primary pb-2 sm:flex-row sm:items-end sm:gap-2.5">
+          <Icon className="h-6 w-6 shrink-0 text-primary sm:h-7 sm:w-7" strokeWidth={1.6} />
+          <p className="text-xs font-semibold leading-snug sm:text-[13px]">{label}</p>
         </div>
-        <Icon className="h-6 w-6 shrink-0 text-medsuite-primary" />
+        <p className="text-2xl font-bold tabular-nums tracking-tight sm:text-3xl">{value}</p>
       </CardContent>
     </Card>
   );
@@ -76,8 +80,8 @@ const DayCard = ({
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between gap-2 space-y-0">
-        <CardTitle className="flex items-center gap-2 text-base">
-          <Icon className="h-4 w-4" />
+        <CardTitle className="flex items-center gap-2 text-sm font-bold uppercase tracking-wide">
+          <Icon className="h-4 w-4 text-primary" />
           {title}
         </CardTitle>
         {action}
@@ -151,11 +155,11 @@ export const StaffDashboard = () => {
     <AppLayout title={t('dashboard.title')}>
       <div className="space-y-6">
         <div>
-          <h2 className="text-xl font-semibold">{fullName ? t('dashboard.greeting', { name: fullName }) : t('dashboard.greetingNoName')}</h2>
+          <h2 className="text-xl font-bold">{fullName ? t('dashboard.greeting', { name: fullName }) : t('dashboard.greetingNoName')}</h2>
           <p className="text-sm text-muted-foreground">{t('dashboard.today', { date: formatDate(day) })}</p>
         </div>
 
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-3">
           {seesConsultations && <StatTile icon={Stethoscope} label={t('dashboard.tiles.consultations')} value={listFigure(consultations)} />}
           {seesDocuments && (
             <StatTile

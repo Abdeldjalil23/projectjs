@@ -28,6 +28,9 @@ export const fr: Translation = {
     contracted_doctor: 'Médecin conventionné',
   },
   login: {
+    heroLead: "L'énergie au service de",
+    heroStrong: 'la santé des travailleurs',
+    heroText: "Dossiers médicaux, visites de médecine du travail, consultations et prises en charge des travailleurs, réunis dans un seul espace pour l'équipe du centre médical.",
     welcome: 'Bienvenue',
     staffHint: 'Connectez-vous avec votre identifiant',
     serverMissing: "Copiez .env.example vers .env.local et renseignez les clés Supabase (voir docs/SETUP-SUPABASE.md), puis relancez l'application.",
