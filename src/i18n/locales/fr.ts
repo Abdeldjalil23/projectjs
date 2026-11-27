@@ -98,6 +98,18 @@ export const fr: Translation = {
   },
   settings: {
     title: "Paramètres",
+    appearance: {
+      title: "Couleurs",
+      hint: "Couleur du menu et des boutons, gardée pour vous sur cet ordinateur.",
+      themes: {
+        sonatrach: "Sonatrach",
+        ubuntu: "Ubuntu",
+        blue: "Bleu",
+        teal: "Turquoise",
+        green: "Vert",
+        purple: "Violet",
+      },
+    },
     account: {
       title: "Mon compte",
       hint: "Votre nom, votre identifiant et votre rôle sont gérés par l'administration.",

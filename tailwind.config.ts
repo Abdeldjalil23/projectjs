@@ -64,9 +64,10 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				medsuite: {
-					primary: '#EF8A23',   // Sonatrach Orange
-					secondary: '#F9E4C8',  // Light orange for secondary elements
-					accent: '#D67B16',     // Darker orange for accents
+					// Brand colour of the chosen theme (Sonatrach orange by default), see src/index.css.
+					primary: 'hsl(var(--medsuite-primary) / <alpha-value>)',
+					secondary: 'hsl(var(--medsuite-secondary) / <alpha-value>)',  // Light shade for secondary elements
+					accent: 'hsl(var(--medsuite-accent) / <alpha-value>)',        // Darker shade for accents
 					light: '#FFFFFF',      // White
 					dark: '#000000',       // Black
 					success: '#4CAF50',    // Keeping success color

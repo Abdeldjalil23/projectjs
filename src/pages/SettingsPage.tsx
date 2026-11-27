@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
-import { KeyRound, UserRound } from 'lucide-react';
+import { Check, KeyRound, Palette, UserRound } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
 import LanguageSwitcher from '@/components/shared/LanguageSwitcher';
 import { Button } from '@/components/ui/button';
@@ -12,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/context/AuthContext';
 import { MIN_PASSWORD_LENGTH, changeMyPassword } from '@/lib/accounts';
+import { THEMES, THEME_COLORS, Theme, saveTheme, savedTheme } from '@/lib/theme';
 
 const Detail = ({ label, value }: { label: string; value: string | null }) => (
   <div className="space-y-1">
@@ -19,6 +20,44 @@ const Detail = ({ label, value }: { label: string; value: string | null }) => (
     <dd className="font-medium">{value || '—'}</dd>
   </div>
 );
+
+/** Colour theme of the interface, applied at once and kept for this user on this computer. */
+const ThemePicker = () => {
+  const { t } = useTranslation();
+  const { userId } = useAuth();
+  const [current, setCurrent] = useState<Theme>(() => savedTheme(userId));
+
+  const choose = (theme: Theme) => {
+    setCurrent(theme);
+    saveTheme(theme, userId);
+  };
+
+  return (
+    <div role="radiogroup" aria-label={t('settings.appearance.title')} className="flex flex-wrap gap-4">
+      {THEMES.map((theme) => {
+        const selected = theme === current;
+        return (
+          <button
+            key={theme}
+            type="button"
+            role="radio"
+            aria-checked={selected}
+            onClick={() => choose(theme)}
+            className="flex w-20 flex-col items-center gap-2 rounded-md p-2 text-xs outline-none hover:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <span
+              className={`flex h-10 w-10 items-center justify-center rounded-full ring-offset-2 ${selected ? 'ring-2 ring-foreground' : ''}`}
+              style={{ backgroundColor: THEME_COLORS[theme] }}
+            >
+              {selected && <Check className="h-5 w-5 text-white" />}
+            </span>
+            <span className={selected ? 'font-medium' : 'text-muted-foreground'}>{t(`settings.appearance.themes.${theme}`)}</span>
+          </button>
+        );
+      })}
+    </div>
+  );
+};
 
 const PasswordForm = () => {
   const { t } = useTranslation();
@@ -114,6 +153,19 @@ const SettingsPage = () => {
               <span className="text-sm text-muted-foreground">{t('language.label')}</span>
               <LanguageSwitcher showName />
             </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-base">
+              <Palette className="h-4 w-4" />
+              {t('settings.appearance.title')}
+            </CardTitle>
+            <CardDescription>{t('settings.appearance.hint')}</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThemePicker />
           </CardContent>
         </Card>
 
