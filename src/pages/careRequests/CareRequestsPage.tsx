@@ -213,7 +213,7 @@ const RequestsTab = ({ state, onState }: { state: CareState | 'all'; onState: (s
                           {r.requester_name && <p className="text-xs text-muted-foreground">{r.requester_name}</p>}
                         </TableCell>
                         <TableCell className="text-sm">
-                          <Badge variant="outline" className={STATE_STYLE[s]}>
+                          <Badge variant="outline" className={`whitespace-nowrap ${STATE_STYLE[s]}`}>
                             {t(`careRequests.state.${s}`)}
                           </Badge>
                           <p className="mt-1 max-w-[14rem] text-xs text-muted-foreground">
