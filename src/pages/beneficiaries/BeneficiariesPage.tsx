@@ -5,7 +5,6 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, FileUp, Plus, Search } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,7 +34,7 @@ type DialogState =
 
 export const BeneficiariesPage = () => {
   const { t } = useTranslation();
-  const { isDemo, can } = useAuth();
+  const { can } = useAuth();
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<ListFilters['category']>('all');
   const [status, setStatus] = useState<ListFilters['status']>('active');
@@ -51,17 +50,9 @@ export const BeneficiariesPage = () => {
   const list = useQuery({
     queryKey: ['beneficiaries', filters],
     queryFn: () => fetchBeneficiaries(filters),
-    enabled: !isDemo,
     placeholderData: keepPreviousData,
   });
 
-  if (isDemo) {
-    return (
-      <AppLayout title={t('beneficiaries.title')}>
-        <ServerRequiredNotice />
-      </AppLayout>
-    );
-  }
 
   const total = list.data?.total ?? 0;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));

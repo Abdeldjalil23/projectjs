@@ -6,8 +6,6 @@ import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Printer } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
-import { useAuth } from '@/context/AuthContext';
 import { fetchBeneficiary } from '@/lib/beneficiaries';
 import { DECISIONS, fetchVisit } from '@/lib/visits';
 
@@ -27,19 +25,17 @@ export const VisitCertificatePage = () => {
   const navigate = useNavigate();
   const [params, setParams] = useSearchParams();
   const { i18n, t: ui } = useTranslation();
-  const { isDemo } = useAuth();
   const lang = params.get('lang') === 'ar' ? 'ar' : 'fr';
   const t = i18n.getFixedT(lang);
   const dir = lang === 'ar' ? 'rtl' : 'ltr';
 
-  const visit = useQuery({ queryKey: ['visit', id], queryFn: () => fetchVisit(id), enabled: !isDemo && Boolean(id) });
+  const visit = useQuery({ queryKey: ['visit', id], queryFn: () => fetchVisit(id), enabled: Boolean(id) });
   const person = useQuery({
     queryKey: ['beneficiary', visit.data?.beneficiary_id],
     queryFn: () => fetchBeneficiary(visit.data!.beneficiary_id),
     enabled: Boolean(visit.data?.beneficiary_id),
   });
 
-  if (isDemo) return <ServerRequiredNotice />;
 
   const date = (value: string | null | undefined) =>
     value ? new Intl.DateTimeFormat(lang === 'ar' ? 'ar-DZ' : 'fr-DZ', { dateStyle: 'long' }).format(new Date(`${value}T00:00:00`)) : '…';

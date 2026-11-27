@@ -1,7 +1,7 @@
 // Data access for staff accounts, roles and permissions (Supabase).
 import { FunctionsHttpError } from '@supabase/supabase-js';
 import i18n from '@/i18n';
-import { supabase } from '@/lib/supabase';
+import { staffEmail, supabase } from '@/lib/supabase';
 
 export interface StaffRole {
   id: string;
@@ -138,6 +138,28 @@ export const generatePassword = (length = 12) => {
   const values = new Uint32Array(length);
   crypto.getRandomValues(values);
   return Array.from(values, (v) => alphabet[v % alphabet.length]).join('');
+};
+
+/** Shortest password accepted, here and by the admin-users function. */
+export const MIN_PASSWORD_LENGTH = 8;
+
+/**
+ * Changes the signed-in user's own password. The current password is checked first by signing in
+ * with it again, so a session left open on a shared computer cannot be used to change it.
+ */
+export const changeMyPassword = async (staffId: string, current: string, next: string) => {
+  const { error: checkError } = await client().auth.signInWithPassword({ email: staffEmail(staffId), password: current });
+  if (checkError) {
+    if (checkError.status === 429) throw new Error(i18n.t('login.errors.tooMany'));
+    if (checkError.status === 400 || checkError.code === 'invalid_credentials') throw new Error(i18n.t('settings.password.wrongCurrent'));
+    throw new Error(i18n.t('login.errors.network'));
+  }
+  const { error } = await client().auth.updateUser({ password: next });
+  if (error) {
+    if (error.code === 'same_password') throw new Error(i18n.t('settings.password.same'));
+    if (error.code === 'weak_password') throw new Error(i18n.t('settings.password.weak'));
+    fail(error);
+  }
 };
 
 /** Saves the signed-in user's language in their account, so it follows them to other computers. */

@@ -1,7 +1,7 @@
 
-import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Bell, User } from 'lucide-react';
+import { User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -17,16 +17,14 @@ interface HeaderProps {
 export const Header = ({ title }: HeaderProps) => {
   const { t } = useTranslation();
   const { userRole, userId, specialty, fullName, staffRole, roleLabel: accountRole, logout } = useAuth();
-  const [notifications] = useState(3);
-
   const initials = userRole ? ROLE_INITIALS[userRole] : 'US';
   const roleLabel = staffRole ? t(`roles.${staffRole}`, { defaultValue: accountRole ?? '' }) : '';
-  const specialtyLabel = specialty ? t(`login.specialties.${specialty}`, { defaultValue: specialty }) : null;
+  const specialtyLabel = specialty || null;
   const idLabel = userId ? t('nav.staffId', { id: userId }) : null;
   const displayName = fullName || idLabel || roleLabel;
   const subtitle = [roleLabel, specialtyLabel, fullName ? idLabel : null].filter(Boolean).join(' · ');
-  // Pages not translated yet pass their title as is; known titles are translated here.
-  const pageTitle = t(`pageTitles.${title}`, { defaultValue: title });
+  // Every page passes its title already translated.
+  const pageTitle = title;
 
   return (
     <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b bg-background/95 backdrop-blur px-4">
@@ -37,15 +35,6 @@ export const Header = ({ title }: HeaderProps) => {
 
       <div className="flex items-center gap-2 md:gap-4">
         <LanguageSwitcher />
-
-        <Button variant="ghost" size="icon" className="relative" aria-label={t('nav.notifications')}>
-          <Bell className="h-5 w-5" />
-          {notifications > 0 && (
-            <span className="absolute top-1 end-1 flex h-4 w-4 items-center justify-center rounded-full bg-medsuite-primary text-[10px] text-white">
-              {notifications}
-            </span>
-          )}
-        </Button>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -66,9 +55,11 @@ export const Header = ({ title }: HeaderProps) => {
                 </p>
               </div>
             </div>
-            <DropdownMenuItem>
-              <User className="me-2 h-4 w-4" />
-              <span>{t('nav.myProfile')}</span>
+            <DropdownMenuItem asChild>
+              <Link to="/settings">
+                <User className="me-2 h-4 w-4" />
+                <span>{t('nav.myProfile')}</span>
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem onClick={logout}>
               <span>{t('nav.signOut')}</span>

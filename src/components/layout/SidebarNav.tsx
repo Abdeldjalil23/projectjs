@@ -14,11 +14,11 @@ import {
   SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { useAuth } from '@/context/AuthContext';
+import { dashboardPathFor } from '@/lib/roles';
 import { Button } from '@/components/ui/button';
 import {
   Home,
   FileText,
-  Users,
   LogOut,
   HeartPulse,
   ClipboardCheck,
@@ -35,76 +35,37 @@ type MenuItem = {
   label: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   url: string;
+  /** Permission the account needs to see the item; none for the dashboard. */
+  permission?: string;
 };
+
+// Same menu for every workspace: each account sees the items its role has the permission for.
+const ITEMS: MenuItem[] = [
+  { label: 'beneficiaries', icon: Contact, url: '/beneficiaries', permission: 'beneficiaries.read' },
+  { label: 'visits', icon: CalendarCheck, url: '/visits', permission: 'appointments.read' },
+  { label: 'documents', icon: FileStack, url: '/documents', permission: 'documents.read' },
+  { label: 'medicines', icon: Pill, url: '/medicines', permission: 'medicines.read' },
+  { label: 'careRequests', icon: ClipboardCheck, url: '/care-requests', permission: 'care_requests.read' },
+  { label: 'reports', icon: FileText, url: '/reports', permission: 'reports.read' },
+  { label: 'staffAccounts', icon: UserCog, url: '/admin/accounts', permission: 'users.manage' },
+  { label: 'rolesPermissions', icon: ShieldCheck, url: '/admin/roles', permission: 'roles.manage' },
+];
 
 export const SidebarNav = () => {
   const { t, i18n } = useTranslation();
-  const { userRole, staffRole, roleLabel, logout, isDemo, can } = useAuth();
+  const { userRole, staffRole, roleLabel, logout, can } = useAuth();
   const location = useLocation();
 
-  const menuItems = useMemo<MenuItem[]>(() => {
-    // Real data pages, shown to every workspace whose role has the permission.
-    const beneficiaries: MenuItem[] =
-      !isDemo && can('beneficiaries.read') ? [{ label: 'beneficiaries', icon: Contact, url: '/beneficiaries' }] : [];
-    // Visit schedule: the real page once the server is connected, the sample page in the demo.
-    const visits = (demoUrl: string): MenuItem[] =>
-      isDemo
-        ? [{ label: 'periodicVisit', icon: FileText, url: demoUrl }]
-        : can('appointments.read')
-          ? [{ label: 'visits', icon: CalendarCheck, url: '/visits' }]
-          : [];
-    // Register of the documents issued.
-    const documents: MenuItem[] =
-      !isDemo && can('documents.read') ? [{ label: 'documents', icon: FileStack, url: '/documents' }] : [];
-    // Medicine stock.
-    const medicines: MenuItem[] =
-      !isDemo && can('medicines.read') ? [{ label: 'medicines', icon: Pill, url: '/medicines' }] : [];
-    switch (userRole) {
-      case 'doctor':
-        return [
-          { label: 'dashboard', icon: Home, url: '/medecin/dashboard' },
-          ...beneficiaries,
-          // Sample pages, replaced by the patient files once the server is connected.
-          ...(isDemo ? [{ label: 'medicalRecords', icon: FileText, url: '/dossiers-medicaux' }] : []),
-          ...visits('/visite-periodique'),
-          ...documents,
-          ...medicines,
-          { label: 'reports', icon: FileText, url: '/medecin/reports' },
-        ];
-      case 'admin':
-        return [
-          { label: 'dashboard', icon: Home, url: '/admin/dashboard' },
-          ...beneficiaries,
-          { label: 'reports', icon: FileText, url: '/admin/reports' },
-          ...visits('/admin/visite-perdue'),
-          ...medicines,
-          { label: 'careRequests', icon: ClipboardCheck, url: '/admin/requests-prise-en-charge' },
-          // Account and permission management works only with the real server.
-          ...(!isDemo && can('users.manage') ? [{ label: 'staffAccounts', icon: UserCog, url: '/admin/accounts' }] : []),
-          ...(!isDemo && can('roles.manage') ? [{ label: 'rolesPermissions', icon: ShieldCheck, url: '/admin/roles' }] : []),
-        ];
-      case 'social':
-        return [
-          { label: 'dashboard', icon: Home, url: '/social/dashboard' },
-          ...beneficiaries,
-          { label: 'patientSupport', icon: HeartPulse, url: '/social/patients' },
-          { label: 'socialServices', icon: Users, url: '/social/services' },
-          { label: 'reports', icon: FileText, url: '/social/reports' },
-          { label: 'resources', icon: FileText, url: '/social/resources' },
-        ];
-      case 'dentist':
-        return [
-          { label: 'dashboard', icon: Home, url: '/dentist/dashboard' },
-          ...beneficiaries,
-          ...documents,
-          ...medicines,
-          // Sample page, replaced by the patient files once the server is connected.
-          ...(isDemo ? [{ label: 'patientManagement', icon: HeartPulse, url: '/dentist/patient-management' }] : []),
-        ];
-      default:
-        return [];
-    }
-  }, [userRole, isDemo, can]);
+  const menuItems = useMemo<MenuItem[]>(
+    () =>
+      userRole
+        ? [
+            { label: 'dashboard', icon: Home, url: dashboardPathFor(userRole) },
+            ...ITEMS.filter((item) => !item.permission || can(item.permission)),
+          ]
+        : [],
+    [userRole, can],
+  );
 
   const roleName = staffRole ? t(`roles.${staffRole}`, { defaultValue: roleLabel ?? '' }) : '';
 

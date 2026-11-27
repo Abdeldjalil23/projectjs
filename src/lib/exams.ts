@@ -1,58 +1,5 @@
-import { Stethoscope, Pill, Navigation, Microscope, Image, Ambulance, HeartPulse } from 'lucide-react';
-import type { ServiceType } from './types';
-
-export const printStyles = `
-@media print {
-  @page {
-    size: A5 portrait;
-    margin: 0.5cm;
-  }
-
-  body * {
-    visibility: hidden;
-  }
-
-  .print-area, .print-area * {
-    visibility: visible;
-  }
-
-  .print-area {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: white;
-    z-index: 9999;
-    display: flex !important;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 0;
-  }
-
-  .print-area > div {
-    width: 14.8cm;
-    height: 20cm;
-    box-shadow: none;
-    page-break-after: avoid;
-    page-break-inside: avoid;
-  }
-
-  .dialog-print-hide {
-    display: none !important;
-  }
-}
-`;
-
-export const SERVICE_TYPES: ServiceType[] = [
-  { icon: <Stethoscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Diagnostic', desc: 'مقابلة مع الطبيب العام', action: 'Demander' },
-  { icon: <Pill className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Ordonnance', desc: 'طلب وصفة طبية', action: 'Demander' },
-  { icon: <Navigation className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Orientation', desc: 'إحالة أو توجيه لطبيب مختص', action: 'Demander' },
-  { icon: <Microscope className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'ANALYSE', desc: 'طلب تحاليل أو فحوصات مخبرية', action: 'Demander' },
-  { icon: <Image className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Imagerie', desc: 'طلب تصوير (أشعة، IRM…)', action: 'Demander' },
-  { icon: <Ambulance className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Evacuation', desc: 'إخلاء أو نقل طبي', action: 'Demander' },
-  { icon: <HeartPulse className="w-12 h-12 text-medsuite-primary mb-2" />, title: 'Soins', desc: 'رعاية تمريضية أو متابعة', action: 'Demander' }
-];
+// Lists offered when requesting lab tests and imaging, as used by the centre (French names, as
+// printed on the documents).
 
 export const testOptions = {
   interne: [
@@ -110,11 +57,3 @@ export const imagerieOptions = {
     "Électromyogramme", "Test d'effort", "Holter ECG", "Holter Tension", "Échographie de Stress"
   ]
 };
-
-export const natureOptions: string[] = [
-  'Visite périodique',
-  'Urgence médicochirurgicale',
-  'Visite spécifique',
-  'Visite d\'embauche',
-  'Visite de soins'
-];

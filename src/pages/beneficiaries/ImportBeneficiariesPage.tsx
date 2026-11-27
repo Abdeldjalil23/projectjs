@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import type { TFunction } from 'i18next';
 import { ArrowLeft, FileSpreadsheet, Upload } from 'lucide-react';
 import AppLayout from '@/components/layout/AppLayout';
-import ServerRequiredNotice from '@/components/shared/ServerRequiredNotice';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,6 @@ import { Label } from '@/components/ui/label';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { useAuth } from '@/context/AuthContext';
 import { CATEGORIES, Category, ImportResult, importBeneficiaries } from '@/lib/beneficiaries';
 import {
   IMPORT_FIELDS,
@@ -40,7 +38,6 @@ const issueText = (t: TFunction, issue: Issue) =>
 
 export const ImportBeneficiariesPage = () => {
   const { t } = useTranslation();
-  const { isDemo } = useAuth();
   const queryClient = useQueryClient();
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -100,13 +97,6 @@ export const ImportBeneficiariesPage = () => {
     },
   });
 
-  if (isDemo) {
-    return (
-      <AppLayout title={t('importPage.title')}>
-        <ServerRequiredNotice />
-      </AppLayout>
-    );
-  }
 
   const fieldLabel = (field: ImportField) =>
     `${t(`importPage.fields.${field}`)}${REQUIRED_FIELDS.includes(field) ? ` (${t('importPage.required')})` : ''}`;

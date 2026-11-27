@@ -17,13 +17,13 @@ import { saveMyLanguage } from '@/lib/accounts';
 /** Language menu. Once signed in, the choice is also saved in the account. */
 export const LanguageSwitcher = ({ showName = false }: { showName?: boolean }) => {
   const { t, i18n } = useTranslation();
-  const { isLoggedIn, isDemo } = useAuth();
+  const { isLoggedIn } = useAuth();
   const current = i18n.resolvedLanguage as Language;
 
   const choose = async (language: Language) => {
     if (language === current) return;
     await i18n.changeLanguage(language);
-    if (isLoggedIn && !isDemo) {
+    if (isLoggedIn) {
       try {
         await saveMyLanguage(language);
       } catch {
