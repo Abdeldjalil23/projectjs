@@ -10,11 +10,15 @@ interface AppLayoutProps {
   title: string;
 }
 
+// Each page has its own layout, so the menu reads how it was left (open or folded to its icons)
+// from the cookie the sidebar writes when it is toggled.
+const sidebarWasOpen = () => !document.cookie.split('; ').includes('sidebar:state=false');
+
 export const AppLayout = ({ children, title }: AppLayoutProps) => {
   const { t } = useTranslation();
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={sidebarWasOpen()}>
       <div className="min-h-screen flex w-full">
         <SidebarNav />
         <div className="flex flex-1 flex-col min-w-0">
