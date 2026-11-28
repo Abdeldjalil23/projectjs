@@ -92,7 +92,7 @@ npx supabase functions deploy admin-users --remote=<project-ref> --no-verify-jwt
 
 أو من الحاسوب: `npx supabase functions deploy worker-access --remote=<project-ref> --no-verify-jwt`.
 
-**أرقام الاتصال في التطبيق** (صفحة Contacts): في **SQL Editor**، مع تغيير الأرقام:
+**أرقام الاتصال في التطبيق** (صفحة Contacts): تُعدَّل من المنصة في **Paramètres du centre**. أو في **SQL Editor**، مع تغيير الأرقام:
 
 ```sql
 update public.app_settings
