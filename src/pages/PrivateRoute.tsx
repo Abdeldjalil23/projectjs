@@ -8,8 +8,9 @@ interface PrivateRouteProps {
   children: JSX.Element;
   /** Roles allowed to open this page. Leave empty to allow every logged-in user. */
   roles?: UserRole[];
-  /** Permission needed to open this page (checked against the database permissions). */
-  permission?: string;
+  /** Permission needed to open this page (checked against the database permissions); with a
+   *  list, any one of them is enough. */
+  permission?: string | string[];
 }
 
 const PrivateRoute = ({ children, roles, permission }: PrivateRouteProps) => {
@@ -24,7 +25,7 @@ const PrivateRoute = ({ children, roles, permission }: PrivateRouteProps) => {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
 
-  if ((roles && !roles.includes(userRole)) || (permission && !can(permission))) {
+  if ((roles && !roles.includes(userRole)) || (permission && ![permission].flat().some((p) => can(p)))) {
     return <Navigate to={dashboardPathFor(userRole)} replace />;
   }
 

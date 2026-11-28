@@ -1,6 +1,7 @@
 // Data access for consultations, the acts performed and the medical documents issued.
 import { supabase } from '@/lib/supabase';
 import i18n from '@/i18n';
+import { searchTerms, type PersonRef } from '@/lib/beneficiaries';
 
 export const SERVICES = ['general', 'nursing', 'dental', 'psychology'] as const;
 export type Service = (typeof SERVICES)[number];
@@ -202,6 +203,45 @@ export const saveConsultation = async (consultation: Consultation, acts: Act[], 
     if (error) fail(error);
   }
   return id!;
+};
+
+export interface RegisterConsultation extends Consultation {
+  id: string;
+  beneficiary: PersonRef | null;
+}
+
+export interface RegisterFilters {
+  from: string;
+  to: string;
+  service: Service | 'all';
+  search: string;
+}
+
+/** Most consultations shown in the register; narrow the dates or search to see older ones. */
+export const REGISTER_LIMIT = 300;
+
+/**
+ * Consultations between two days, newest first, of one service or of every service the user may
+ * read (the database only returns those), optionally of the people matching a search.
+ */
+export const fetchConsultationRegister = async ({ from, to, service, search }: RegisterFilters): Promise<RegisterConsultation[]> => {
+  const terms = searchTerms(search);
+  let query = client()
+    .from('consultations')
+    .select(`*, beneficiary:beneficiaries${terms.length ? '!inner' : ''}(id, external_id, last_name, first_name)`)
+    .gte('consultation_date', from)
+    .lte('consultation_date', to);
+  if (service !== 'all') query = query.eq('service', service);
+  for (const term of terms) query = query.ilike('beneficiary.search_text', term);
+  const { data, error } = await query
+    .order('consultation_date', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(REGISTER_LIMIT);
+  if (error) fail(error);
+  return ((data ?? []) as unknown as (RegisterConsultation & { beneficiary: unknown })[]).map((c) => ({
+    ...c,
+    beneficiary: (Array.isArray(c.beneficiary) ? c.beneficiary[0] ?? null : c.beneficiary) as PersonRef | null,
+  }));
 };
 
 const DOCUMENT_COLUMNS = 'id, beneficiary_id, consultation_id, doc_type, serial, issued_on, author_name, content, cancelled_at, cancel_reason, created_at';
