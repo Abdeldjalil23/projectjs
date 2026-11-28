@@ -28,6 +28,12 @@ interface ConsultationDialogProps {
   onClose: () => void;
   /** Opens the document form for this consultation (after saving it). */
   onIssueDocument?: (consultation: Consultation) => void;
+  /** Values a new consultation starts with (the reason of the appointment it follows…). */
+  initial?: Partial<Consultation>;
+  /** Called once the consultation is saved. */
+  onSaved?: (id: string) => void;
+  /** Who the consultation is for, shown under the title when opened outside the patient file. */
+  person?: string;
 }
 
 const empty = (beneficiaryId: string, service: Service): Consultation => ({
@@ -43,11 +49,11 @@ const empty = (beneficiaryId: string, service: Service): Consultation => ({
   work_stoppage_days: null,
 });
 
-export const ConsultationDialog = ({ beneficiaryId, consultation, service, canWrite, onClose, onIssueDocument }: ConsultationDialogProps) => {
+export const ConsultationDialog = ({ beneficiaryId, consultation, service, canWrite, onClose, onIssueDocument, initial, onSaved, person }: ConsultationDialogProps) => {
   const { t } = useTranslation();
   const { can } = useAuth();
   const queryClient = useQueryClient();
-  const [form, setForm] = useState<Consultation>(() => consultation ?? empty(beneficiaryId, service));
+  const [form, setForm] = useState<Consultation>(() => consultation ?? { ...empty(beneficiaryId, service), ...initial });
   const catalogue = service === 'nursing' || service === 'dental' ? ACTS[service] : null;
   const savedActs = useQuery({
     queryKey: ['acts', consultation?.id],
@@ -65,7 +71,10 @@ export const ConsultationDialog = ({ beneficiaryId, consultation, service, canWr
     onSuccess: (id, withDocument) => {
       queryClient.invalidateQueries({ queryKey: ['consultations', beneficiaryId] });
       queryClient.invalidateQueries({ queryKey: ['acts', id] });
+      queryClient.invalidateQueries({ queryKey: ['consultation-register'] });
+      queryClient.invalidateQueries({ queryKey: ['dashboard', 'consultations'] });
       toast.success(t('consultations.saved'));
+      onSaved?.(id);
       onClose();
       if (withDocument) onIssueDocument?.({ ...form, id });
     },
@@ -116,6 +125,7 @@ export const ConsultationDialog = ({ beneficiaryId, consultation, service, canWr
             <DialogTitle>
               {t(`consultations.services.${form.service}`)} — {form.id ? t('consultations.titleExisting') : t('consultations.titleNew')}
             </DialogTitle>
+            {person && <p className="text-sm text-muted-foreground">{person}</p>}
           </DialogHeader>
           <fieldset disabled={!canWrite} className="mt-4 grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">

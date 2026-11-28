@@ -29,6 +29,7 @@ import {
   FileStack,
   Pill,
   SlidersHorizontal,
+  Stethoscope,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -36,13 +37,19 @@ type MenuItem = {
   label: string;
   icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
   url: string;
-  /** Permission the account needs to see the item; none for the dashboard. */
-  permission?: string;
+  /** Permission the account needs to see the item (any one of a list); none for the dashboard. */
+  permission?: string | string[];
 };
 
 // Same menu for every workspace: each account sees the items its role has the permission for.
 const ITEMS: MenuItem[] = [
   { label: 'beneficiaries', icon: Contact, url: '/beneficiaries', permission: 'beneficiaries.read' },
+  {
+    label: 'consultations',
+    icon: Stethoscope,
+    url: '/consultations',
+    permission: ['consultations.read', 'nursing.read', 'dental.read', 'psychology.read'],
+  },
   { label: 'visits', icon: CalendarCheck, url: '/visits', permission: 'appointments.read' },
   { label: 'appointments', icon: CalendarClock, url: '/appointments', permission: 'appointments.read' },
   { label: 'documents', icon: FileStack, url: '/documents', permission: 'documents.read' },
@@ -75,7 +82,7 @@ export const SidebarNav = () => {
       userRole
         ? [
             { label: 'dashboard', icon: Home, url: dashboardPathFor(userRole) },
-            ...ITEMS.filter((item) => !item.permission || can(item.permission)),
+            ...ITEMS.filter((item) => !item.permission || [item.permission].flat().some((p) => can(p))),
           ]
         : [],
     [userRole, can],

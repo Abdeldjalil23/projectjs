@@ -77,7 +77,7 @@ const fail = (error: { message?: string; code?: string } | null): never => {
 };
 
 /** Each word typed must appear in the number, the last name or the first name. */
-const searchTerms = (search: string) =>
+export const searchTerms = (search: string) =>
   search
     .trim()
     .toLowerCase()

@@ -26,6 +26,7 @@ const PatientFilePage = lazy(() => import("./pages/patient/PatientFilePage"));
 const VisitSchedulePage = lazy(() => import("./pages/visits/VisitSchedulePage"));
 const VisitCertificatePage = lazy(() => import("./pages/visits/VisitCertificatePage"));
 const AppointmentsPage = lazy(() => import("./pages/appointments/AppointmentsPage"));
+const ConsultationsPage = lazy(() => import("./pages/consultations/ConsultationsPage"));
 const DocumentsPage = lazy(() => import("./pages/documents/DocumentsPage"));
 const DocumentPrintPage = lazy(() => import("./pages/documents/DocumentPrintPage"));
 const MedicinesPage = lazy(() => import("./pages/medicines/MedicinesPage"));
@@ -45,13 +46,15 @@ const DENTIST: UserRole[] = ["dentist"];
 // Pages shared by every staff workspace; the permission decides who may open them.
 const STAFF: UserRole[] = ["admin", "doctor", "dentist", "social"];
 
+const CONSULTATION_READ = ["consultations.read", "nursing.read", "dental.read", "psychology.read"];
+
 // Sends "/" to the dashboard of the logged-in role.
 const HomeRedirect = () => {
   const { userRole } = useAuth();
   return <Navigate to={dashboardPathFor(userRole)} replace />;
 };
 
-const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[]; permission?: string }[] = [
+const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[]; permission?: string | string[] }[] = [
   { path: "/", element: <HomeRedirect /> },
   { path: "/settings", element: <SettingsPage /> },
 
@@ -70,6 +73,8 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/visits", element: <VisitSchedulePage />, roles: STAFF, permission: "appointments.read" },
   { path: "/appointments", element: <AppointmentsPage />, roles: STAFF, permission: "appointments.read" },
   { path: "/visits/:id/certificate", element: <VisitCertificatePage />, roles: STAFF, permission: "visits.read" },
+  // Consultations of every service the account may read.
+  { path: "/consultations", element: <ConsultationsPage />, roles: STAFF, permission: CONSULTATION_READ },
   { path: "/documents", element: <DocumentsPage />, roles: STAFF, permission: "documents.read" },
   { path: "/documents/:id/print", element: <DocumentPrintPage />, roles: STAFF, permission: "documents.read" },
   { path: "/medicines", element: <MedicinesPage />, roles: STAFF, permission: "medicines.read" },
