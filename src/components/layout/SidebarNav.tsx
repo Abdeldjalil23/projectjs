@@ -27,6 +27,7 @@ import {
   CalendarCheck,
   FileStack,
   Pill,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 type MenuItem = {
@@ -48,6 +49,7 @@ const ITEMS: MenuItem[] = [
   { label: 'reports', icon: FileText, url: '/reports', permission: 'reports.read' },
   { label: 'staffAccounts', icon: UserCog, url: '/admin/accounts', permission: 'users.manage' },
   { label: 'rolesPermissions', icon: ShieldCheck, url: '/admin/roles', permission: 'roles.manage' },
+  { label: 'centreSettings', icon: SlidersHorizontal, url: '/admin/settings', permission: 'settings.manage' },
 ];
 
 // Menu entries in capitals, as in the menu of sonatrach.com; the open page is marked by a bar and

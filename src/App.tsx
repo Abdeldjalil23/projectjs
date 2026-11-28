@@ -19,6 +19,7 @@ const SettingsPage = lazy(() => import("./pages/SettingsPage"));
 const StaffDashboard = lazy(() => import("./components/dashboard/StaffDashboard"));
 const AccountsPage = lazy(() => import("./pages/admin/AccountsPage"));
 const RolesPermissionsPage = lazy(() => import("./pages/admin/RolesPermissionsPage"));
+const CentreSettingsPage = lazy(() => import("./pages/admin/CentreSettingsPage"));
 const BeneficiariesPage = lazy(() => import("./pages/beneficiaries/BeneficiariesPage"));
 const ImportBeneficiariesPage = lazy(() => import("./pages/beneficiaries/ImportBeneficiariesPage"));
 const PatientFilePage = lazy(() => import("./pages/patient/PatientFilePage"));
@@ -61,6 +62,7 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
 
   { path: "/admin/accounts", element: <AccountsPage />, roles: ADMIN, permission: "users.manage" },
   { path: "/admin/roles", element: <RolesPermissionsPage />, roles: ADMIN, permission: "roles.manage" },
+  { path: "/admin/settings", element: <CentreSettingsPage />, roles: ADMIN, permission: "settings.manage" },
   { path: "/beneficiaries", element: <BeneficiariesPage />, roles: STAFF, permission: "beneficiaries.read" },
   { path: "/beneficiaries/import", element: <ImportBeneficiariesPage />, roles: STAFF, permission: "beneficiaries.import" },
   { path: "/beneficiaries/:id", element: <PatientFilePage />, roles: STAFF, permission: "beneficiaries.read" },
