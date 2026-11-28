@@ -18,6 +18,7 @@ import { useNumberFormat } from '@/hooks/useNumberFormat';
 import { fetchAccounts } from '@/lib/accounts';
 import { personLabel } from '@/lib/beneficiaries';
 import { countPendingCareRequests } from '@/lib/careRequests';
+import { countRequestedAppointments } from '@/lib/appointments';
 import { SERVICES, SERVICE_PERMISSION } from '@/lib/consultations';
 import {
   DAY_LIST_LIMIT,
@@ -113,7 +114,7 @@ export const StaffDashboard = () => {
   const formatDate = useDateFormat();
   const number = useNumberFormat();
   const day = today();
-  const time = new Intl.DateTimeFormat(intlLocale(i18n.language), { timeStyle: 'short' });
+  const time = new Intl.DateTimeFormat(intlLocale(i18n.language), { timeStyle: 'short', hourCycle: 'h23' });
 
   const services = SERVICES.filter((s) => can(`${SERVICE_PERMISSION[s]}.read`));
   const seesConsultations = services.length > 0;
@@ -144,6 +145,9 @@ export const StaffDashboard = () => {
   // Care coverage requests waiting for the administration.
   const reviewsCare = can('care_requests.review');
   const pendingCare = useQuery({ queryKey: ['dashboard', 'care-requests'], queryFn: countPendingCareRequests, enabled: reviewsCare });
+  // Appointments asked for in the workers' app, waiting for a time and a doctor.
+  const booksAppointments = can('appointments.write');
+  const appointmentRequests = useQuery({ queryKey: ['dashboard', 'appointment-requests'], queryFn: countRequestedAppointments, enabled: booksAppointments });
 
   /** A figure, "…" while it loads and "—" when it could not be read. */
   const figure = (q: { isLoading: boolean; isError: boolean; data?: number }) =>
@@ -192,6 +196,9 @@ export const StaffDashboard = () => {
           )}
           {reviewsCare && (
             <StatTile icon={ClipboardCheck} label={t('dashboard.tiles.careRequests')} value={figure(pendingCare)} to="/care-requests?state=pending" />
+          )}
+          {booksAppointments && (
+            <StatTile icon={CalendarClock} label={t('dashboard.tiles.appointmentRequests')} value={figure(appointmentRequests)} to="/appointments?tab=requests" />
           )}
         </div>
 

@@ -25,6 +25,7 @@ const ImportBeneficiariesPage = lazy(() => import("./pages/beneficiaries/ImportB
 const PatientFilePage = lazy(() => import("./pages/patient/PatientFilePage"));
 const VisitSchedulePage = lazy(() => import("./pages/visits/VisitSchedulePage"));
 const VisitCertificatePage = lazy(() => import("./pages/visits/VisitCertificatePage"));
+const AppointmentsPage = lazy(() => import("./pages/appointments/AppointmentsPage"));
 const DocumentsPage = lazy(() => import("./pages/documents/DocumentsPage"));
 const DocumentPrintPage = lazy(() => import("./pages/documents/DocumentPrintPage"));
 const MedicinesPage = lazy(() => import("./pages/medicines/MedicinesPage"));
@@ -67,6 +68,7 @@ const protectedRoutes: { path: string; element: JSX.Element; roles?: UserRole[];
   { path: "/beneficiaries/import", element: <ImportBeneficiariesPage />, roles: STAFF, permission: "beneficiaries.import" },
   { path: "/beneficiaries/:id", element: <PatientFilePage />, roles: STAFF, permission: "beneficiaries.read" },
   { path: "/visits", element: <VisitSchedulePage />, roles: STAFF, permission: "appointments.read" },
+  { path: "/appointments", element: <AppointmentsPage />, roles: STAFF, permission: "appointments.read" },
   { path: "/visits/:id/certificate", element: <VisitCertificatePage />, roles: STAFF, permission: "visits.read" },
   { path: "/documents", element: <DocumentsPage />, roles: STAFF, permission: "documents.read" },
   { path: "/documents/:id/print", element: <DocumentPrintPage />, roles: STAFF, permission: "documents.read" },

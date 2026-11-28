@@ -2,23 +2,29 @@
 // contacts of the centre.
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'sonner';
 import { Bell, CalendarCheck, ClipboardList, Download, FileCheck2, LogOut, MapPin, Phone, Plus, Search, Share, Stethoscope } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDateFormat } from '@/hooks/useDateFormat';
 import { intlLocale } from '@/lib/format';
 import {
+  WorkerAppointment,
   WorkerNotification,
+  cancelWorkerAppointment,
   fetchWorkerAppointments,
   fetchWorkerContacts,
   fetchWorkerDoctors,
   fetchWorkerNotifications,
   fetchWorkerRequests,
   markWorkerNotificationsRead,
+  requestWorkerAppointment,
 } from '@/lib/worker';
 import { useInstallPrompt } from './pwa';
 import { useWorkerAuth } from './WorkerAuth';
@@ -193,52 +199,228 @@ export const WorkerDoctorsPage = () => {
   );
 };
 
+const SERVICES = ['general', 'dental', 'psychology', 'nursing'] as const;
+
+/** Day and time at the centre (Algeria keeps UTC+1). */
+const useCentreTime = () => {
+  const { i18n } = useTranslation();
+  const format = new Intl.DateTimeFormat(intlLocale(i18n.language), { dateStyle: 'full', timeStyle: 'short', hourCycle: 'h23', timeZone: 'Africa/Algiers' });
+  return (iso: string | null | undefined) => (iso ? format.format(new Date(iso)) : '—');
+};
+
+const STATUS_COLOR: Record<WorkerAppointment['status'], string> = {
+  requested: 'text-amber-700',
+  scheduled: 'text-green-700',
+  missed: 'text-red-700',
+  done: 'text-muted-foreground',
+  cancelled: 'text-muted-foreground',
+};
+
 export const WorkerAppointmentsPage = () => {
   const { t } = useTranslation();
   const formatDate = useDateFormat();
+  const centreTime = useCentreTime();
+  const queryClient = useQueryClient();
+  const [asking, setAsking] = useState(false);
   const appointments = useQuery({ queryKey: ['worker', 'appointments'], queryFn: fetchWorkerAppointments });
+  const cancel = useMutation({
+    mutationFn: cancelWorkerAppointment,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['worker', 'appointments'] });
+      toast.success(t('worker.appointments.cancelled'));
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t('common.requestFailed')),
+  });
+
   return (
     <WorkerLayout title={t('worker.nav.appointments')} back="/app">
-      <SectionTitle>{t('worker.appointments.title')}</SectionTitle>
-      <p className="mb-4 text-sm text-muted-foreground">{t('worker.appointments.hint')}</p>
-      {appointments.isLoading ? (
-        <Loading />
-      ) : appointments.isError ? (
-        <Failed error={appointments.error} />
-      ) : (appointments.data ?? []).length === 0 ? (
-        <Empty>{t('worker.appointments.empty')}</Empty>
+      <div className="mb-4 flex items-center justify-between gap-3">
+        <SectionTitle>{t('worker.appointments.title')}</SectionTitle>
+        {!asking && (
+          <Button onClick={() => setAsking(true)}>
+            <Plus className="me-1 h-4 w-4" />
+            {t('worker.appointments.ask')}
+          </Button>
+        )}
+      </div>
+      {asking ? (
+        <AppointmentRequestForm onDone={() => setAsking(false)} />
       ) : (
-        <div className="space-y-3">
-          {appointments.data!.map((a) => (
-            <Card key={a.id} className={a.status === 'missed' ? 'border-red-300' : ''}>
-              <CardContent className="flex items-center gap-4 p-4">
-                <div className="flex w-16 shrink-0 flex-col items-center rounded-md bg-secondary py-2 text-secondary-foreground">
-                  <CalendarCheck className="h-5 w-5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="font-semibold">{formatDate(a.scheduled_on)}</p>
-                  <p className="text-sm">{t(`reports.visitTypes.${a.visit_type}`)}</p>
-                  <p className="text-xs text-muted-foreground">{a.beneficiary_name}</p>
-                </div>
-                <span className={`text-xs font-semibold ${a.status === 'missed' ? 'text-red-700' : a.status === 'done' ? 'text-muted-foreground' : 'text-green-700'}`}>
-                  {t(`worker.appointments.status.${a.status}`)}
-                </span>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <>
+          <p className="mb-4 text-sm text-muted-foreground">{t('worker.appointments.hint')}</p>
+          {appointments.isLoading ? (
+            <Loading />
+          ) : appointments.isError ? (
+            <Failed error={appointments.error} />
+          ) : (appointments.data ?? []).length === 0 ? (
+            <Empty>{t('worker.appointments.empty')}</Empty>
+          ) : (
+            <div className="space-y-3">
+              {appointments.data!.map((a) => (
+                <Card key={a.id} className={a.status === 'missed' ? 'border-red-300' : a.status === 'cancelled' ? 'opacity-70' : ''} data-appointment={a.id}>
+                  <CardContent className="space-y-2 p-4">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-secondary text-secondary-foreground">
+                        <CalendarCheck className="h-5 w-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold first-letter:uppercase">
+                          {a.kind === 'visit'
+                            ? formatDate(a.scheduled_on)
+                            : a.starts_at
+                              ? centreTime(a.starts_at)
+                              : t('worker.appointments.preferred', {
+                                  date: formatDate(a.preferred_date),
+                                  slot: a.preferred_slot ? t(`appointments.slots.${a.preferred_slot}`) : t('appointments.slots.any'),
+                                })}
+                        </p>
+                        <p className="text-sm">
+                          {a.kind === 'visit' ? t(`reports.visitTypes.${a.visit_type}`) : t(`consultations.services.${a.service}`)}
+                          {a.staff_name ? ` · ${a.staff_name}` : ''}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {a.beneficiary_name}
+                          {a.reason ? ` · ${a.reason}` : ''}
+                        </p>
+                        {a.status === 'cancelled' && a.cancel_reason && <p className="text-xs text-muted-foreground">{a.cancel_reason}</p>}
+                      </div>
+                      <span className={`shrink-0 text-xs font-semibold ${STATUS_COLOR[a.status]}`}>{t(`worker.appointments.status.${a.status}`)}</span>
+                    </div>
+                    {a.can_cancel && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                        disabled={cancel.isPending}
+                        onClick={() => window.confirm(t('worker.appointments.confirmCancel')) && cancel.mutate(a.id)}
+                      >
+                        {t('worker.appointments.cancel')}
+                      </Button>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </>
       )}
     </WorkerLayout>
   );
 };
 
-const notificationText = (n: WorkerNotification, t: TFunction, formatDate: (v?: string | null) => string) =>
+const AppointmentRequestForm = ({ onDone }: { onDone: () => void }) => {
+  const { t } = useTranslation();
+  const { profile } = useWorkerAuth();
+  const queryClient = useQueryClient();
+  const people = profile ? [profile.me, ...profile.family] : [];
+  const tomorrow = (() => {
+    const d = new Date(Date.now() + 86_400_000 + 3_600_000);
+    return d.toISOString().slice(0, 10);
+  })();
+  const [person, setPerson] = useState(profile?.me.id ?? '');
+  const [service, setService] = useState<string>('general');
+  const [date, setDate] = useState(tomorrow);
+  const [slot, setSlot] = useState<'morning' | 'afternoon' | 'any'>('morning');
+  const [reason, setReason] = useState('');
+  const save = useMutation({
+    mutationFn: () => requestWorkerAppointment({ beneficiary_id: person, service, preferred_date: date, slot: slot === 'any' ? null : slot, reason }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['worker', 'appointments'] });
+      toast.success(t('worker.appointments.sent'));
+      onDone();
+    },
+    onError: (e) => toast.error(e instanceof Error ? e.message : t('common.requestFailed')),
+  });
+
+  return (
+    <form
+      className="grid gap-5"
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!person || !date) return;
+        save.mutate();
+      }}
+    >
+      <p className="text-sm text-muted-foreground">{t('worker.appointments.askHint')}</p>
+      <div className="grid gap-2">
+        <Label htmlFor="ap-person">{t('worker.requests.for')}</Label>
+        <Select value={person} onValueChange={setPerson}>
+          <SelectTrigger id="ap-person" className="h-12">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {people.map((p, i) => (
+              <SelectItem key={p.id} value={p.id}>
+                {p.first_name} {p.last_name}
+                {i === 0 ? ` (${t('worker.requests.myself')})` : ''}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="ap-service">{t('worker.appointments.service')}</Label>
+        <Select value={service} onValueChange={setService}>
+          <SelectTrigger id="ap-service" className="h-12">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SERVICES.map((s) => (
+              <SelectItem key={s} value={s}>
+                {t(`consultations.services.${s}`)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-2">
+          <Label htmlFor="ap-date">{t('worker.appointments.day')}</Label>
+          <Input id="ap-date" type="date" className="h-12" min={tomorrow} value={date} onChange={(e) => setDate(e.target.value)} />
+        </div>
+        <div className="grid gap-2">
+          <Label htmlFor="ap-slot">{t('worker.appointments.slot')}</Label>
+          <Select value={slot} onValueChange={(v) => setSlot(v as typeof slot)}>
+            <SelectTrigger id="ap-slot" className="h-12">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {(['morning', 'afternoon', 'any'] as const).map((s) => (
+                <SelectItem key={s} value={s}>
+                  {t(`appointments.slots.${s}`)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+      <div className="grid gap-2">
+        <Label htmlFor="ap-reason">{t('worker.appointments.reason')}</Label>
+        <Input id="ap-reason" className="h-12" maxLength={300} value={reason} onChange={(e) => setReason(e.target.value)} />
+        <p className="text-xs text-muted-foreground">{t('worker.appointments.reasonHint')}</p>
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        <Button type="button" variant="outline" className="h-12" onClick={onDone}>
+          {t('common.cancel')}
+        </Button>
+        <Button type="submit" className="h-12" disabled={save.isPending}>
+          {save.isPending ? t('common.saving') : t('worker.appointments.send')}
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+const notificationText = (n: WorkerNotification, t: TFunction, formatDate: (v?: string | null) => string, locale: string) =>
   t(`worker.notifications.kinds.${n.kind}`, {
     number: n.data.number ?? '',
     prestation: n.data.prestation ?? '',
     reason: n.data.reason ?? '',
     date: formatDate(n.data.valid_until),
     name: n.data.beneficiary ?? '',
+    service: n.data.service ? t(`consultations.services.${n.data.service}`) : '',
+    when: n.data.starts_at ? new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short', hourCycle: 'h23', timeZone: 'Africa/Algiers' }).format(new Date(n.data.starts_at)) : '',
+    staff: n.data.staff ? ` — ${n.data.staff}` : '',
   });
 
 export const WorkerNotificationsPage = () => {
@@ -246,7 +428,7 @@ export const WorkerNotificationsPage = () => {
   const formatDate = useDateFormat();
   const queryClient = useQueryClient();
   const notifications = useQuery({ queryKey: ['worker', 'notifications'], queryFn: fetchWorkerNotifications });
-  const time = new Intl.DateTimeFormat(intlLocale(i18n.language), { dateStyle: 'medium', timeStyle: 'short' });
+  const time = new Intl.DateTimeFormat(intlLocale(i18n.language), { dateStyle: 'medium', timeStyle: 'short', hourCycle: 'h23' });
   const hasUnread = (notifications.data ?? []).some((n) => !n.read_at);
 
   // Opening the page marks the notifications as read (the highlight stays until the next visit).
@@ -269,10 +451,14 @@ export const WorkerNotificationsPage = () => {
       ) : (
         <div className="space-y-2">
           {notifications.data!.map((n) => (
-            <Link key={n.id} to={n.data.request_id ? `/app/requests/${n.data.request_id}` : '/app/requests'} className="block">
+            <Link
+              key={n.id}
+              to={n.kind.startsWith('appointment_') ? '/app/appointments' : n.data.request_id ? `/app/requests/${n.data.request_id}` : '/app/requests'}
+              className="block"
+            >
               <Card className={n.read_at ? '' : 'border-primary bg-secondary/60'}>
                 <CardContent className="space-y-1 p-4">
-                  <p className="text-sm">{notificationText(n, t, formatDate)}</p>
+                  <p className="text-sm">{notificationText(n, t, formatDate, intlLocale(i18n.language))}</p>
                   <p className="text-xs text-muted-foreground">{time.format(new Date(n.created_at))}</p>
                 </CardContent>
               </Card>

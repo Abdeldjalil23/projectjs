@@ -40,6 +40,9 @@ const SERVER_ERRORS: [RegExp, string][] = [
   [/beneficiary is not active/, 'careRequests.errors.beneficiaryInactive'],
   [/Invalid number or activation code/, 'worker.errors.invalidCode'],
   [/8 to 72 characters/, 'worker.errors.password'],
+  [/within the next 90 days/, 'worker.errors.appointmentDay'],
+  [/Too many requests waiting/, 'worker.errors.tooManyRequests'],
+  [/cannot be cancelled/, 'worker.errors.cannotCancel'],
 ];
 
 const fail = (error: { message?: string } | null): never => {
@@ -96,15 +99,43 @@ export interface WorkerDoctor {
 export interface WorkerAppointment {
   id: string;
   beneficiary_name: string;
-  visit_type: string;
-  scheduled_on: string;
-  status: 'scheduled' | 'missed' | 'done';
+  /** Visit of occupational medicine, or consultation appointment with a doctor and a time. */
+  kind: 'visit' | 'consultation';
+  visit_type: string | null;
+  service: 'general' | 'dental' | 'psychology' | 'nursing' | null;
+  scheduled_on: string | null;
+  starts_at: string | null;
+  preferred_date: string | null;
+  preferred_slot: 'morning' | 'afternoon' | null;
+  staff_name: string | null;
+  reason: string | null;
+  cancel_reason: string | null;
+  status: 'requested' | 'scheduled' | 'missed' | 'done' | 'cancelled';
+  can_cancel: boolean;
 }
 
 export interface WorkerNotification {
   id: number;
-  kind: 'care_request_created' | 'care_request_approved' | 'care_request_refused' | 'care_request_used';
-  data: { request_id?: string; number?: string; prestation?: string; reason?: string | null; valid_until?: string | null; beneficiary?: string };
+  kind:
+    | 'care_request_created'
+    | 'care_request_approved'
+    | 'care_request_refused'
+    | 'care_request_used'
+    | 'appointment_scheduled'
+    | 'appointment_moved'
+    | 'appointment_cancelled';
+  data: {
+    request_id?: string;
+    number?: string;
+    prestation?: string;
+    reason?: string | null;
+    valid_until?: string | null;
+    beneficiary?: string;
+    appointment_id?: string;
+    service?: string;
+    starts_at?: string | null;
+    staff?: string | null;
+  };
   read_at: string | null;
   created_at: string;
 }
@@ -174,6 +205,29 @@ export const fetchWorkerAppointments = async (): Promise<WorkerAppointment[]> =>
   const { data, error } = await client().rpc('worker_appointments');
   if (error) fail(error);
   return (data ?? []) as WorkerAppointment[];
+};
+
+/** The worker asks for an appointment; the centre books the time and the doctor. */
+export const requestWorkerAppointment = async (input: {
+  beneficiary_id: string;
+  service: string;
+  preferred_date: string;
+  slot: 'morning' | 'afternoon' | null;
+  reason: string | null;
+}) => {
+  const { error } = await client().rpc('worker_request_appointment', {
+    p_beneficiary_id: input.beneficiary_id,
+    p_service: input.service,
+    p_preferred_date: input.preferred_date,
+    p_slot: input.slot,
+    p_reason: input.reason?.trim() || null,
+  });
+  if (error) fail(error);
+};
+
+export const cancelWorkerAppointment = async (id: string) => {
+  const { error } = await client().rpc('worker_cancel_appointment', { p_id: id });
+  if (error) fail(error);
 };
 
 export const fetchWorkerNotifications = async (): Promise<WorkerNotification[]> => {

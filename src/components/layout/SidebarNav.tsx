@@ -25,6 +25,7 @@ import {
   ShieldCheck,
   Contact,
   CalendarCheck,
+  CalendarClock,
   FileStack,
   Pill,
   SlidersHorizontal,
@@ -43,6 +44,7 @@ type MenuItem = {
 const ITEMS: MenuItem[] = [
   { label: 'beneficiaries', icon: Contact, url: '/beneficiaries', permission: 'beneficiaries.read' },
   { label: 'visits', icon: CalendarCheck, url: '/visits', permission: 'appointments.read' },
+  { label: 'appointments', icon: CalendarClock, url: '/appointments', permission: 'appointments.read' },
   { label: 'documents', icon: FileStack, url: '/documents', permission: 'documents.read' },
   { label: 'medicines', icon: Pill, url: '/medicines', permission: 'medicines.read' },
   { label: 'careRequests', icon: ClipboardCheck, url: '/care-requests', permission: 'care_requests.read' },
