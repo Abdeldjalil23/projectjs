@@ -108,9 +108,11 @@ const { data } = await supabase.rpc('verify_care_request', { p_token: token });
 | `worker_care_requests()` | طلبات العائلة، مع الحالة المحسوبة، و`qr_token` للطلبات المقبولة فقط |
 | `worker_create_care_request(p_beneficiary_id, p_doctor_id, p_prestation, p_notes)` | طلب جديد بمصدر `app`، للعامل أو لأحد ذوي حقوقه فقط |
 | `worker_doctors()` | الأطباء المتعاقدون النشطون |
-| `worker_appointments()` | مواعيد طب العمل للعائلة |
+| `worker_appointments()` | مواعيد العائلة: زيارات طب العمل (`kind = 'visit'`) ومواعيد الاستشارات بالطبيب والساعة (`kind = 'consultation'`) |
+| `worker_request_appointment(p_beneficiary_id, p_service, p_preferred_date, p_slot, p_reason)` | طلب موعد (اليوم المفضّل خلال 90 يوماً، صباحاً أو مساءً)، 3 طلبات منتظرة على الأكثر |
+| `worker_cancel_appointment(p_id)` | إلغاء طلب أو موعد لم يحن بعد |
 | `worker_notifications()` / `worker_read_notifications()` | الإشعارات، وتعليمها مقروءة |
 
-- **الإشعارات:** trigger على `care_requests` يكتبها في جدول `notifications` عند: طلب قدّمه الطاقم باسمه (`care_request_created`)، والقبول، والرفض، والاستعمال. النص يُكتب في التطبيق بلغة القارئ من `kind` و`data`.
+- **الإشعارات:** trigger على `care_requests` يكتبها في جدول `notifications` عند: طلب قدّمه الطاقم باسمه (`care_request_created`)، والقبول، والرفض، والاستعمال. النص يُكتب في التطبيق بلغة القارئ من `kind` و`data`. وللمواعيد: `appointment_scheduled` و`appointment_moved` و`appointment_cancelled` (عند الإلغاء من المركز فقط).
 - **التفعيل:** الطاقم (`worker_access.manage`) ينشئ الرمز بـ `create_worker_invitation`. لا يُحفظ إلا بصمة SHA-256 للرمز. وظيفة `worker-access` تتحقق منه بـ `redeem_worker_invitation`، الذي يعيد صفاً فارغاً لرقم أو رمز خاطئ ويغلق الرمز بعد 5 محاولات. بعدها تنشئ الحساب `<الرقم>@worker.medsuite.local` وتربطه بـ `complete_worker_invitation`. هاتان الوظيفتان لا يصل إليهما إلا المفتاح السري.
 - **لاحقاً:** إشعارات الهاتف خارج التطبيق (Web Push)، أو SMS إن قرّر المركز ذلك (الإعداد `notification_channels`).
